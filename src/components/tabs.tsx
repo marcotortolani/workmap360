@@ -15,6 +15,7 @@ interface TabsNavigationProps {
 export function TabsNavigation({ tabs, basePath }: TabsNavigationProps) {
   const router = useRouter()
   const pathname = usePathname()
+  console.log(basePath)
 
   const currentTab =
     tabs.find((tab) => pathname === tab.href)?.value || tabs[0].value

@@ -25,6 +25,7 @@ interface SidebarProps {
 export function Sidebar({ items }: SidebarProps) {
   const pathname = usePathname()
   // Mapeo de strings a íconos
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const iconMap: { [key: string]: React.ComponentType<any> } = {
     'folder-kanban': FolderKanban,
     'user-cog': UserCog,

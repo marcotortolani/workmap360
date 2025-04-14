@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import React, { useState } from 'react'
@@ -65,7 +66,7 @@ export default function ClientProjectsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {projects.map((project, i) => (
+              {projects.map((project) => (
                 <React.Fragment key={project.id}>
                   <TableRow
                     key={project.id}
