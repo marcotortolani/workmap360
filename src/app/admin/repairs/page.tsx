@@ -18,6 +18,8 @@ import { TabsNavigation } from '@/components/tabs'
 import { RepairsFilter } from '@/components/repairs-filter'
 import { RepairDetailModal } from '@/components/repair-detail-modal'
 
+import { RepairDataType, RepairStatusType } from '@/types/types'
+
 const adminTabs = [
   { value: 'projects', label: 'Projects', href: '/admin/projects' },
   { value: 'roles', label: 'Roles', href: '/admin/roles' },
@@ -47,7 +49,7 @@ export default function AdminRepairsPage() {
     setIsModalOpen(true)
   }
 
-  const handleStatusUpdate = (repairId: string, status: string) => {
+  const handleStatusUpdate = (repairId: string, status: RepairStatusType) => {
     console.log(`Updated repair ${repairId} status to ${status}`)
     // In a real app, you would update the status in your data
     setRepairs(
@@ -141,12 +143,12 @@ export default function AdminRepairsPage() {
   )
 }
 
-const repairsData = [
+const repairsData: RepairDataType[] = [
   {
     id: 'REP-001',
     projectId: 'PRJ-001',
-    drop: '15',
-    level: '3',
+    drop: 15,
+    level: 3,
     repairType: 'Structural',
     technician: 'Robert Johnson',
     date: '2023-05-15',
@@ -155,8 +157,8 @@ const repairsData = [
   {
     id: 'REP-002',
     projectId: 'PRJ-001',
-    drop: '18',
-    level: '4',
+    drop: 18,
+    level: 4,
     repairType: 'Electrical',
     technician: 'Robert Johnson',
     date: '2023-05-18',
@@ -165,8 +167,8 @@ const repairsData = [
   {
     id: 'REP-003',
     projectId: 'PRJ-002',
-    drop: '20',
-    level: '5',
+    drop: 20,
+    level: 5,
     repairType: 'Mechanical',
     technician: 'Michael Brown',
     date: '2023-06-02',
@@ -175,8 +177,8 @@ const repairsData = [
   {
     id: 'REP-004',
     projectId: 'PRJ-003',
-    drop: '10',
-    level: '4',
+    drop: 10,
+    level: 4,
     repairType: 'Structural',
     technician: 'Robert Johnson',
     date: '2023-06-10',
@@ -185,8 +187,8 @@ const repairsData = [
   {
     id: 'REP-005',
     projectId: 'PRJ-003',
-    drop: '12',
-    level: '5',
+    drop: 12,
+    level: 5,
     repairType: 'Electrical',
     technician: 'Michael Brown',
     date: '2023-06-15',
@@ -195,8 +197,8 @@ const repairsData = [
   {
     id: 'REP-006',
     projectId: 'PRJ-003',
-    drop: '8',
-    level: '3',
+    drop: 8,
+    level: 3,
     repairType: 'Plumbing',
     technician: 'Robert Johnson',
     date: '2023-06-20',

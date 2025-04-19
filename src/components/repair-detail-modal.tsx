@@ -1,10 +1,22 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Label } from "@/components/ui/label"
+import { useState } from 'react'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Label } from '@/components/ui/label'
+import { RepairStatusType } from '@/types/types'
 
 interface RepairDetailModalProps {
   open: boolean
@@ -17,12 +29,17 @@ interface RepairDetailModalProps {
     repairType: string
     date: string
     technician: string
-    status: "Approved" | "Pending" | "Rejected"
+    status: RepairStatusType
   }
-  onStatusUpdate?: (repairId: string, status: string) => void
+  onStatusUpdate?: (repairId: string, status: RepairStatusType) => void
 }
 
-export function RepairDetailModal({ open, onOpenChange, repair, onStatusUpdate }: RepairDetailModalProps) {
+export function RepairDetailModal({
+  open,
+  onOpenChange,
+  repair,
+  onStatusUpdate,
+}: RepairDetailModalProps) {
   const [status, setStatus] = useState(repair.status)
 
   const handleStatusUpdate = () => {
@@ -34,13 +51,17 @@ export function RepairDetailModal({ open, onOpenChange, repair, onStatusUpdate }
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">Repair {repair.id}</DialogTitle>
+          <DialogTitle className="text-xl font-bold">
+            Repair {repair.id}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-sm font-medium text-gray-500">Project ID</Label>
+              <Label className="text-sm font-medium text-gray-500">
+                Project ID
+              </Label>
               <p className="font-medium">{repair.projectId}</p>
             </div>
             <div>
@@ -56,11 +77,15 @@ export function RepairDetailModal({ open, onOpenChange, repair, onStatusUpdate }
               <p className="font-medium">{repair.level}</p>
             </div>
             <div>
-              <Label className="text-sm font-medium text-gray-500">Repair Type</Label>
+              <Label className="text-sm font-medium text-gray-500">
+                Repair Type
+              </Label>
               <p className="font-medium">{repair.repairType}</p>
             </div>
             <div>
-              <Label className="text-sm font-medium text-gray-500">Technician</Label>
+              <Label className="text-sm font-medium text-gray-500">
+                Technician
+              </Label>
               <p className="font-medium">{repair.technician}</p>
             </div>
           </div>
@@ -69,7 +94,10 @@ export function RepairDetailModal({ open, onOpenChange, repair, onStatusUpdate }
             <Label htmlFor="status" className="text-sm font-medium">
               Status
             </Label>
-            <Select value={status} onValueChange={setStatus}>
+            <Select
+              value={status}
+              onValueChange={(status: RepairStatusType) => setStatus(status)}
+            >
               <SelectTrigger id="status" className="mt-1">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
@@ -83,7 +111,10 @@ export function RepairDetailModal({ open, onOpenChange, repair, onStatusUpdate }
         </div>
 
         <div className="flex justify-end">
-          <Button onClick={handleStatusUpdate} className="bg-orange-500 text-white hover:bg-orange-400">
+          <Button
+            onClick={handleStatusUpdate}
+            className="bg-orange-500 text-white hover:bg-orange-400"
+          >
             Update Status
           </Button>
         </div>
@@ -91,4 +122,3 @@ export function RepairDetailModal({ open, onOpenChange, repair, onStatusUpdate }
     </Dialog>
   )
 }
-
