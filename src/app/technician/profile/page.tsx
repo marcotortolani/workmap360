@@ -43,7 +43,7 @@ export default function TechnicianProfilePage() {
 
       <TabsNavigation tabs={technicianTabs} basePath="/technician" />
 
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
+      <div className="w-1/2 rounded-lg border bg-white p-6 shadow-sm">
         <h2 className="mb-6 text-xl font-semibold">My Profile</h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">

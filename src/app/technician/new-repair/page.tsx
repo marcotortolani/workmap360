@@ -1,25 +1,43 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Camera, Upload } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { LogoutButton } from "@/components/logout-button"
-import { TabsNavigation } from "@/components/tabs"
+import { useState } from 'react'
+import { Camera, Upload } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { LogoutButton } from '@/components/logout-button'
+import { TabsNavigation } from '@/components/tabs'
 
 const technicianTabs = [
-  { value: "projects", label: "My Projects", href: "/technician/projects" },
-  { value: "new-repair", label: "New Repair", href: "/technician/new-repair" },
-  { value: "profile", label: "Profile", href: "/technician/profile" },
+  { value: 'projects', label: 'My Projects', href: '/technician/projects' },
+  { value: 'new-repair', label: 'New Repair', href: '/technician/new-repair' },
+  { value: 'profile', label: 'Profile', href: '/technician/profile' },
 ]
 
+type ImageOrigin = 'camera' | 'uploaded'
+
+type FormData = {
+  projectId: string
+  drop: string
+  level: string
+  repairType: string
+  surveyImage: ImageOrigin | null
+  progressImage: ImageOrigin | null
+  finishImage: ImageOrigin | null
+}
+
 export default function TechnicianNewRepairPage() {
-  const [formData, setFormData] = useState({
-    projectId: "",
-    drop: "",
-    level: "",
-    repairType: "",
+  const [formData, setFormData] = useState<FormData>({
+    projectId: '',
+    drop: '',
+    level: '',
+    repairType: '',
     surveyImage: null,
     progressImage: null,
     finishImage: null,
@@ -37,29 +55,41 @@ export default function TechnicianNewRepairPage() {
   return (
     <div className="flex flex-col gap-8 p-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-orange-500">Technician Dashboard</h1>
+        <h1 className="text-3xl font-bold text-orange-500">
+          Technician Dashboard
+        </h1>
         <LogoutButton />
       </div>
 
       <TabsNavigation tabs={technicianTabs} basePath="/technician" />
 
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
+      <div className=" w-1/2 rounded-lg border bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-xl font-semibold">New Repair</h2>
         <form className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-4">
             <div className="sm:col-span-4">
-              <label className="mb-2 block text-sm font-medium">Project ID</label>
+              <label className="mb-2 block text-sm font-medium">
+                Project ID
+              </label>
               <Select
                 value={formData.projectId}
-                onValueChange={(value) => setFormData({ ...formData, projectId: value })}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, projectId: value })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select project" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="PRJ-001">PRJ-001 (Drop: 10-20, Level: 1-5)</SelectItem>
-                  <SelectItem value="PRJ-002">PRJ-002 (Drop: 15-25, Level: 3-8)</SelectItem>
-                  <SelectItem value="PRJ-003">PRJ-003 (Drop: 5-15, Level: 2-6)</SelectItem>
+                  <SelectItem value="PRJ-001">
+                    PRJ-001 (Drop: 10-20, Level: 1-5)
+                  </SelectItem>
+                  <SelectItem value="PRJ-002">
+                    PRJ-002 (Drop: 15-25, Level: 3-8)
+                  </SelectItem>
+                  <SelectItem value="PRJ-003">
+                    PRJ-003 (Drop: 5-15, Level: 2-6)
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -70,7 +100,9 @@ export default function TechnicianNewRepairPage() {
                 type="number"
                 placeholder="Enter drop"
                 value={formData.drop}
-                onChange={(e) => setFormData({ ...formData, drop: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, drop: e.target.value })
+                }
               />
             </div>
 
@@ -80,15 +112,21 @@ export default function TechnicianNewRepairPage() {
                 type="number"
                 placeholder="Enter level"
                 value={formData.level}
-                onChange={(e) => setFormData({ ...formData, level: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, level: e.target.value })
+                }
               />
             </div>
 
             <div className="sm:col-span-2">
-              <label className="mb-2 block text-sm font-medium">Repair Type</label>
+              <label className="mb-2 block text-sm font-medium">
+                Repair Type
+              </label>
               <Select
                 value={formData.repairType}
-                onValueChange={(value) => setFormData({ ...formData, repairType: value })}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, repairType: value })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select repair type" />
@@ -105,7 +143,9 @@ export default function TechnicianNewRepairPage() {
 
           <div className="grid gap-6 sm:grid-cols-3">
             <div>
-              <label className="mb-2 block text-sm font-medium">Survey Image</label>
+              <label className="mb-2 block text-sm font-medium">
+                Survey Image
+              </label>
               <div className="mt-1 flex flex-col gap-2">
                 <div className="flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pb-6 pt-5">
                   <div className="space-y-1 text-center">
@@ -116,18 +156,27 @@ export default function TechnicianNewRepairPage() {
                         <Input
                           type="file"
                           className="sr-only"
-                          onChange={() => setFormData({ ...formData, surveyImage: "uploaded" })}
+                          onChange={() =>
+                            setFormData({
+                              ...formData,
+                              surveyImage: 'uploaded',
+                            })
+                          }
                         />
                       </label>
                     </div>
-                    <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                    <p className="text-xs text-gray-500">
+                      PNG, JPG, GIF up to 10MB
+                    </p>
                   </div>
                 </div>
                 <Button
                   type="button"
                   variant="outline"
                   className="flex items-center justify-center"
-                  onClick={() => setFormData({ ...formData, surveyImage: "camera" })}
+                  onClick={() =>
+                    setFormData({ ...formData, surveyImage: 'camera' })
+                  }
                 >
                   <Camera className="mr-2 h-4 w-4" />
                   Use Camera
@@ -136,7 +185,9 @@ export default function TechnicianNewRepairPage() {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Progress Image</label>
+              <label className="mb-2 block text-sm font-medium">
+                Progress Image
+              </label>
               <div className="mt-1 flex flex-col gap-2">
                 <div className="flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pb-6 pt-5">
                   <div className="space-y-1 text-center">
@@ -147,18 +198,27 @@ export default function TechnicianNewRepairPage() {
                         <Input
                           type="file"
                           className="sr-only"
-                          onChange={() => setFormData({ ...formData, progressImage: "uploaded" })}
+                          onChange={() =>
+                            setFormData({
+                              ...formData,
+                              progressImage: 'uploaded',
+                            })
+                          }
                         />
                       </label>
                     </div>
-                    <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                    <p className="text-xs text-gray-500">
+                      PNG, JPG, GIF up to 10MB
+                    </p>
                   </div>
                 </div>
                 <Button
                   type="button"
                   variant="outline"
                   className="flex items-center justify-center"
-                  onClick={() => setFormData({ ...formData, progressImage: "camera" })}
+                  onClick={() =>
+                    setFormData({ ...formData, progressImage: 'camera' })
+                  }
                 >
                   <Camera className="mr-2 h-4 w-4" />
                   Use Camera
@@ -167,7 +227,9 @@ export default function TechnicianNewRepairPage() {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Finish Image</label>
+              <label className="mb-2 block text-sm font-medium">
+                Finish Image
+              </label>
               <div className="mt-1 flex flex-col gap-2">
                 <div className="flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pb-6 pt-5">
                   <div className="space-y-1 text-center">
@@ -178,18 +240,27 @@ export default function TechnicianNewRepairPage() {
                         <Input
                           type="file"
                           className="sr-only"
-                          onChange={() => setFormData({ ...formData, finishImage: "uploaded" })}
+                          onChange={() =>
+                            setFormData({
+                              ...formData,
+                              finishImage: 'uploaded',
+                            })
+                          }
                         />
                       </label>
                     </div>
-                    <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                    <p className="text-xs text-gray-500">
+                      PNG, JPG, GIF up to 10MB
+                    </p>
                   </div>
                 </div>
                 <Button
                   type="button"
                   variant="outline"
                   className="flex items-center justify-center"
-                  onClick={() => setFormData({ ...formData, finishImage: "camera" })}
+                  onClick={() =>
+                    setFormData({ ...formData, finishImage: 'camera' })
+                  }
                 >
                   <Camera className="mr-2 h-4 w-4" />
                   Use Camera
@@ -209,4 +280,3 @@ export default function TechnicianNewRepairPage() {
     </div>
   )
 }
-
