@@ -1,27 +1,26 @@
-import { FolderPlus, Edit } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { LogoutButton } from "@/components/logout-button"
-import { TabsNavigation } from "@/components/tabs"
-
-const managerTabs = [
-  { value: "projects", label: "Projects", href: "/manager/projects" },
-  { value: "roles", label: "Roles", href: "/manager/roles" },
-  { value: "users", label: "Users", href: "/manager/users" },
-  { value: "repairs", label: "Repairs", href: "/manager/repairs" },
-]
+import { FolderPlus, Edit } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 export default function ManagerProjectsPage() {
   return (
     <div className="flex flex-col gap-8 p-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-orange-500">Manager Dashboard</h1>
-        <LogoutButton />
-      </div>
 
-      <TabsNavigation tabs={managerTabs} basePath="/manager" />
 
       <div className="rounded-lg border bg-white p-6 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
@@ -56,11 +55,11 @@ export default function ManagerProjectsPage() {
                   <TableCell>
                     <span
                       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        project.status === "Completed"
-                          ? "bg-green-100 text-green-800"
-                          : project.status === "In Progress"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-yellow-100 text-yellow-800"
+                        project.status === 'Completed'
+                          ? 'bg-green-100 text-green-800'
+                          : project.status === 'In Progress'
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-yellow-100 text-yellow-800'
                       }`}
                     >
                       {project.status}
@@ -111,7 +110,9 @@ export default function ManagerProjectsPage() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Level Range</label>
+            <label className="mb-2 block text-sm font-medium">
+              Level Range
+            </label>
             <Input type="number" placeholder="Enter level range" />
           </div>
 
@@ -135,7 +136,9 @@ export default function ManagerProjectsPage() {
           </div>
 
           <div className="sm:col-span-2">
-            <Button className="mt-4 bg-orange-500 text-white hover:bg-orange-400">Save Project</Button>
+            <Button className="mt-4 bg-orange-500 text-white hover:bg-orange-400">
+              Save Project
+            </Button>
           </div>
         </form>
       </div>
@@ -145,28 +148,27 @@ export default function ManagerProjectsPage() {
 
 const projects = [
   {
-    id: "PRJ-001",
-    client: "ABC Corporation",
-    dropRange: "10-20",
-    levelRange: "1-5",
-    price: "5,000",
-    status: "In Progress",
+    id: 'PRJ-001',
+    client: 'ABC Corporation',
+    dropRange: '10-20',
+    levelRange: '1-5',
+    price: '5,000',
+    status: 'In Progress',
   },
   {
-    id: "PRJ-002",
-    client: "XYZ Industries",
-    dropRange: "15-25",
-    levelRange: "3-8",
-    price: "7,500",
-    status: "Pending",
+    id: 'PRJ-002',
+    client: 'XYZ Industries',
+    dropRange: '15-25',
+    levelRange: '3-8',
+    price: '7,500',
+    status: 'Pending',
   },
   {
-    id: "PRJ-003",
-    client: "123 Enterprises",
-    dropRange: "5-15",
-    levelRange: "2-6",
-    price: "4,200",
-    status: "Completed",
+    id: 'PRJ-003',
+    client: '123 Enterprises',
+    dropRange: '5-15',
+    levelRange: '2-6',
+    price: '4,200',
+    status: 'Completed',
   },
 ]
-

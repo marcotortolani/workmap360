@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -37,6 +37,18 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-approved-bg: var(--approved-status-bg);
+  --color-approved-text: var(--approved-status-text);
+  --color-pending-bg: var(--pending-status-bg);
+  --color-pending-text: var(--pending-status-text);
+  --color-rejected-bg: var(--rejected-status-bg);
+  --color-rejected-text: var(--rejected-status-text);
+  --color-completed-bg: var(--completed-status-bg);
+  --color-completed-text: var(--completed-status-text);
+  --color-inprogress-bg: var(--inprogress-status-bg);
+  --color-inprogress-text: var(--inprogress-status-text);
+  --color-canceled-bg: var(--canceled-status-bg);
+  --color-canceled-text: var(--canceled-status-text);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -76,6 +88,18 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --pending-status-bg: oklch(97.3% 0.171 103.193);
+  --pending-status-text: oklch(47.6% 0.114 61.907);
+  --approved-status-bg: oklch(93.8% 0.127 124.321);
+  --approved-status-text: oklch(45.3% 0.124 130.933);
+  --rejected-status-bg: oklch(93.6% 0.032 17.717);
+  --rejected-status-text: oklch(44.4% 0.177 26.899);
+  --completed-status-bg: oklch(93.8% 0.127 124.321);
+  --completed-status-text: oklch(45.3% 0.124 130.933);
+  --inprogress-status-bg: oklch(93.2% 0.032 255.585);
+  --inprogress-status-text: oklch(42.4% 0.199 265.638);
+  --canceled-status-bg: oklch(93.6% 0.032 17.717);
+  --canceled-status-text: oklch(44.4% 0.177 26.899);
 }
 
 .dark {
@@ -110,6 +134,18 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --pending-status-bg: oklch(97.3% 0.071 103.193);
+  --pending-status-text: oklch(47.6% 0.114 61.907);
+  --approved-status-bg: oklch(93.8% 0.127 124.321);
+  --approved-status-text: oklch(45.3% 0.124 130.933);
+  --rejected-status-bg: oklch(93.6% 0.032 17.717);
+  --rejected-status-text: oklch(44.4% 0.177 26.899);
+  --completed-status-bg: oklch(93.8% 0.127 124.321);
+  --completed-status-text: oklch(45.3% 0.124 130.933);
+  --inprogress-status-bg: oklch(93.2% 0.032 255.585);
+  --inprogress-status-text: oklch(42.4% 0.199 265.638);
+  --canceled-status-bg: oklch(93.6% 0.032 17.717);
+  --canceled-status-text: oklch(44.4% 0.177 26.899);
 }
 
 @layer base {

@@ -1,28 +1,19 @@
-import { UserPlus, Edit, Trash2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { LogoutButton } from "@/components/logout-button"
-import { TabsNavigation } from "@/components/tabs"
-
-const managerTabs = [
-  { value: "projects", label: "Projects", href: "/manager/projects" },
-  { value: "roles", label: "Roles", href: "/manager/roles" },
-  { value: "users", label: "Users", href: "/manager/users" },
-  { value: "repairs", label: "Repairs", href: "/manager/repairs" },
-]
+import { UserPlus, Edit, Trash2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 export default function ManagerRolesPage() {
   return (
     <div className="flex flex-col gap-8 p-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-orange-500">Manager Dashboard</h1>
-        <LogoutButton />
-      </div>
-
-      <TabsNavigation tabs={managerTabs} basePath="/manager" />
-
       <div className="rounded-lg border bg-white p-6 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-semibold">Roles</h2>
@@ -67,7 +58,11 @@ export default function ManagerRolesPage() {
                         <Edit className="mr-2 h-4 w-4" />
                         Edit
                       </Button>
-                      <Button variant="outline" size="sm" className="text-red-500 hover:bg-red-50 hover:text-red-600">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-red-500 hover:bg-red-50 hover:text-red-600"
+                      >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete
                       </Button>
@@ -89,10 +84,15 @@ export default function ManagerRolesPage() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Permissions</label>
+            <label className="mb-2 block text-sm font-medium">
+              Permissions
+            </label>
             <div className="grid gap-2 sm:grid-cols-2">
               {permissions.map((permission) => (
-                <div key={permission.id} className="flex items-center space-x-2">
+                <div
+                  key={permission.id}
+                  className="flex items-center space-x-2"
+                >
                   <Checkbox id={`permission-${permission.id}`} />
                   <label
                     htmlFor={`permission-${permission.id}`}
@@ -105,7 +105,9 @@ export default function ManagerRolesPage() {
             </div>
           </div>
 
-          <Button className="bg-orange-500 text-white hover:bg-orange-400">Save Role</Button>
+          <Button className="bg-orange-500 text-white hover:bg-orange-400">
+            Save Role
+          </Button>
         </form>
       </div>
     </div>
@@ -115,42 +117,53 @@ export default function ManagerRolesPage() {
 const roles = [
   {
     id: 1,
-    name: "Admin",
+    name: 'Admin',
     permissions: [
-      "View Projects",
-      "Edit Projects",
-      "View Repairs",
-      "Edit Repairs",
-      "Upload Images",
-      "Manage Users",
-      "Manage Roles",
+      'View Projects',
+      'Edit Projects',
+      'View Repairs',
+      'Edit Repairs',
+      'Upload Images',
+      'Manage Users',
+      'Manage Roles',
     ],
   },
   {
     id: 2,
-    name: "Manager",
-    permissions: ["View Projects", "Edit Projects", "View Repairs", "Edit Repairs", "Upload Images", "Manage Users"],
+    name: 'Manager',
+    permissions: [
+      'View Projects',
+      'Edit Projects',
+      'View Repairs',
+      'Edit Repairs',
+      'Upload Images',
+      'Manage Users',
+    ],
   },
   {
     id: 3,
-    name: "Technician",
-    permissions: ["View Projects", "View Repairs", "Edit Repairs", "Upload Images"],
+    name: 'Technician',
+    permissions: [
+      'View Projects',
+      'View Repairs',
+      'Edit Repairs',
+      'Upload Images',
+    ],
   },
   {
     id: 4,
-    name: "Client",
-    permissions: ["View Projects", "View Repairs"],
+    name: 'Client',
+    permissions: ['View Projects', 'View Repairs'],
   },
 ]
 
 const permissions = [
-  { id: 1, name: "View Projects" },
-  { id: 2, name: "Edit Projects" },
-  { id: 3, name: "View Repairs" },
-  { id: 4, name: "Edit Repairs" },
-  { id: 5, name: "Upload Images" },
-  { id: 6, name: "Manage Users" },
-  { id: 7, name: "Manage Roles" },
-  { id: 8, name: "Approve Repairs" },
+  { id: 1, name: 'View Projects' },
+  { id: 2, name: 'Edit Projects' },
+  { id: 3, name: 'View Repairs' },
+  { id: 4, name: 'Edit Repairs' },
+  { id: 5, name: 'Upload Images' },
+  { id: 6, name: 'Manage Users' },
+  { id: 7, name: 'Manage Roles' },
+  { id: 8, name: 'Approve Repairs' },
 ]
-

@@ -80,10 +80,10 @@ export default function TechnicianProjectsPage() {
                       <span
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                           project.status === 'Completed'
-                            ? 'bg-green-100 text-green-800'
+                            ? 'bg-completed-bg text-completed-text'
                             : project.status === 'In Progress'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-yellow-100 text-yellow-800'
+                            ? 'bg-inprogress-bg text-inprogress-text'
+                            : 'bg-pending-bg text-pending-text'
                         }`}
                       >
                         {project.status}
@@ -115,10 +115,10 @@ export default function TechnicianProjectsPage() {
                                     <span
                                       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                                         repair.status === 'Approved'
-                                          ? 'bg-green-100 text-green-800'
+                                          ? ' bg-approved-bg text-approved-text'
                                           : repair.status === 'Pending'
-                                          ? 'bg-yellow-100 text-yellow-800'
-                                          : 'bg-red-100 text-red-800'
+                                          ? 'bg-pending-bg text-pending-text'
+                                          : 'bg-rejected-bg text-rejected-text'
                                       }`}
                                     >
                                       {repair.status}

@@ -29,6 +29,7 @@ export function TabsNavigation({ tabs, basePath }: TabsNavigationProps) {
           router.push(tab.href)
         }
       }}
+      className=" lg:hidden"
     >
       <TabsList
         className={` grid w-full max-w-md grid-rows-1 gap-1 border-b border-gray-200 bg-white p-1`}

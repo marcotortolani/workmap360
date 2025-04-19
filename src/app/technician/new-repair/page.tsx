@@ -63,7 +63,7 @@ export default function TechnicianNewRepairPage() {
 
       <TabsNavigation tabs={technicianTabs} basePath="/technician" />
 
-      <div className=" w-1/2 rounded-lg border bg-white p-6 shadow-sm">
+      <div className=" w-full lg:w-1/2  rounded-lg border bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-xl font-semibold">New Repair</h2>
         <form className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-4">
