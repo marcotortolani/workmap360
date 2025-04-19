@@ -10,3 +10,11 @@ export interface RepairDataType {
   technician: string
   status: RepairStatusType
 }
+
+export interface ProjectsDataType {
+  id: string
+  dropRange: string
+  levelRange: string
+  status: string
+  repairs: RepairDataType[]
+}

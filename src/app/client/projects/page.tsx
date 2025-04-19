@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import React, { useState } from 'react'
@@ -14,12 +13,13 @@ import {
 } from '@/components/ui/table'
 import { LogoutButton } from '@/components/logout-button'
 import { RepairDetailModal } from '@/components/repair-detail-modal'
+import { ProjectsDataType, RepairDataType } from '@/types/types'
 
 export default function ClientProjectsPage() {
   const [expandedProjects, setExpandedProjects] = useState<
     Record<string, boolean>
   >({})
-  const [selectedRepair, setSelectedRepair] = useState<any>(null)
+  const [selectedRepair, setSelectedRepair] = useState<RepairDataType>()
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const toggleProject = (projectId: string) => {
@@ -29,7 +29,7 @@ export default function ClientProjectsPage() {
     }))
   }
 
-  const handleRepairClick = (repair: any, projectId: string) => {
+  const handleRepairClick = (repair: RepairDataType, projectId: string) => {
     setSelectedRepair({
       ...repair,
       id: `REP-${Math.floor(Math.random() * 1000)}`,
@@ -166,7 +166,7 @@ export default function ClientProjectsPage() {
   )
 }
 
-const projects = [
+const projects: ProjectsDataType[] = [
   {
     id: 'PRJ-001',
     dropRange: '10-20',
@@ -174,15 +174,23 @@ const projects = [
     status: 'In Progress',
     repairs: [
       {
-        drop: '15',
-        level: '3',
+        id: 'REP-001',
+        projectId: 'PRJ-001',
+        drop: 15,
+        level: 3,
         repairType: 'Structural',
+        date: '2023-05-15',
+        technician: 'Robert Johnson',
         status: 'Approved',
       },
       {
-        drop: '18',
-        level: '4',
+        id: 'REP-002',
+        projectId: 'PRJ-001',
+        drop: 18,
+        level: 4,
         repairType: 'Electrical',
+        date: '2023-05-18',
+        technician: 'Robert Johnson',
         status: 'Pending',
       },
     ],
@@ -194,9 +202,13 @@ const projects = [
     status: 'Pending',
     repairs: [
       {
-        drop: '20',
-        level: '5',
+        id: 'REP-003',
+        projectId: 'PRJ-002',
+        drop: 20,
+        level: 5,
         repairType: 'Mechanical',
+        date: '2023-06-02',
+        technician: 'Michael Brown',
         status: 'Pending',
       },
     ],
@@ -208,21 +220,33 @@ const projects = [
     status: 'Completed',
     repairs: [
       {
-        drop: '10',
-        level: '4',
+        id: 'REP-004',
+        projectId: 'PRJ-003',
+        drop: 10,
+        level: 4,
         repairType: 'Structural',
+        date: '2023-05-10',
+        technician: 'Robert Johnson',
         status: 'Approved',
       },
       {
-        drop: '12',
-        level: '5',
+        id: 'REP-005',
+        projectId: 'PRJ-003',
+        drop: 12,
+        level: 5,
         repairType: 'Electrical',
+        date: '2023-05-12',
+        technician: 'Robert Johnson',
         status: 'Approved',
       },
       {
-        drop: '8',
-        level: '3',
+        id: 'REP-006',
+        projectId: 'PRJ-003',
+        drop: 8,
+        level: 3,
         repairType: 'Plumbing',
+        date: '2023-05-08',
+        technician: 'Michael Brown',
         status: 'Rejected',
       },
     ],

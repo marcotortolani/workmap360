@@ -16,22 +16,16 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
-import { RepairStatusType } from '@/types/types'
+import { RepairStatusType, RepairDataType } from '@/types/types'
 
 interface RepairDetailModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  repair: {
-    id: string
-    projectId: string
-    drop: string
-    level: string
-    repairType: string
-    date: string
-    technician: string
+  repair: RepairDataType
+  onStatusUpdate?: (
+    repairId: RepairDataType['id'],
     status: RepairStatusType
-  }
-  onStatusUpdate?: (repairId: string, status: RepairStatusType) => void
+  ) => void
 }
 
 export function RepairDetailModal({
