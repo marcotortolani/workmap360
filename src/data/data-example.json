@@ -1,0 +1,19 @@
+{
+  "projects": [
+    {
+      "id": 1,
+      "name": "Project 1",
+      "technicians-asigned": [
+        {
+          "id": 1,
+          "name": "Technician 1"
+        },
+        {
+          "id": 2,
+          "name": "Technician 2"
+        }
+      ]
+    }
+  ]
+
+}

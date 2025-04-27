@@ -1,14 +1,20 @@
-export type RepairStatusType = 'Approved' | 'Pending' | 'Rejected'
+import { RepairType } from './repair-type'
 
-export interface RepairDataType {
+export type RepairStatusType = 'approved' | 'pending' | 'rejected'
+
+export interface RepairData {
   id: string
+  timestamp: number
   projectId: string
   drop: number
   level: number
   repairType: string
-  date: string
+  repairTypeId: number
+  measurements: Record<string, number>
   technician: string
+  technicianId: number
   status: RepairStatusType
+  images: { survey: Blob; progress: Blob[]; finish: Blob }
 }
 
 export interface ProjectsDataType {
@@ -16,5 +22,6 @@ export interface ProjectsDataType {
   dropRange: string
   levelRange: string
   status: string
-  repairs: RepairDataType[]
+  repairTypes: RepairType[]
+  repairs: RepairData[]
 }

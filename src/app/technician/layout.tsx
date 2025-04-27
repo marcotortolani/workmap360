@@ -14,6 +14,16 @@ const sidebarItems = [
     icon: 'pen-tool',
   },
   {
+    title: 'Reparations',
+    href: '/technician/reparations',
+    icon: 'table',
+  },
+  {
+    title: "Map's View",
+    href: '/technician/maps-view',
+    icon: 'map',
+  },
+  {
     title: 'Profile',
     href: '/technician/profile',
     icon: 'user-circle',

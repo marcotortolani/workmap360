@@ -11,6 +11,8 @@ import {
   PlusCircle,
   UserCircle,
   PenToolIcon,
+  MapIcon,
+  TableIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -25,6 +27,7 @@ interface SidebarProps {
 export function Sidebar({ items }: SidebarProps) {
   const pathname = usePathname()
   // Mapeo de strings a íconos
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const iconMap: { [key: string]: React.ComponentType<any> } = {
     'folder-kanban': FolderKanban,
@@ -35,6 +38,8 @@ export function Sidebar({ items }: SidebarProps) {
     'plus-circle': PlusCircle,
     'user-circle': UserCircle,
     'pen-tool': PenToolIcon,
+    map: MapIcon,
+    table: TableIcon,
   }
 
   return (
