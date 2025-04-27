@@ -1,23 +1,16 @@
 // lib/offline.ts
 import Dexie, { Table } from 'dexie'
-
-type RepairData = Table<{
-  timestamp: number
-  projectId: string
-  drop: number
-  level: number
-  repairType: string
-  images: { survey: Blob; progress: Blob; finish: Blob }
-}>
+import { RepairData } from '@/types/repair-type'
 
 // Extendemos Dexie para tipar la base de datos
 class OfflineDB extends Dexie {
-  repairs!: Table<RepairData, number> // Tipamos la tabla con RepairData y clave primaria number
+  repairs!: Table<RepairData, string> // Tipamos la tabla con RepairData y clave primaria number
 
   constructor() {
-    super('OfflineDB')
+    super('AltitudeAccessDB')
     this.version(1).stores({
-      repairs: 'timestamp, projectId, drop, level, repairType, images', // Índices
+      repairs:
+        'id, timestamp, projectId, drop, level, repairType, repairTypeId, measurements, technician, technicianId, status, images',
     })
   }
 }
@@ -36,6 +29,6 @@ export async function getPendingRepairs(): Promise<RepairData[]> {
 }
 
 // Eliminar una reparación pendiente por timestamp
-export async function deletePendingRepair(timestamp: number): Promise<void> {
-  await db.repairs.where('timestamp').equals(timestamp).delete()
+export async function deletePendingRepair(id: string): Promise<void> {
+  await db.repairs.where('id').equals(id).delete()
 }

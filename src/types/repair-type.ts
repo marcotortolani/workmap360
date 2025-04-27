@@ -19,7 +19,25 @@ export interface RepairType {
   unitMeasure: UnitMeasure // Unidad de medición
   unitToCharge: string // Unidad de cobro
   conversion?: UnitConversion // Regla de conversión (opcional)
+  createdBy: string // Nombre del usuario que lo creó
   createdByUser: number // ID del usuario que lo creó
   createdAt: number // Timestamp de creación
   updatedAt?: number // Timestamp de última actualización
+}
+
+export type RepairStatusType = 'approved' | 'pending' | 'rejected'
+
+export interface RepairData {
+  id: string // podria ser el ID del proyecto + el ID de la reparación
+  timestamp: number
+  projectId: string
+  drop: number
+  level: number
+  repairType: string
+  repairTypeId: number
+  measurements: Record<string, number>
+  technician: string
+  technicianId: number
+  status: RepairStatusType
+  images: { survey: Blob; progress: Blob[]; finish: Blob }
 }
