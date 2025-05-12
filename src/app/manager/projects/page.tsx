@@ -38,6 +38,7 @@ const clientList = [
   { id: 2, name: 'XYZ Industries' },
   { id: 3, name: 'DEF Enterprises' },
   { id: 4, name: 'GHI Holdings' },
+  { id: 5, name: 'JKL Enterprises' },
 ]
 
 const techniciansList: TechnicianType[] = [
