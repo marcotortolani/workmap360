@@ -4,11 +4,14 @@ export interface Elevation {
   levels: number // Cantidad de niveles, ej. 7
 }
 
+export type ProjectStatusType = 'pending' | 'in-progress' | 'completed'
+
 export interface ProjectRepairType {
   repairTypeId: number // ID del tipo de reparación, ej. 1
   repairType: string // Código del tipo de reparación, ej. "CR"
   phases: number // Cantidad de fases (mín: 3, máx: 10)
   price: number // Precio de la reparación para este proyecto, ej. 1500
+  unitToCharge: string // Unidad usada para facturar en el tipo de reparacion, ej. "unit"
 }
 
 export interface TechnicianAssignment {
@@ -30,4 +33,11 @@ export interface ProjectData {
   createdByUser: number // ID del Manager que creó el proyecto
   createdAt: number // Timestamp de creación
   updatedAt?: number // Timestamp de última actualización
+  status: ProjectStatusType // Estado del proyecto
+}
+
+export const PROJECT_STATUS: Record<ProjectStatusType, ProjectStatusType> = {
+  pending: 'pending',
+  'in-progress': 'in-progress',
+  completed: 'completed',
 }

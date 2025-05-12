@@ -3,7 +3,7 @@ import type { RepairType } from '@/types/repair-type'
 
 const MM3_TO_LITERS = 0.000001 // 1 mm³ = 0.000001 litros
 
-export const REPAIR_TYPES: RepairType[] = [
+export const REPAIR_LIST: RepairType[] = [
   {
     id: 1,
     variation: 'Concrete Repair 1',
@@ -180,11 +180,11 @@ export const REPAIR_TYPES: RepairType[] = [
     type: 'HB',
     description: '',
     unitMeasure: {
-      type: 'custom',
-      value: '1m bar',
+      type: 'unit',
+      value: 'unit',
       dimensions: ['count'],
     },
-    unitToCharge: '1m bar',
+    unitToCharge: 'unit',
     createdBy: 'admin',
     createdByUser: 1,
     createdAt: Date.now(),
@@ -195,21 +195,11 @@ export const REPAIR_TYPES: RepairType[] = [
     type: 'PP',
     description: '',
     unitMeasure: {
-      type: 'volume',
-      value: 'mm x mm x mm',
-      dimensions: ['width', 'height', 'depth'],
+      type: 'unit',
+      value: 'unit',
+      dimensions: ['count'],
     },
-    unitToCharge: 'Lt',
-    conversion: {
-      from: {
-        type: 'volume',
-        value: 'mm x mm x mm',
-        dimensions: ['width', 'height', 'depth'],
-      },
-      to: 'Lt',
-      conversionFactor: ({ width, height, depth }) =>
-        width * height * depth * MM3_TO_LITERS,
-    },
+    unitToCharge: 'unit',
     createdBy: 'admin',
     createdByUser: 1,
     createdAt: Date.now(),
