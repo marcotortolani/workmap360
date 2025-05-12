@@ -1,67 +1,68 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useState } from 'react'
-import { Eye } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+// import { useState } from 'react'
+// import { Eye } from 'lucide-react'
+// import { Button } from '@/components/ui/button'
+// import {
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableHead,
+//   TableHeader,
+//   TableRow,
+// } from '@/components/ui/table'
 
-import { LogoutButton } from '@/components/logout-button'
-import { TabsNavigation } from '@/components/tabs'
-import { RepairsFilter } from '@/components/repairs-filter'
-import { RepairDetailModal } from '@/components/repair-detail-modal'
+// import { LogoutButton } from '@/components/logout-button'
+// import { TabsNavigation } from '@/components/tabs'
+// import { RepairsFilter } from '@/components/repairs-filter'
+// import { RepairDetailModal } from '@/components/repair-detail-modal'
 
-import { RepairData, RepairStatusType } from '@/types/repair-type'
+// import { RepairData, RepairStatusType } from '@/types/repair-type'
 
-const adminTabs = [
-  { value: 'projects', label: 'Projects', href: '/admin/projects' },
-  { value: 'roles', label: 'Roles', href: '/admin/roles' },
-  { value: 'users', label: 'Users', href: '/admin/users' },
-  { value: 'repairs', label: 'Repairs', href: '/admin/repairs' },
-]
+// import { REPAIR_LIST } from '@/data/repair-list'
+
+// const adminTabs = [
+//   { value: 'projects', label: 'Projects', href: '/admin/projects' },
+//   { value: 'roles', label: 'Roles', href: '/admin/roles' },
+//   { value: 'users', label: 'Users', href: '/admin/users' },
+//   { value: 'repairs', label: 'Repairs', href: '/admin/repairs' },
+// ]
 
 export default function AdminRepairsPage() {
-  const [repairs, setRepairs] = useState(repairsData)
-  const [selectedRepair, setSelectedRepair] = useState<any>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  // const [repairs, setRepairs] = useState(REPAIR_LIST)
+  // const [selectedRepair, setSelectedRepair] = useState<RepairData>({})
+  // const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const handleFilter = (filters: any) => {
-    console.log('Applying filters:', filters)
-    // In a real app, you would filter the repairs based on the filters
-    // For now, we'll just log the filters
-  }
+  // const handleFilter = (filters: any) => {
+  //   console.log('Applying filters:', filters)
+  //   // In a real app, you would filter the repairs based on the filters
+  //   // For now, we'll just log the filters
+  // }
 
-  const handleSort = (sort: any) => {
-    console.log('Applying sort:', sort)
-    // In a real app, you would sort the repairs based on the sort
-    // For now, we'll just log the sort
-  }
+  // const handleSort = (sort: any) => {
+  //   console.log('Applying sort:', sort)
+  //   // In a real app, you would sort the repairs based on the sort
+  //   // For now, we'll just log the sort
+  // }
 
-  const handleViewRepair = (repair: any) => {
-    setSelectedRepair(repair)
-    setIsModalOpen(true)
-  }
+  // const handleViewRepair = (repair: any) => {
+  //   setSelectedRepair(repair)
+  //   setIsModalOpen(true)
+  // }
 
-  const handleStatusUpdate = (repairId: string, status: RepairStatusType) => {
-    console.log(`Updated repair ${repairId} status to ${status}`)
-    // In a real app, you would update the status in your data
-    setRepairs(
-      repairs.map((repair) =>
-        repair.id === repairId ? { ...repair, status: status as any } : repair
-      )
-    )
-  }
+  // const handleStatusUpdate = (repairId: string, status: RepairStatusType) => {
+  //   console.log(`Updated repair ${repairId} status to ${status}`)
+  //   // In a real app, you would update the status in your data
+  //   setRepairs(
+  //     repairs.map((repair) =>
+  //       repair.id === repairId ? { ...repair, status: status as any } : repair
+  //     )
+  //   )
+  // }
 
   return (
     <div className="flex flex-col gap-8 p-8">
-      <div className="flex items-center justify-between">
+      {/* <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-orange-500">Admin Dashboard</h1>
         <LogoutButton />
       </div>
@@ -138,64 +139,7 @@ export default function AdminRepairsPage() {
           repair={selectedRepair}
           onStatusUpdate={handleStatusUpdate}
         />
-      )}
+      )} */}
     </div>
   )
 }
-
-const repairsData: RepairData[] = [
-  {
-    id: 'REP-001',
-    timestamp: 34232,
-    projectId: 'PRJ-001',
-    drop: 15,
-    level: 3,
-    repairType: 'Structural',
-    repairTypeId: 1,
-    measurements: {
-      length: 10,
-      width: 20,
-      height: 30,
-    },
-    technician: 'Robert Johnson',
-    technicianId: 1,
-    status: 'approved',
-    images: { survey: new Blob(), progress: [], finish: new Blob() },
-  },
-  {
-    id: 'REP-002',
-    timestamp: 34232,
-    projectId: 'PRJ-001',
-    drop: 18,
-    level: 4,
-    repairType: 'Electrical',
-    repairTypeId: 2,
-    measurements: {
-      length: 10,
-      width: 20,
-      height: 30,
-    },
-    technician: 'Robert Johnson',
-    technicianId: 1,
-    status: 'pending',
-    images: { survey: new Blob(), progress: [], finish: new Blob() },
-  },
-  {
-    id: 'REP-003',
-    timestamp: 34232,
-    projectId: 'PRJ-002',
-    drop: 20,
-    level: 5,
-    repairType: 'Mechanical',
-    repairTypeId: 3,
-    measurements: {
-      length: 10,
-      width: 20,
-      height: 30,
-    },
-    technician: 'Michael Brown',
-    technicianId: 2,
-    status: 'approved',
-    images: { survey: new Blob(), progress: [], finish: new Blob() },
-  },
-]
