@@ -12,38 +12,41 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { LogoutButton } from '@/components/logout-button'
-import { RepairDetailModal } from '@/components/repair-detail-modal'
-import { ProjectsDataType, RepairDataType } from '@/types/types'
+//import { RepairDetailModal } from '@/components/repair-detail-modal'
+
+//import { RepairData } from '@/types/repair-type'
+
+import { EXAMPLE_PROJECTS } from '@/data/data-example'
 
 export default function ClientProjectsPage() {
   const [expandedProjects, setExpandedProjects] = useState<
     Record<string, boolean>
   >({})
-  const [selectedRepair, setSelectedRepair] = useState<RepairDataType>()
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  //const [selectedRepair, setSelectedRepair] = useState<RepairData>()
+  //const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const toggleProject = (projectId: string) => {
+  const toggleProject = (projectId: number) => {
     setExpandedProjects((prev) => ({
       ...prev,
       [projectId]: !prev[projectId],
     }))
   }
 
-  const handleRepairClick = (repair: RepairDataType, projectId: string) => {
-    setSelectedRepair({
-      ...repair,
-      id: `REP-${Math.floor(Math.random() * 1000)}`,
-      projectId,
-      date: '2023-05-15',
-      technician: 'Robert Johnson',
-    })
-    setIsModalOpen(true)
-  }
+  // const handleRepairClick = (repair: RepairData, projectId: number) => {
+  //   setSelectedRepair({
+  //     ...repair,
+  //     id: `REP-${Math.floor(Math.random() * 1000)}`,
+  //     projectId,
+  //     status: 'pending',
+  //     technician: 'Robert Johnson',
+  //   })
+  //   setIsModalOpen(true)
+  // }
 
-  const handleStatusUpdate = (repairId: string, status: string) => {
-    console.log(`Updated repair ${repairId} status to ${status}`)
-    // In a real app, you would update the status in your data
-  }
+  // const handleStatusUpdate = (repairId: string, status: string) => {
+  //   console.log(`Updated repair ${repairId} status to ${status}`)
+  //   // In a real app, you would update the status in your data
+  // }
 
   return (
     <div className="flex flex-col gap-8 p-8">
@@ -60,13 +63,13 @@ export default function ClientProjectsPage() {
               <TableRow>
                 <TableHead></TableHead>
                 <TableHead>Project ID</TableHead>
+                <TableHead>Elevations</TableHead>
                 <TableHead>Drop Range</TableHead>
-                <TableHead>Level Range</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {projects.map((project) => (
+              {EXAMPLE_PROJECTS.map((project) => (
                 <React.Fragment key={project.id}>
                   <TableRow
                     key={project.id}
@@ -83,14 +86,19 @@ export default function ClientProjectsPage() {
                       </Button>
                     </TableCell>
                     <TableCell className="font-medium">{project.id}</TableCell>
-                    <TableCell>{project.dropRange}</TableCell>
-                    <TableCell>{project.levelRange}</TableCell>
+                    <TableCell>{project.elevations.length}</TableCell>
+                    <TableCell>
+                      {project.elevations.reduce(
+                        (total, e) => total + e.drops,
+                        0
+                      )}
+                    </TableCell>
                     <TableCell>
                       <span
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                          project.status === 'Completed'
+                          project.status === 'completed'
                             ? 'bg-green-700 text-white'
-                            : project.status === 'In Progress'
+                            : project.status === 'in-progress'
                             ? 'bg-blue-100 text-blue-800'
                             : 'bg-yellow-100 text-yellow-800'
                         }`}
@@ -100,7 +108,7 @@ export default function ClientProjectsPage() {
                     </TableCell>
                   </TableRow>
 
-                  {expandedProjects[project.id] && (
+                  {/* {expandedProjects[project.id] && (
                     <TableRow>
                       <TableCell colSpan={5} className="p-0">
                         <div className="bg-gray-50 p-4">
@@ -115,15 +123,15 @@ export default function ClientProjectsPage() {
                               </TableRow>
                             </TableHeader>
                             <TableBody>
-                              {project.repairs.map((repair, index) => (
+                              {project.repairTypes.map((repair, index) => (
                                 <TableRow
                                   key={`repair-${repair}-${index}`}
                                   className="cursor-pointer hover:bg-gray-100"
-                                  onClick={() =>
-                                    handleRepairClick(repair, project.id)
-                                  }
+                                  // onClick={() =>
+                                  //   handleRepairClick(repair, project.id)
+                                  // }
                                 >
-                                  <TableCell>{repair.drop}</TableCell>
+                                  <TableCell>{repair.}</TableCell>
                                   <TableCell>{repair.level}</TableCell>
                                   <TableCell>{repair.repairType}</TableCell>
                                   <TableCell>
@@ -146,7 +154,7 @@ export default function ClientProjectsPage() {
                         </div>
                       </TableCell>
                     </TableRow>
-                  )}
+                  )} */}
                 </React.Fragment>
               ))}
             </TableBody>
@@ -154,101 +162,14 @@ export default function ClientProjectsPage() {
         </div>
       </div>
 
-      {selectedRepair && (
+      {/* {selectedRepair && (
         <RepairDetailModal
           open={isModalOpen}
           onOpenChange={setIsModalOpen}
           repair={selectedRepair}
           onStatusUpdate={handleStatusUpdate}
         />
-      )}
+      )} */}
     </div>
   )
 }
-
-const projects: ProjectsDataType[] = [
-  {
-    id: 'PRJ-001',
-    dropRange: '10-20',
-    levelRange: '1-5',
-    status: 'In Progress',
-    repairs: [
-      {
-        id: 'REP-001',
-        projectId: 'PRJ-001',
-        drop: 15,
-        level: 3,
-        repairType: 'Structural',
-        date: '2023-05-15',
-        technician: 'Robert Johnson',
-        status: 'Approved',
-      },
-      {
-        id: 'REP-002',
-        projectId: 'PRJ-001',
-        drop: 18,
-        level: 4,
-        repairType: 'Electrical',
-        date: '2023-05-18',
-        technician: 'Robert Johnson',
-        status: 'Pending',
-      },
-    ],
-  },
-  {
-    id: 'PRJ-002',
-    dropRange: '15-25',
-    levelRange: '3-8',
-    status: 'Pending',
-    repairs: [
-      {
-        id: 'REP-003',
-        projectId: 'PRJ-002',
-        drop: 20,
-        level: 5,
-        repairType: 'Mechanical',
-        date: '2023-06-02',
-        technician: 'Michael Brown',
-        status: 'Pending',
-      },
-    ],
-  },
-  {
-    id: 'PRJ-003',
-    dropRange: '5-15',
-    levelRange: '2-6',
-    status: 'Completed',
-    repairs: [
-      {
-        id: 'REP-004',
-        projectId: 'PRJ-003',
-        drop: 10,
-        level: 4,
-        repairType: 'Structural',
-        date: '2023-05-10',
-        technician: 'Robert Johnson',
-        status: 'Approved',
-      },
-      {
-        id: 'REP-005',
-        projectId: 'PRJ-003',
-        drop: 12,
-        level: 5,
-        repairType: 'Electrical',
-        date: '2023-05-12',
-        technician: 'Robert Johnson',
-        status: 'Approved',
-      },
-      {
-        id: 'REP-006',
-        projectId: 'PRJ-003',
-        drop: 8,
-        level: 3,
-        repairType: 'Plumbing',
-        date: '2023-05-08',
-        technician: 'Michael Brown',
-        status: 'Rejected',
-      },
-    ],
-  },
-]

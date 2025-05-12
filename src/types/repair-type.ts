@@ -30,7 +30,7 @@ export type RepairStatusType = 'approved' | 'pending' | 'rejected'
 export interface RepairData {
   id: string // podria ser el ID del proyecto + el ID de la reparación
   timestamp: number
-  projectId: string
+  projectId: number
   drop: number
   level: number
   repairType: string

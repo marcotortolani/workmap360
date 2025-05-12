@@ -16,14 +16,15 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
-import { RepairStatusType, RepairDataType } from '@/types/types'
+
+import { RepairStatusType, RepairData } from '@/types/repair-type'
 
 interface RepairDetailModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  repair: RepairDataType
+  repair: RepairData
   onStatusUpdate?: (
-    repairId: RepairDataType['id'],
+    repairId: RepairData['id'],
     status: RepairStatusType
   ) => void
 }
@@ -60,7 +61,7 @@ export function RepairDetailModal({
             </div>
             <div>
               <Label className="text-sm font-medium text-gray-500">Date</Label>
-              <p className="font-medium">{repair.date}</p>
+              <p className="font-medium">{repair.timestamp}</p>
             </div>
             <div>
               <Label className="text-sm font-medium text-gray-500">Drop</Label>
