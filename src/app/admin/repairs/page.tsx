@@ -18,7 +18,7 @@ import { TabsNavigation } from '@/components/tabs'
 import { RepairsFilter } from '@/components/repairs-filter'
 import { RepairDetailModal } from '@/components/repair-detail-modal'
 
-import { RepairDataType, RepairStatusType } from '@/types/types'
+import { RepairData, RepairStatusType } from '@/types/repair-type'
 
 const adminTabs = [
   { value: 'projects', label: 'Projects', href: '/admin/projects' },
@@ -99,13 +99,13 @@ export default function AdminRepairsPage() {
                   <TableCell>{repair.level}</TableCell>
                   <TableCell>{repair.repairType}</TableCell>
                   <TableCell>{repair.technician}</TableCell>
-                  <TableCell>{repair.date}</TableCell>
+                  <TableCell>{repair.timestamp}</TableCell>
                   <TableCell>
                     <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        repair.status === 'Approved'
+                      className={`inline-flex items-center capitalize rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        repair.status === 'approved'
                           ? 'bg-green-100 text-green-800'
-                          : repair.status === 'Pending'
+                          : repair.status === 'pending'
                           ? 'bg-yellow-100 text-yellow-800'
                           : 'bg-red-100 text-red-800'
                       }`}
@@ -143,65 +143,59 @@ export default function AdminRepairsPage() {
   )
 }
 
-const repairsData: RepairDataType[] = [
+const repairsData: RepairData[] = [
   {
     id: 'REP-001',
+    timestamp: 34232,
     projectId: 'PRJ-001',
     drop: 15,
     level: 3,
     repairType: 'Structural',
+    repairTypeId: 1,
+    measurements: {
+      length: 10,
+      width: 20,
+      height: 30,
+    },
     technician: 'Robert Johnson',
-    date: '2023-05-15',
-    status: 'Approved',
+    technicianId: 1,
+    status: 'approved',
+    images: { survey: new Blob(), progress: [], finish: new Blob() },
   },
   {
     id: 'REP-002',
+    timestamp: 34232,
     projectId: 'PRJ-001',
     drop: 18,
     level: 4,
     repairType: 'Electrical',
+    repairTypeId: 2,
+    measurements: {
+      length: 10,
+      width: 20,
+      height: 30,
+    },
     technician: 'Robert Johnson',
-    date: '2023-05-18',
-    status: 'Pending',
+    technicianId: 1,
+    status: 'pending',
+    images: { survey: new Blob(), progress: [], finish: new Blob() },
   },
   {
     id: 'REP-003',
+    timestamp: 34232,
     projectId: 'PRJ-002',
     drop: 20,
     level: 5,
     repairType: 'Mechanical',
+    repairTypeId: 3,
+    measurements: {
+      length: 10,
+      width: 20,
+      height: 30,
+    },
     technician: 'Michael Brown',
-    date: '2023-06-02',
-    status: 'Pending',
-  },
-  {
-    id: 'REP-004',
-    projectId: 'PRJ-003',
-    drop: 10,
-    level: 4,
-    repairType: 'Structural',
-    technician: 'Robert Johnson',
-    date: '2023-06-10',
-    status: 'Approved',
-  },
-  {
-    id: 'REP-005',
-    projectId: 'PRJ-003',
-    drop: 12,
-    level: 5,
-    repairType: 'Electrical',
-    technician: 'Michael Brown',
-    date: '2023-06-15',
-    status: 'Approved',
-  },
-  {
-    id: 'REP-006',
-    projectId: 'PRJ-003',
-    drop: 8,
-    level: 3,
-    repairType: 'Plumbing',
-    technician: 'Robert Johnson',
-    date: '2023-06-20',
-    status: 'Rejected',
+    technicianId: 2,
+    status: 'approved',
+    images: { survey: new Blob(), progress: [], finish: new Blob() },
   },
 ]
