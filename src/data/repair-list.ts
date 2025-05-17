@@ -29,6 +29,7 @@ export const REPAIR_LIST: RepairType[] = [
     createdBy: 'admin',
     createdByUser: 1,
     createdAt: Date.now(),
+    status: 'active',
   },
   {
     id: 2,
@@ -53,6 +54,7 @@ export const REPAIR_LIST: RepairType[] = [
     createdBy: 'admin',
     createdByUser: 1,
     createdAt: Date.now(),
+    status: 'active',
   },
   {
     id: 3,
@@ -73,6 +75,7 @@ export const REPAIR_LIST: RepairType[] = [
     createdBy: 'admin',
     createdByUser: 1,
     createdAt: Date.now(),
+    status: 'active',
   },
   {
     id: 4,
@@ -93,6 +96,7 @@ export const REPAIR_LIST: RepairType[] = [
     createdBy: 'admin',
     createdByUser: 1,
     createdAt: Date.now(),
+    status: 'active',
   },
   {
     id: 5,
@@ -113,6 +117,7 @@ export const REPAIR_LIST: RepairType[] = [
     createdBy: 'admin',
     createdByUser: 1,
     createdAt: Date.now(),
+    status: 'active',
   },
   {
     id: 6,
@@ -128,6 +133,7 @@ export const REPAIR_LIST: RepairType[] = [
     createdBy: 'admin',
     createdByUser: 1,
     createdAt: Date.now(),
+    status: 'active',
   },
   {
     id: 7,
@@ -143,6 +149,7 @@ export const REPAIR_LIST: RepairType[] = [
     createdBy: 'admin',
     createdByUser: 1,
     createdAt: Date.now(),
+    status: 'active',
   },
   {
     id: 8,
@@ -158,6 +165,7 @@ export const REPAIR_LIST: RepairType[] = [
     createdBy: 'admin',
     createdByUser: 1,
     createdAt: Date.now(),
+    status: 'active',
   },
   {
     id: 9,
@@ -173,6 +181,7 @@ export const REPAIR_LIST: RepairType[] = [
     createdBy: 'admin',
     createdByUser: 1,
     createdAt: Date.now(),
+    status: 'active',
   },
   {
     id: 10,
@@ -188,6 +197,7 @@ export const REPAIR_LIST: RepairType[] = [
     createdBy: 'admin',
     createdByUser: 1,
     createdAt: Date.now(),
+    status: 'active',
   },
   {
     id: 11,
@@ -203,6 +213,7 @@ export const REPAIR_LIST: RepairType[] = [
     createdBy: 'admin',
     createdByUser: 1,
     createdAt: Date.now(),
+    status: 'active',
   },
   {
     id: 12,
@@ -223,6 +234,7 @@ export const REPAIR_LIST: RepairType[] = [
     createdBy: 'admin',
     createdByUser: 1,
     createdAt: Date.now(),
+    status: 'active',
   },
   {
     id: 13,
@@ -238,6 +250,7 @@ export const REPAIR_LIST: RepairType[] = [
     createdBy: 'admin',
     createdByUser: 1,
     createdAt: Date.now(),
+    status: 'active',
   },
   {
     id: 14,
@@ -258,6 +271,7 @@ export const REPAIR_LIST: RepairType[] = [
     createdBy: 'admin',
     createdByUser: 1,
     createdAt: Date.now(),
+    status: 'active',
   },
   {
     id: 15,
@@ -278,6 +292,7 @@ export const REPAIR_LIST: RepairType[] = [
     createdBy: 'admin',
     createdByUser: 1,
     createdAt: Date.now(),
+    status: 'active',
   },
   {
     id: 16,
@@ -293,6 +308,7 @@ export const REPAIR_LIST: RepairType[] = [
     createdBy: 'admin',
     createdByUser: 1,
     createdAt: Date.now(),
+    status: 'active',
   },
   {
     id: 17,
@@ -319,5 +335,60 @@ export const REPAIR_LIST: RepairType[] = [
     createdBy: 'admin',
     createdByUser: 1,
     createdAt: Date.now(),
+    status: 'active',
+  },
+  {
+    id: 18,
+    variation: 'Concrete Repair 1',
+    type: 'CR1',
+    description: '',
+    unitMeasure: {
+      type: 'volume',
+      value: 'mm x mm x mm',
+      defaultValues: { depth: 1 },
+      dimensions: ['width', 'height', 'depth'],
+    },
+    unitToCharge: 'Lt',
+    conversion: {
+      from: {
+        type: 'volume',
+        value: 'mm x mm x mm',
+        dimensions: ['width', 'height', 'depth'],
+      },
+      to: 'Lt',
+      conversionFactor: ({ width, height, depth }) =>
+        width * height * (depth || 10) * MM3_TO_LITERS,
+    },
+    createdBy: 'admin',
+    createdByUser: 1,
+    createdAt: Date.now(),
+    status: 'inactive',
+  },
+  {
+    id: 19,
+    variation: 'Concrete Repair 1',
+    type: 'CR2',
+    description: '',
+    unitMeasure: {
+      type: 'volume',
+      value: 'mm x mm x mm',
+      defaultValues: { depth: 2 },
+      dimensions: ['width', 'height', 'depth'],
+    },
+    unitToCharge: 'Lt',
+    conversion: {
+      from: {
+        type: 'volume',
+        value: 'mm x mm x mm',
+        dimensions: ['width', 'height', 'depth'],
+      },
+      to: 'Lt',
+      conversionFactor: ({ width, height, depth }) =>
+        width * height * (depth || 10) * MM3_TO_LITERS,
+    },
+    createdBy: 'admin',
+    createdByUser: 1,
+    createdAt: Date.now(),
+    status: 'inactive',
   },
 ]

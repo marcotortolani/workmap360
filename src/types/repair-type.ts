@@ -23,6 +23,7 @@ export interface RepairType {
   createdByUser: number // ID del usuario que lo creó
   createdAt: number // Timestamp de creación
   updatedAt?: number // Timestamp de última actualización
+  status: 'active' | 'inactive'
 }
 
 export type RepairStatusType = 'approved' | 'pending' | 'rejected'
