@@ -48,7 +48,7 @@ export default function ManagerRepairsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8 p-8">
+    <div className="flex flex-col gap-8">
 
       <div className="rounded-lg border bg-white p-6 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
