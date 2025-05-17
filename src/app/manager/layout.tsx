@@ -25,6 +25,11 @@ const sidebarItems = [
     href: '/manager/repairs',
     icon: 'wrench',
   },
+  {
+    title: 'Repair Type',
+    href: '/manager/repair-type',
+    icon: 'list-ordered',
+  },
 ]
 
 const managerTabs = [
@@ -32,6 +37,11 @@ const managerTabs = [
   { value: 'roles', label: 'Roles', href: '/manager/roles' },
   { value: 'users', label: 'Users', href: '/manager/users' },
   { value: 'repairs', label: 'Repairs', href: '/manager/repairs' },
+  {
+    value: 'repair type',
+    label: 'Repair Type',
+    href: '/manager/repair-type',
+  },
 ]
 
 export default function ManagerLayout({

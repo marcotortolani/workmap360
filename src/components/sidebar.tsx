@@ -13,6 +13,7 @@ import {
   PenToolIcon,
   MapIcon,
   TableIcon,
+  ListOrderedIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -40,6 +41,7 @@ export function Sidebar({ items }: SidebarProps) {
     'pen-tool': PenToolIcon,
     map: MapIcon,
     table: TableIcon,
+    'list-ordered': ListOrderedIcon,
   }
 
   return (

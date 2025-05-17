@@ -4,7 +4,7 @@ export interface Role {
   description: string
 }
 
-export interface TechnicianType {
+export interface AdminType {
   id: number
   firstName: string
   lastName: string
@@ -26,7 +26,7 @@ export interface ManagerType {
   avatar: string
 }
 
-export interface AdminType {
+export interface TechnicianType {
   id: number
   firstName: string
   lastName: string
@@ -47,4 +47,3 @@ export interface ClientType {
   status: string
   avatar: string
 }
-

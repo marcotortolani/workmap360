@@ -32,12 +32,14 @@ export const EXAMPLE_PROJECTS: ProjectData[] = [
     technicians: [
       {
         technicianId: 10,
-        technicianName: 'Jose Hernandez',
+        technicianFirstName: 'Jose',
+        technicianLastName: 'Hernandez',
         technicianAvatar: 'https://example.com/avatar/jose.jpg',
       },
       {
         technicianId: 11,
-        technicianName: 'Maria Lopez',
+        technicianFirstName: 'Maria',
+        technicianLastName: 'Lopez',
         technicianAvatar: 'https://example.com/avatar/maria.jpg',
       },
     ],
@@ -78,12 +80,15 @@ export const EXAMPLE_PROJECTS: ProjectData[] = [
     technicians: [
       {
         technicianId: 10,
-        technicianName: 'Jose Hernandez',
+
+        technicianFirstName: 'Jose',
+        technicianLastName: 'Hernandez',
         technicianAvatar: 'https://example.com/avatar/jose.jpg',
       },
       {
         technicianId: 11,
-        technicianName: 'Maria Lopez',
+        technicianFirstName: 'Maria',
+        technicianLastName: 'Lopez',
         technicianAvatar: 'https://example.com/avatar/maria.jpg',
       },
     ],
@@ -124,12 +129,14 @@ export const EXAMPLE_PROJECTS: ProjectData[] = [
     technicians: [
       {
         technicianId: 10,
-        technicianName: 'Jose Hernandez',
+        technicianFirstName: 'Jose',
+        technicianLastName: 'Hernandez',
         technicianAvatar: 'https://example.com/avatar/jose.jpg',
       },
       {
         technicianId: 11,
-        technicianName: 'Maria Lopez',
+        technicianFirstName: 'Maria',
+        technicianLastName: 'Lopez',
         technicianAvatar: 'https://example.com/avatar/maria.jpg',
       },
     ],

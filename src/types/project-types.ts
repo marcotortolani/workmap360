@@ -16,7 +16,8 @@ export interface ProjectRepairType {
 
 export interface TechnicianAssignment {
   technicianId: number // ID del técnico, ej. 10
-  technicianName: string // Nombre del técnico, ej. "Jose Hernandez"
+  technicianFirstName: string // Nombre del técnico, ej. "Jose"
+  technicianLastName: string // Apellido del técnico, ej. "Hernandez"
   technicianAvatar: string // URL o referencia al avatar (como string, ya que es un dato que luego se sincronizará)
 }
 

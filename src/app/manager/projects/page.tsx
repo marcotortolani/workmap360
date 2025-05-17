@@ -42,8 +42,10 @@ import {
 } from '@/types/project-types'
 import { Separator } from '@/components/ui/separator'
 import { TechnicianType } from '@/types/roles-types'
-import Image from 'next/image'
+
 import { Label } from '@/components/ui/label'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ProjectsFilter } from '@/components/projects-filter'
 
 const clientList = [
   { id: 1, name: 'ABC Corporation' },
@@ -98,7 +100,7 @@ export default function ManagerProjectsPage() {
   const { projectsList, deleteProject } = useProjectsListStore()
 
   return (
-    <div className=" relative flex flex-col gap-8 p-0">
+    <div className=" relative flex flex-col gap-8">
       <div className="rounded-lg border bg-white p-6 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-semibold">Projects</h2>
@@ -113,6 +115,8 @@ export default function ManagerProjectsPage() {
             Create Project
           </Button>
         </div>
+
+        <ProjectsFilter onFilter={() => {}} onSort={() => {}} />
 
         <div className="overflow-x-auto">
           <Table>
@@ -316,7 +320,8 @@ const ProjectForm = ({
     Partial<TechnicianAssignment>
   >({
     technicianId: 0,
-    technicianName: '',
+    technicianFirstName: '',
+    technicianLastName: '',
     technicianAvatar: '',
   })
 
@@ -403,35 +408,6 @@ const ProjectForm = ({
     }
   }
 
-  // Manejador para agregar un tipo de reparación
-  // const handleAddRepairType = () => {
-  //   if (
-  //     !newRepairType.repairTypeId ||
-  //     newRepairType.phases! < 3 ||
-  //     newRepairType.phases! > 10 ||
-  //     newRepairType.price! <= 0
-  //   ) {
-  //     alert('Please fill in all repair type fields with valid values')
-  //     return
-  //   }
-
-  //   const repairTypeToAdd: ProjectRepairType = {
-  //     repairTypeId: newRepairType.repairTypeId!,
-  //     repairType: newRepairType.repairType!,
-  //     phases: newRepairType.phases!,
-  //     price: newRepairType.price!,
-  //     unitToCharge: newRepairType.unitToCharge!,
-  //   }
-
-  //   setRepairTypes([...repairTypes, repairTypeToAdd])
-  //   setNewRepairType({
-  //     repairTypeId: 0,
-  //     repairType: '',
-  //     phases: 3,
-  //     price: 0,
-  //     unitToCharge: '',
-  //   })
-  // }
   // Manejador para agregar o actualizar un tipo de reparación
   const handleAddOrUpdateRepairType = () => {
     if (
@@ -506,8 +482,8 @@ const ProjectForm = ({
     if (selectedTechnician) {
       setNewTechnician({
         technicianId: selectedId,
-        technicianName:
-          selectedTechnician.firstName + ' ' + selectedTechnician.lastName,
+        technicianFirstName: selectedTechnician.firstName,
+        technicianLastName: selectedTechnician.lastName,
         technicianAvatar: selectedTechnician.avatar,
       })
     }
@@ -525,7 +501,8 @@ const ProjectForm = ({
 
     const technicianToAdd: TechnicianAssignment = {
       technicianId: newTechnician.technicianId!,
-      technicianName: newTechnician.technicianName!,
+      technicianFirstName: newTechnician.technicianFirstName!,
+      technicianLastName: newTechnician.technicianLastName!,
       technicianAvatar: newTechnician.technicianAvatar!,
     }
 
@@ -540,7 +517,8 @@ const ProjectForm = ({
 
     setNewTechnician({
       technicianId: 0,
-      technicianName: '',
+      technicianFirstName: '',
+      technicianLastName: '',
       technicianAvatar: '',
     })
   }
@@ -561,7 +539,8 @@ const ProjectForm = ({
     setEditingTechnicianIndex(null)
     setNewTechnician({
       technicianId: 0,
-      technicianName: '',
+      technicianFirstName: '',
+      technicianLastName: '',
       technicianAvatar: '',
     })
   }
@@ -725,7 +704,9 @@ const ProjectForm = ({
                 id="sameLevels"
                 type="checkbox"
                 checked={sameLevelsForAll}
-                onChange={handleSameLevelsChange}
+                onChange={
+                  elevations.length === 0 ? handleSameLevelsChange : () => {}
+                }
                 className="h-4 w-4"
               />
               <Label htmlFor="sameLevels">Same levels for all elevations</Label>
@@ -777,8 +758,9 @@ const ProjectForm = ({
           {elevations.length < 6 && (
             <div className="flex items-end space-x-2 mt-2">
               <div className=" w-full">
-                <Label>Elevation Name</Label>
+                <Label htmlFor="elevationName">Elevation Name</Label>
                 <Input
+                  name="elevationName"
                   type="text"
                   value={newElevation.name}
                   onChange={(e) =>
@@ -791,8 +773,9 @@ const ProjectForm = ({
                 />
               </div>
               <div>
-                <Label>Drops</Label>
+                <Label htmlFor="drops">Drops</Label>
                 <Input
+                  name="drops"
                   type="number"
                   value={newElevation.drops || ''}
                   onChange={(e) =>
@@ -806,9 +789,10 @@ const ProjectForm = ({
                 />
               </div>
               <div>
-                <Label>Levels</Label>
+                <Label htmlFor="levels">Levels</Label>
                 <Input
                   type="number"
+                  name="levels"
                   value={newElevation.levels || commonLevels || ''}
                   onChange={(e) =>
                     setNewElevation({
@@ -816,6 +800,7 @@ const ProjectForm = ({
                       levels: Number(e.target.value),
                     })
                   }
+                  disabled={sameLevelsForAll && commonLevels !== 0}
                   placeholder="5"
                   min="1"
                 />
@@ -1044,15 +1029,16 @@ const ProjectForm = ({
                 className="flex space-x-2 items-center justify-between p-2 border rounded-lg"
               >
                 <div className=" flex items-center gap-2">
-                  <Image
-                    src={tech.technicianAvatar || ''}
-                    alt={tech.technicianName}
-                    width={50}
-                    height={50}
-                    className="w-10 h-10 rounded-full"
-                  />
+                  <Avatar>
+                    <AvatarImage src={tech.technicianAvatar} />
+                    <AvatarFallback className="bg-orange-100 text-orange-800">
+                      {tech.technicianFirstName.charAt(0)}
+                      {tech.technicianLastName.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
                   <span className=" ">
-                    {tech.technicianName} (ID: {tech.technicianId})
+                    {tech.technicianFirstName} {tech.technicianLastName} (ID:{' '}
+                    {tech.technicianId})
                   </span>
                 </div>
                 <div className=" flex items-center gap-2">
