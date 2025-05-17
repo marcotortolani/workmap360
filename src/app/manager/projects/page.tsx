@@ -32,6 +32,7 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { TechnicianType } from '@/types/roles-types'
 import Image from 'next/image'
+import { Label } from '@/components/ui/label'
 
 const clientList = [
   { id: 1, name: 'ABC Corporation' },
@@ -117,6 +118,13 @@ export default function ManagerProjectsPage() {
     technicianAvatar: '',
   })
 
+  console.log(
+    'tech in list: ',
+    technicians
+      .map((tech) => tech.technicianId)
+      .includes(newTechnician?.technicianId || 0)
+  )
+
   const [editingTechnicianIndex, setEditingTechnicianIndex] = useState<
     number | null
   >(null)
@@ -185,16 +193,15 @@ export default function ManagerProjectsPage() {
   }
 
   // Manejador para seleccionar un tipo de reparación
-  const handleRepairTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedId = Number(e.target.value)
+  const handleRepairTypeChange = (repair: string) => {
     const selectedRepairType = repairList.find(
-      (repairType) => repairType.id === selectedId
+      (repairType) => repairType.type === repair
     )
 
     if (selectedRepairType) {
       setNewRepairType({
         ...newRepairType,
-        repairTypeId: selectedId,
+        repairTypeId: selectedRepairType.id,
         repairType: selectedRepairType.type,
         unitToCharge: selectedRepairType.unitToCharge,
       })
@@ -295,8 +302,8 @@ export default function ManagerProjectsPage() {
   }
 
   // Manejador para seleccionar un técnico
-  const handleTechnicianChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedId = Number(e.target.value)
+  const handleTechnicianChange = (technicianIDStringed: string) => {
+    const selectedId = Number(technicianIDStringed)
     const selectedTechnician = techniciansList.find(
       (tech) => tech.id === selectedId
     )
@@ -399,12 +406,12 @@ export default function ManagerProjectsPage() {
   }
 
   return (
-    <div className=" relative flex flex-col gap-8 p-8">
+    <div className=" relative flex flex-col gap-8 p-0">
       <div className="rounded-lg border bg-white p-6 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-semibold">Projects</h2>
           <Button
-            className="bg-orange-500 text-white hover:bg-orange-400"
+            className="bg-green-600 text-white hover:bg-green-500"
             onClick={() => setShowCreateForm(true)}
           >
             <FolderPlus className="mr-2 h-4 w-4" />
@@ -492,19 +499,22 @@ export default function ManagerProjectsPage() {
         <div
           className={`relative w-2/5 h-[95%] mx-auto overflow-y-scroll rounded-lg border bg-white p-6 shadow-sm`}
         >
-          <button
+          <Button
             type="button"
             onClick={() => setShowCreateForm(false)}
-            className="absolute top-6 right-6 bg-neutral-900 text-white hover:bg-neutral-600 rounded-md p-1"
+            className="absolute top-6 right-6 w-fit bg-neutral-900 text-white hover:bg-neutral-600 rounded-md"
           >
-            <XIcon className="h-6 w-6" />
-          </button>
-          <h2 className="mb-4 text-xl font-semibold">Create Project</h2>
+            <XIcon className="h-6 w-6 stroke-3" />
+          </Button>
+          <h2 className="mb-4 text-center text-xl font-semibold">
+            Create a new Project
+          </h2>
           <form className="grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit}>
+            <h3 className=" col-span-2 mb-0 text-lg font-semibold">
+              Project Data
+            </h3>
             <div>
-              <label className="mb-2 block text-sm font-medium">
-                Project Name
-              </label>
+              <Label>Project Name</Label>
               <Input
                 placeholder="Enter project name"
                 onChange={(e) => setProjectName(e.target.value)}
@@ -512,8 +522,9 @@ export default function ManagerProjectsPage() {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Client</label>
+              <Label htmlFor="client">Client</Label>
               <Select
+                name="client"
                 value={clientName}
                 onValueChange={(e) => {
                   setClientName(e as string)
@@ -538,7 +549,7 @@ export default function ManagerProjectsPage() {
             {/* Status Project */}
 
             <div className=" col-span-2">
-              <label className="mb-2 block text-sm font-medium">Status</label>
+              <Label>Status</Label>
               <Select
                 defaultValue={'pending'}
                 value={status}
@@ -576,24 +587,22 @@ export default function ManagerProjectsPage() {
               <div className="col-span-2 h-20 flex items-center justify-between">
                 {/* Checkbox para "Same levels for all elevations" */}
                 <div className="flex items-center space-x-2 mb-4">
-                  <input
+                  <Input
                     id="sameLevels"
                     type="checkbox"
                     checked={sameLevelsForAll}
                     onChange={handleSameLevelsChange}
                     className="h-4 w-4"
                   />
-                  <label className="text-sm font-medium" htmlFor="sameLevels">
+                  <Label htmlFor="sameLevels">
                     Same levels for all elevations
-                  </label>
+                  </Label>
                 </div>
                 {/* Campo para el valor común de levels (si el checkbox está marcado) */}
                 {sameLevelsForAll && (
                   <div className="mb-4">
-                    <label className="block text-sm font-medium">
-                      Common Levels for All Elevations
-                    </label>
-                    <input
+                    <Label>Common Levels for All Elevations</Label>
+                    <Input
                       type="number"
                       value={commonLevels || ''}
                       onChange={
@@ -607,7 +616,7 @@ export default function ManagerProjectsPage() {
                         elevations.length === 0
                           ? ' pointer-events-auto '
                           : ' pointer-events-none '
-                      } border rounded p-2 w-full`}
+                      } `}
                     />
                   </div>
                 )}
@@ -617,65 +626,75 @@ export default function ManagerProjectsPage() {
               <div className="space-y-2">
                 {elevations.map((elevation, index) => (
                   <div key={index} className="flex space-x-2 items-center">
-                    <span className="border p-2 rounded">
-                      {elevation.name}: {elevation.drops} drops,{' '}
-                      {elevation.levels} levels
-                    </span>
-                    <button
+                    <div className="flex items-center gap-6 border p-2 rounded">
+                      <span className=" font-bold">{elevation.name}</span>
+                      <span>{elevation.drops} drops</span>
+                      <span>{elevation.levels} levels</span>
+                    </div>
+                    <Button
                       type="button"
                       onClick={() => handleRemoveElevation(index)}
-                      className="flex items-center gap-2 bg-red-500 text-white px-2 py-1 rounded"
+                      className="flex items-center gap-2 bg-red-500 text-white hover:bg-red-600 rounded"
                     >
                       <Trash2Icon className="h-4 w-4" />
                       Remove
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>
               {elevations.length < 6 && (
-                <div className="flex space-x-2 mt-2">
-                  <input
-                    type="text"
-                    value={newElevation.name}
-                    onChange={(e) =>
-                      setNewElevation({ ...newElevation, name: e.target.value })
-                    }
-                    placeholder="Elevation Name (e.g., Norte)"
-                    className="border rounded p-2 flex-1"
-                  />
-                  <input
-                    type="number"
-                    value={newElevation.drops || ''}
-                    onChange={(e) =>
-                      setNewElevation({
-                        ...newElevation,
-                        drops: Number(e.target.value),
-                      })
-                    }
-                    placeholder="Drops"
-                    min="1"
-                    className="border rounded p-2 w-24"
-                  />
-                  <input
-                    type="number"
-                    value={newElevation.levels || commonLevels || ''}
-                    onChange={(e) =>
-                      setNewElevation({
-                        ...newElevation,
-                        levels: Number(e.target.value),
-                      })
-                    }
-                    placeholder="Levels"
-                    min="1"
-                    className="border rounded p-2 w-24"
-                  />
-                  <button
+                <div className="flex items-end space-x-2 mt-2">
+                  <div className=" w-full">
+                    <Label>Elevation Name</Label>
+                    <Input
+                      type="text"
+                      value={newElevation.name}
+                      onChange={(e) =>
+                        setNewElevation({
+                          ...newElevation,
+                          name: e.target.value,
+                        })
+                      }
+                      placeholder="(e.g., North, Street Name...)"
+                    />
+                  </div>
+                  <div>
+                    <Label>Drops</Label>
+                    <Input
+                      type="number"
+                      value={newElevation.drops || ''}
+                      onChange={(e) =>
+                        setNewElevation({
+                          ...newElevation,
+                          drops: Number(e.target.value),
+                        })
+                      }
+                      placeholder="8"
+                      min="1"
+                    />
+                  </div>
+                  <div>
+                    <Label>Levels</Label>
+                    <Input
+                      type="number"
+                      value={newElevation.levels || commonLevels || ''}
+                      onChange={(e) =>
+                        setNewElevation({
+                          ...newElevation,
+                          levels: Number(e.target.value),
+                        })
+                      }
+                      placeholder="5"
+                      min="1"
+                    />
+                  </div>
+                  <Button
                     type="button"
                     onClick={handleAddElevation}
                     className="bg-green-600 hover:bg-green-500 focus:outline-blue-500 text-white px-4 py-2 rounded"
                   >
                     Add Elevation
-                  </button>
+                  </Button>
                 </div>
               )}
               <div className=" w-full my-4 flex items-center gap-10">
@@ -707,11 +726,11 @@ export default function ManagerProjectsPage() {
                 {repairTypes.map((rt, index) => (
                   <div
                     key={index}
-                    className=" p-2 flex items-center justify-between border rounded"
+                    className=" p-2 flex items-center justify-between border rounded-lg"
                   >
                     <div className=" flex items-center gap-2">
                       <div className=" flex items-center gap-2">
-                        <span className="  bg-neutral-700 text-white font-semibold px-2 py-1 border rounded-lg">
+                        <span className="  bg-neutral-700 text-white font-semibold px-2 py-1 border rounded-md">
                           {rt.repairType}
                         </span>
                         <span>
@@ -738,6 +757,10 @@ export default function ManagerProjectsPage() {
                       />
                       <div className=" flex items-center gap-2">
                         <span>{rt.phases} phases</span>
+                        <Separator
+                          orientation="vertical"
+                          className="w-0.5 h-6 bg-neutral-300"
+                        />
                         <span>
                           ${rt.price} ({rt.unitToCharge})
                         </span>
@@ -745,44 +768,79 @@ export default function ManagerProjectsPage() {
                     </div>
 
                     <div className=" flex items-center gap-2">
-                      <button
+                      <Button
                         type="button"
                         onClick={() => handleEditRepairType(index)}
-                        className="flex items-center gap-1 bg-blue-500 text-white text-xs px-2 py-1 rounded"
+                        className="flex items-center gap-1 bg-blue-500 text-white hover:bg-blue-600 text-xs rounded"
                       >
                         <Pencil className="h-3 w-3" />
                         Edit
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         type="button"
                         onClick={() => handleRemoveRepairType(index)}
-                        className="flex items-center gap-2 bg-red-500 text-white px-2 py-1 rounded"
+                        className="flex items-center gap-2 bg-red-500 text-white hover:bg-red-600 rounded"
                       >
                         <Trash2Icon className="h-4 w-4" />
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 ))}
               </div>
 
               {/* Formulario para agregar un nuevo repairType */}
-              <div className="flex flex-col gap-4 mt-8 p-2 border rounded">
-                <div className="flex gap-8">
-                  <select
-                    value={newRepairType.repairTypeId || ''}
-                    onChange={handleRepairTypeChange}
-                    className="col-span-1 border rounded p-2 flex-1"
-                  >
-                    <option value="">Select Repair Type</option>
-                    {repairList.map((repairType) => (
-                      <option key={repairType.id} value={repairType.id}>
-                        {repairType.variation} ({repairType.type})
-                      </option>
-                    ))}
-                  </select>
+              <div className="flex flex-col gap-4 mt-8 p-2 border rounded-lg">
+                <div className="flex items-end gap-4">
+                  <div className="w-2/3 text-black">
+                    <Label htmlFor="repairType">Repair Type</Label>
+                    <Select
+                      name="repairType"
+                      value={newRepairType.repairType}
+                      onValueChange={(e) => handleRepairTypeChange(e)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select repair type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {repairList.map((repair) => (
+                          <SelectItem
+                            key={repair.id}
+                            value={repair.type}
+                            disabled={repairTypes
+                              .map((rt) => rt.repairTypeId)
+                              .includes(repair.id)}
+                          >
+                            {repair.variation} ({repair.type})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className=" w-1/3">
+                    <Label htmlFor="status">Status</Label>
+                    <Select
+                      name="status"
+                      defaultValue={'pending'}
+                      value={status}
+                      onValueChange={(e) => {
+                        setStatus(e as ProjectData['status'])
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pending" defaultChecked>
+                          Pending
+                        </SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <div className=" space-x-2 ">
-                    <label htmlFor="phases">Phases (3-10):</label>
-                    <input
+                    <Label htmlFor="phases">Phases (3-10):</Label>
+                    <Input
                       id="phases"
                       type="number"
                       value={newRepairType.phases || ''}
@@ -795,14 +853,14 @@ export default function ManagerProjectsPage() {
                       placeholder="Phases (3-10)"
                       min="3"
                       max="10"
-                      className="border rounded p-2 w-24"
+                      className=" w-28"
                     />
                   </div>
                 </div>
                 <div className=" flex justify-between">
-                  <div className=" space-x-2 ">
-                    <label htmlFor="price">Price:</label>
-                    <input
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="price">Price:</Label>
+                    <Input
                       id="price"
                       type="number"
                       value={newRepairType.price || ''}
@@ -814,27 +872,26 @@ export default function ManagerProjectsPage() {
                       }
                       placeholder="Price"
                       min="0"
-                      className="border rounded p-2 w-24"
                     />
                     {newRepairType.unitToCharge && (
                       <span>/{newRepairType.unitToCharge}</span>
                     )}
                   </div>
-                  <button
+                  <Button
                     type="button"
                     onClick={handleAddOrUpdateRepairType}
                     className="bg-green-600 hover:bg-green-500 focus:outline-blue-500 text-white px-4 py-2 rounded"
                   >
                     {editingIndex !== null ? 'Update' : 'Add'} Repair Type
-                  </button>
+                  </Button>
                   {editingIndex !== null && (
-                    <button
+                    <Button
                       type="button"
                       onClick={handleCancelEditRepairType}
                       className="bg-gray-500 text-white px-4 py-2 rounded"
                     >
                       Cancel
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>
@@ -853,7 +910,7 @@ export default function ManagerProjectsPage() {
                 {technicians.map((tech, index) => (
                   <div
                     key={index}
-                    className="flex space-x-2 items-center justify-between p-2 border rounded"
+                    className="flex space-x-2 items-center justify-between p-2 border rounded-lg"
                   >
                     <div className=" flex items-center gap-2">
                       <Image
@@ -868,56 +925,73 @@ export default function ManagerProjectsPage() {
                       </span>
                     </div>
                     <div className=" flex items-center gap-2">
-                      <button
+                      <Button
                         type="button"
                         onClick={() => handleEditTechnician(index)}
-                        className="flex items-center gap-2 bg-blue-500 text-xs text-white px-2 py-1 rounded"
+                        className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-xs text-white rounded"
                       >
                         <Pencil className="h-3 w-3" />
                         Edit
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         type="button"
                         onClick={() => handleRemoveTechnician(index)}
-                        className="bg-red-500 text-white px-2 py-1 rounded"
+                        className="bg-red-500 hover:bg-red-600 text-white rounded"
                       >
                         <Trash2Icon className="h-4 w-4" />
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 ))}
               </div>
 
               {/* Formulario para agregar/editar un técnico */}
-              <div className="flex space-x-2 mt-2">
-                <select
-                  value={newTechnician.technicianId || ''}
-                  onChange={handleTechnicianChange}
-                  className="border rounded p-2 flex-1"
-                >
-                  <option value="">Select Technician</option>
-                  {techniciansList.map((tech) => (
-                    <option key={tech.id} value={tech.id}>
-                      {tech.firstName} {tech.lastName} (ID: {tech.id})
-                    </option>
-                  ))}
-                </select>
-                <button
+              <div className="flex items-end gap-4 mt-2">
+                <div className="w-full ">
+                  <Label htmlFor="technician">Add New Technician</Label>
+                  <Select
+                    name="technician"
+                    value={
+                      newTechnician.technicianId !== 0
+                        ? `${newTechnician.technicianId}`
+                        : ''
+                    }
+                    onValueChange={(e) => handleTechnicianChange(e)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Technician" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {techniciansList.map((tech) => (
+                        <SelectItem
+                          key={tech.id}
+                          value={`${tech.id}`}
+                          disabled={technicians
+                            .map((tech) => tech.technicianId)
+                            .includes(tech.id)}
+                        >
+                          {tech.firstName} {tech.lastName} (ID: {tech.id})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button
                   type="button"
                   onClick={handleAddOrUpdateTechnician}
                   className="bg-green-600 hover:bg-green-500 focus:outline-blue-500 text-white px-4 py-2 rounded"
                 >
                   {editingTechnicianIndex !== null ? 'Update' : 'Add'}{' '}
                   Technician
-                </button>
+                </Button>
                 {editingTechnicianIndex !== null && (
-                  <button
+                  <Button
                     type="button"
                     onClick={handleCancelEditTechnician}
                     className="bg-gray-500 text-white px-4 py-2 rounded"
                   >
                     Cancel
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -939,7 +1013,7 @@ export default function ManagerProjectsPage() {
 
             <div className="space-x-2 sm:col-span-2">
               <Button
-                className="mt-4 bg-orange-500 text-white hover:bg-orange-400"
+                className="mt-4 bg-green-600 text-white hover:bg-green-500"
                 type="submit"
               >
                 Save Project

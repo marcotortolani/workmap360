@@ -43,8 +43,8 @@ export default function ManagerLayout({
     <div className="flex h-screen">
       <Sidebar items={sidebarItems} />
 
-      <main className="flex-1 overflow-auto bg-gray-50">
-        <div className="px-2 flex items-center justify-between ">
+      <main className="py-8 px-10 flex-1 space-y-6 overflow-auto bg-gray-50">
+        <div className=" flex items-center justify-between ">
           <h1 className=" text-3xl font-bold text-orange-500">
             Manager Dashboard
           </h1>

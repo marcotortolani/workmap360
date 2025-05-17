@@ -14,10 +14,10 @@ export function LogoutButton() {
   return (
     <Button
       onClick={handleLogout}
-      className="bg-orange-500 text-white hover:bg-orange-400 static md:mt-0 z-10 shadow-md md:shadow-none"
+      className="bg-red-600 text-white hover:bg-red-500 static md:mt-0 z-10 shadow-md md:shadow-none"
     >
-      <LogOut className="md:mr-2 h-4 w-4" />
-      <span className="hidden md:inline">Logout</span>
+      <LogOut className="md:mr-2 h-4 w-4 stroke-3" />
+      <span className="hidden md:inline font-bold">Logout</span>
     </Button>
   )
 }
