@@ -1,11 +1,18 @@
+export type ProjectStatusType = 'pending' | 'in-progress' | 'completed'
+export const PROJECT_STATUS: Record<ProjectStatusType, ProjectStatusType> = {
+  pending: 'pending',
+  'in-progress': 'in-progress',
+  completed: 'completed',
+}
+
+export type RepairStatusType = 'pending' | 'active'
+export const REPAIR_STATUS_OPTIONS: RepairStatusType[] = ['pending', 'active']
+
 export interface Elevation {
   name: string // Nombre de la cara, ej. "Norte", "Sur", "George St"
   drops: number // Cantidad de drops, ej. 11
   levels: number // Cantidad de niveles, ej. 7
 }
-
-export type ProjectStatusType = 'pending' | 'in-progress' | 'completed'
-export type RepairStatusType = 'pending' | 'in-progress' | 'completed'
 
 export interface ProjectRepairType {
   repairTypeId: number // ID del tipo de reparación, ej. 1
@@ -32,15 +39,9 @@ export interface ProjectData {
   repairTypes: ProjectRepairType[] // Tipos de reparación permitidos en el proyecto
   technicians: TechnicianAssignment[] // Técnicos asignados al proyecto
   googleDriveUrl: string // URL de la carpeta de Google Drive, ej. "https://drive.google.com/folder/xyz"
-  createdBy: string // Nombre del Manager que creó el proyecto
-  createdByUser: number // ID del Manager que creó el proyecto
+  createdByUserName: string // Nombre del Manager que creó el proyecto
+  createdByUserId: number // ID del Manager que creó el proyecto
   createdAt: number // Timestamp de creación
   updatedAt?: number // Timestamp de última actualización
   status: ProjectStatusType // Estado del proyecto
-}
-
-export const PROJECT_STATUS: Record<ProjectStatusType, ProjectStatusType> = {
-  pending: 'pending',
-  'in-progress': 'in-progress',
-  completed: 'completed',
 }

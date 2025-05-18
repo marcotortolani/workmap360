@@ -32,6 +32,7 @@ import {
   Pencil,
   Trash2,
   MessageSquareWarning,
+  Eye,
 } from 'lucide-react'
 import {
   PROJECT_STATUS,
@@ -40,6 +41,7 @@ import {
   ProjectRepairType,
   TechnicianAssignment,
   RepairStatusType,
+  REPAIR_STATUS_OPTIONS,
 } from '@/types/project-types'
 import { Separator } from '@/components/ui/separator'
 import { TechnicianType } from '@/types/roles-types'
@@ -47,6 +49,7 @@ import { TechnicianType } from '@/types/roles-types'
 import { Label } from '@/components/ui/label'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ProjectsFilter } from '@/components/projects-filter'
+import Link from 'next/link'
 
 const clientList = [
   { id: 1, name: 'ABC Corporation' },
@@ -90,9 +93,9 @@ const techniciansList: TechnicianType[] = [
 ]
 
 export default function ManagerProjectsPage() {
-  const [formStatus, setFormStatus] = useState<'close' | 'new' | 'edit'>(
-    'close'
-  )
+  const [actionSelected, setActionSelected] = useState<
+    'close' | 'new' | 'edit' | 'view'
+  >('close')
   const [selectedProject, setSelectedProject] = useState<ProjectData | null>(
     null
   )
@@ -108,8 +111,8 @@ export default function ManagerProjectsPage() {
           <Button
             className="bg-green-600 text-white hover:bg-green-500"
             onClick={() => {
-              setFormStatus('new')
               setSelectedProject(null)
+              setActionSelected('new')
             }}
           >
             <FolderPlus className="mr-2 h-4 w-4" />
@@ -182,15 +185,27 @@ export default function ManagerProjectsPage() {
                       minute: 'numeric',
                     })}
                   </TableCell>
-                  {/* Actions (Edit)*/}
+                  {/* Actions (View - Edit - Delete)*/}
                   <TableCell className="flex gap-2">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-blue-500 hover:bg-blue-50 hover:text-blue-600"
+                      className="text-green-600 hover:bg-green-100 hover:text-green-700"
                       onClick={() => {
                         setSelectedProject(project)
-                        setFormStatus('edit')
+                        setActionSelected('view')
+                      }}
+                    >
+                      <Eye className="mr-2 h-4 w-4" />
+                      View
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-blue-500 hover:bg-blue-100 hover:text-blue-600"
+                      onClick={() => {
+                        setSelectedProject(project)
+                        setActionSelected('edit')
                       }}
                     >
                       <Edit className="mr-2 h-4 w-4" />
@@ -199,7 +214,7 @@ export default function ManagerProjectsPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-red-500 hover:bg-red-50 hover:text-red-600"
+                      className="text-red-500 hover:bg-red-100 hover:text-red-600"
                       onClick={() => {
                         setMessageAdvice('delete')
                         setSelectedProject(project)
@@ -262,14 +277,26 @@ export default function ManagerProjectsPage() {
 
       <div
         className={`${
-          formStatus !== 'close'
+          actionSelected === 'new' || actionSelected === 'edit'
             ? ' translate-y-0 scale-100 '
             : ' translate-y-[200%] scale-50 '
         } fixed top-0 left-0 z-50 w-screen h-screen bg-black/50 flex items-center justify-center transition-all duration-300 ease-in-out`}
       >
         <ProjectForm
           projectData={selectedProject || undefined}
-          onClose={() => setFormStatus('close')}
+          onClose={() => setActionSelected('close')}
+        />
+      </div>
+      <div
+        className={`${
+          actionSelected === 'view'
+            ? ' translate-y-0 scale-100 '
+            : ' translate-y-[200%] scale-50 '
+        } fixed top-0 left-0 z-50 w-screen h-screen bg-black/50 flex items-center justify-center transition-all duration-300 ease-in-out`}
+      >
+        <ProjectDataModal
+          projectData={selectedProject}
+          onClose={() => setActionSelected('close')}
         />
       </div>
     </div>
@@ -313,7 +340,7 @@ const ProjectForm = ({
     phases: 3,
     price: 0,
     unitToCharge: '',
-    status: 'in-progress',
+    status: 'active',
   })
   const [editingIndex, setEditingIndex] = useState<number | null>(null) // Índice del repairType que se está editando
 
@@ -448,7 +475,7 @@ const ProjectForm = ({
       phases: 3,
       price: 0,
       unitToCharge: '',
-      status: 'in-progress',
+      status: 'active',
     })
   }
 
@@ -472,7 +499,7 @@ const ProjectForm = ({
       phases: 3,
       price: 0,
       unitToCharge: '',
-      status: 'in-progress',
+      status: 'active',
     })
   }
 
@@ -574,8 +601,8 @@ const ProjectForm = ({
         technicians,
         googleDriveUrl,
         status,
-        createdBy: projectData.createdBy,
-        createdByUser: projectData.createdByUser,
+        createdByUserName: projectData.createdByUserName,
+        createdByUserId: projectData.createdByUserId,
         createdAt: projectData.createdAt,
         updatedAt: Date.now(),
       }
@@ -591,8 +618,8 @@ const ProjectForm = ({
         technicians,
         googleDriveUrl,
         status,
-        createdBy: 'John Doe',
-        createdByUser: 123,
+        createdByUserName: 'John Doe',
+        createdByUserId: 123,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       }
@@ -614,6 +641,24 @@ const ProjectForm = ({
       setRepairTypes(projectData.repairTypes)
       setTechnicians(projectData.technicians)
       setGoogleDriveUrl(projectData.googleDriveUrl)
+    } else {
+      setProjectName('')
+      setClientName('')
+      setStatus(PROJECT_STATUS['in-progress'])
+      setElevations([])
+      setRepairTypes([])
+      setTechnicians([])
+      setGoogleDriveUrl('')
+      setSameLevelsForAll(false)
+      setCommonLevels(0)
+      setEditingTechnicianIndex(null)
+      setNewTechnician({
+        technicianId: 0,
+        technicianFirstName: '',
+        technicianLastName: '',
+        technicianAvatar: '',
+      })
+      setEditingTechnicianIndex(null)
     }
   }, [projectData])
 
@@ -971,11 +1016,16 @@ const ProjectForm = ({
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
+                    {REPAIR_STATUS_OPTIONS.map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {status}
+                      </SelectItem>
+                    ))}
+                    {/* <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="in-progress" defaultChecked>
                       In Progress
                     </SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem> */}
                   </SelectContent>
                 </Select>
               </div>
@@ -1138,6 +1188,8 @@ const ProjectForm = ({
           </div>
         </div>
 
+        <Separator className=" w-full col-span-2 mt-4" />
+
         {/* Google Drive URL */}
         <div>
           <label className="block text-sm font-medium">Google Drive URL</label>
@@ -1167,6 +1219,261 @@ const ProjectForm = ({
           </Button>
         </div>
       </form>
+    </div>
+  )
+}
+
+const ProjectDataModal = ({
+  projectData,
+  onClose,
+}: {
+  projectData?: ProjectData | null
+  onClose: () => void
+}) => {
+  const { repairList } = useRepairListStore()
+
+  if (!projectData) return null
+
+  return (
+    <div
+      className={`relative w-2/5 h-[95%] mx-auto overflow-y-scroll rounded-lg border bg-white p-6 shadow-sm`}
+    >
+      <Button
+        type="button"
+        onClick={onClose}
+        className="absolute top-6 right-6 w-fit bg-neutral-900 text-white hover:bg-neutral-600 rounded-md"
+      >
+        <XIcon className="h-6 w-6 stroke-3" />
+      </Button>
+      <h2 className="mb-4 text-center text-xl font-semibold">Project Data</h2>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="col-span-2 flex items-center justify-between">
+          {/* Project Name */}
+          <div>
+            <Label>Project Name</Label>
+            <h3 className="text-lg font-semibold">{projectData?.name}</h3>
+            <span
+              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                projectData?.status === PROJECT_STATUS['completed']
+                  ? 'bg-green-100 text-green-800'
+                  : projectData?.status === PROJECT_STATUS['in-progress']
+                  ? 'bg-blue-100 text-blue-800'
+                  : 'bg-yellow-100 text-yellow-800'
+              }`}
+            >
+              {projectData?.status}
+            </span>
+          </div>
+
+          {/* Client Project */}
+          <div>
+            <Label>Client</Label>
+            <p className="text-lg font-semibold">{projectData?.clientName}</p>
+          </div>
+        </div>
+
+        {/* Created & Updated */}
+        <div className="col-span-2 flex items-start justify-between">
+          <div>
+            <Label>Created By</Label>
+            <p>
+              {projectData?.createdByUserName} (ID:{' '}
+              {projectData?.createdByUserId})
+            </p>
+          </div>
+          <div>
+            <Label>Created At</Label>
+            <p>
+              {new Date(projectData?.createdAt || '').toLocaleDateString(
+                'en-US',
+                {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                }
+              )}
+            </p>
+          </div>
+          <div>
+            <Label>Last Updated</Label>
+            <p>
+              {new Date(projectData?.updatedAt || '').toLocaleDateString(
+                'en-US',
+                {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                  hour: 'numeric',
+                  minute: 'numeric',
+                  hour12: true,
+                }
+              )}
+            </p>
+          </div>
+        </div>
+
+        <Separator className=" w-full col-span-2 mt-4" />
+
+        {/* Elevations */}
+        <div className=" col-span-2">
+          <h3 className="text-lg font-medium">Elevations (1 min - 6 max)</h3>
+
+          {/* Elevations list */}
+          <div className="flex flex-wrap gap-4 ">
+            {projectData?.elevations.map((elevation, index) => (
+              <div key={index} className="flex space-x-2 items-center">
+                <div className="flex items-center gap-6 border p-2 rounded">
+                  <span className=" font-bold">{elevation.name}</span>
+                  <span>{elevation.drops} drops</span>
+                  <span>{elevation.levels} levels</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className=" w-full mt-6 mb-0 flex items-center gap-10">
+            <p className=" text-sm text-muted-foreground">
+              Elevations: {projectData?.elevations?.length}
+            </p>
+            <p className=" text-sm text-muted-foreground">
+              Total Drops:{' '}
+              {projectData?.elevations?.reduce(
+                (total, e) => total + e.drops,
+                0
+              )}
+            </p>
+          </div>
+        </div>
+
+        <Separator className=" w-full col-span-2 mt-4" />
+
+        {/* Reparations list */}
+        <div className=" col-span-2">
+          <h3 className=" col-span-2 mb-1 text-lg font-semibold">
+            Reparation Types
+          </h3>
+
+          {/* Lista de repairTypes existentes */}
+          <div className="space-y-2">
+            {projectData?.repairTypes &&
+              projectData?.repairTypes?.length > 0 &&
+              projectData?.repairTypes?.map((rt, index) => (
+                <div
+                  key={index}
+                  className=" p-2 flex items-center gap-4 border rounded-lg"
+                >
+                  <div className=" flex items-center gap-2">
+                    <span className="  bg-neutral-700 text-white font-semibold px-2 py-1 border rounded-md">
+                      {rt.repairType}
+                    </span>
+                    <span>
+                      {
+                        repairList.find((r) => r.id === rt.repairTypeId)
+                          ?.variation
+                      }{' '}
+                      {repairList.find((r) => r.id === rt.repairTypeId)
+                        ?.unitMeasure?.defaultValues?.depth ? (
+                        <span>
+                          (
+                          {
+                            repairList.find((r) => r.id === rt.repairTypeId)
+                              ?.unitMeasure?.defaultValues?.depth
+                          }{' '}
+                          mm)
+                        </span>
+                      ) : null}
+                    </span>
+                  </div>
+                  <Separator
+                    orientation="vertical"
+                    className="w-0.5 h-6 bg-neutral-300"
+                  />
+                  <div className=" flex items-center gap-2">
+                    <span>{rt.phases} phases</span>
+                    <Separator
+                      orientation="vertical"
+                      className="w-0.5 h-6 bg-neutral-300"
+                    />
+                    <span>
+                      ${rt.price} ({rt.unitToCharge})
+                    </span>
+                  </div>
+                  <Separator
+                    orientation="vertical"
+                    className="w-0.5 h-6 bg-neutral-300"
+                  />
+                  <span
+                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      rt.status === 'active'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}
+                  >
+                    {rt.status}
+                  </span>
+                </div>
+              ))}
+          </div>
+        </div>
+
+        <Separator className=" w-full col-span-2 mt-4" />
+
+        {/* Technicians */}
+        <div className=" col-span-2">
+          <h3 className=" col-span-2 mb-1 text-lg font-semibold">
+            Technicians
+          </h3>
+
+          {/* Lista de technicians existentes */}
+          <div className="space-y-2">
+            {projectData?.technicians &&
+              projectData?.technicians?.length > 0 &&
+              projectData?.technicians?.map((tech, index) => (
+                <div
+                  key={index}
+                  className="flex space-x-2 items-center justify-between p-2 border rounded-lg"
+                >
+                  <div className=" flex items-center gap-2">
+                    <Avatar>
+                      <AvatarImage src={tech.technicianAvatar} />
+                      <AvatarFallback className="bg-orange-100 text-orange-800">
+                        {tech.technicianFirstName.charAt(0)}
+                        {tech.technicianLastName.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className=" ">
+                      {tech.technicianFirstName} {tech.technicianLastName} (ID:{' '}
+                      {tech.technicianId})
+                    </span>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+
+        <Separator className=" w-full col-span-2 mt-4" />
+
+        {/* Google Drive URL */}
+        <div>
+          <label className="block text-sm font-medium">Google Drive URL</label>
+          <Link
+            href={projectData?.googleDriveUrl || ''}
+            className=" text-sky-600 hover:underline hover:text-sky-500"
+          >
+            {projectData?.googleDriveUrl || 'No URL provided'}
+          </Link>
+        </div>
+
+        <div className="space-x-2 sm:col-span-2">
+          <Button
+            type="button"
+            className="mt-4 bg-neutral-900 text-white hover:bg-neutral-700"
+            onClick={onClose}
+          >
+            Close
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }
