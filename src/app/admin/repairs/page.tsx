@@ -17,7 +17,7 @@
 // import { RepairsFilter } from '@/components/repairs-filter'
 // import { RepairDetailModal } from '@/components/repair-detail-modal'
 
-// import { RepairData, RepairStatusType } from '@/types/repair-type'
+// import { RepairData, RepairDataStatusType } from '@/types/repair-type'
 
 // import { REPAIR_LIST } from '@/data/repair-list'
 
@@ -50,7 +50,7 @@ export default function AdminRepairsPage() {
   //   setIsModalOpen(true)
   // }
 
-  // const handleStatusUpdate = (repairId: string, status: RepairStatusType) => {
+  // const handleStatusUpdate = (repairId: string, status: RepairDataStatusType) => {
   //   console.log(`Updated repair ${repairId} status to ${status}`)
   //   // In a real app, you would update the status in your data
   //   setRepairs(

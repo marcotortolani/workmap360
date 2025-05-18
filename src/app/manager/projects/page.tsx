@@ -39,6 +39,7 @@ import {
   ProjectData,
   ProjectRepairType,
   TechnicianAssignment,
+  RepairStatusType,
 } from '@/types/project-types'
 import { Separator } from '@/components/ui/separator'
 import { TechnicianType } from '@/types/roles-types'
@@ -312,6 +313,7 @@ const ProjectForm = ({
     phases: 3,
     price: 0,
     unitToCharge: '',
+    status: 'in-progress',
   })
   const [editingIndex, setEditingIndex] = useState<number | null>(null) // Índice del repairType que se está editando
 
@@ -393,11 +395,10 @@ const ProjectForm = ({
   }
 
   // Manejador para seleccionar un tipo de reparación
-  const handleRepairTypeChange = (repair: string) => {
+  const handleRepairTypeChange = (repairID: string) => {
     const selectedRepairType = repairList.find(
-      (repairType) => repairType.type === repair
+      (repairType) => repairType.id === Number(repairID)
     )
-
     if (selectedRepairType) {
       setNewRepairType({
         ...newRepairType,
@@ -426,6 +427,7 @@ const ProjectForm = ({
       phases: newRepairType.phases!,
       price: newRepairType.price!,
       unitToCharge: newRepairType.unitToCharge!,
+      status: newRepairType.status!,
     }
 
     if (editingIndex !== null) {
@@ -446,6 +448,7 @@ const ProjectForm = ({
       phases: 3,
       price: 0,
       unitToCharge: '',
+      status: 'in-progress',
     })
   }
 
@@ -469,6 +472,7 @@ const ProjectForm = ({
       phases: 3,
       price: 0,
       unitToCharge: '',
+      status: 'in-progress',
     })
   }
 
@@ -637,7 +641,7 @@ const ProjectForm = ({
             onChange={(e) => setProjectName(e.target.value)}
           />
         </div>
-
+        {/* Client Project */}
         <div>
           <Label htmlFor="client">Client</Label>
           <Select
@@ -663,8 +667,8 @@ const ProjectForm = ({
             </SelectContent>
           </Select>
         </div>
-        {/* Status Project */}
 
+        {/* Status Project */}
         <div className=" col-span-2">
           <Label>Status</Label>
           <Select
@@ -881,6 +885,21 @@ const ProjectForm = ({
                       ${rt.price} ({rt.unitToCharge})
                     </span>
                   </div>
+                  <Separator
+                    orientation="vertical"
+                    className="w-0.5 h-6 bg-neutral-300"
+                  />
+                  <span
+                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      rt.status === PROJECT_STATUS['completed']
+                        ? 'bg-green-100 text-green-800'
+                        : rt.status === PROJECT_STATUS['in-progress']
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}
+                  >
+                    {rt.status}
+                  </span>
                 </div>
 
                 <div className=" flex items-center gap-2">
@@ -911,49 +930,56 @@ const ProjectForm = ({
                 <Label htmlFor="repairType">Repair Type</Label>
                 <Select
                   name="repairType"
-                  value={newRepairType.repairType}
+                  value={`${newRepairType.repairTypeId}`}
                   onValueChange={(e) => handleRepairTypeChange(e)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select repair type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {repairList.map((repair) => (
-                      <SelectItem
-                        key={repair.id}
-                        value={repair.type}
-                        disabled={repairTypes
-                          .map((rt) => rt.repairTypeId)
-                          .includes(repair.id)}
-                      >
-                        {repair.variation} ({repair.type})
-                      </SelectItem>
-                    ))}
+                    {repairList
+                      .filter((r) => r.status === 'active')
+                      .map((repair) => (
+                        <SelectItem
+                          key={repair.id}
+                          value={`${repair.id}`}
+                          disabled={repairTypes
+                            .map((rt) => rt.repairTypeId)
+                            .includes(repair.id)}
+                        >
+                          {repair.variation} ({repair.type})
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
+
               <div className=" w-1/3">
-                <Label htmlFor="status">Status</Label>
+                <Label htmlFor="repairStatus">Status</Label>
                 <Select
-                  name="status"
-                  defaultValue={'pending'}
-                  value={status}
+                  name="repairStatus"
+                  value={newRepairType.status || ''}
                   onValueChange={(e) => {
-                    setStatus(e as ProjectData['status'])
+                    // setStatus(e as RepairStatusType)
+                    setNewRepairType({
+                      ...newRepairType,
+                      status: e as RepairStatusType,
+                    })
                   }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pending" defaultChecked>
-                      Pending
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="in-progress" defaultChecked>
+                      In Progress
                     </SelectItem>
-                    <SelectItem value="in-progress">In Progress</SelectItem>
                     <SelectItem value="completed">Completed</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+
               <div className=" space-x-2 ">
                 <Label htmlFor="phases">Phases (3-10):</Label>
                 <Input

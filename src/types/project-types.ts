@@ -5,6 +5,7 @@ export interface Elevation {
 }
 
 export type ProjectStatusType = 'pending' | 'in-progress' | 'completed'
+export type RepairStatusType = 'pending' | 'in-progress' | 'completed'
 
 export interface ProjectRepairType {
   repairTypeId: number // ID del tipo de reparación, ej. 1
@@ -12,6 +13,7 @@ export interface ProjectRepairType {
   phases: number // Cantidad de fases (mín: 3, máx: 10)
   price: number // Precio de la reparación para este proyecto, ej. 1500
   unitToCharge: string // Unidad usada para facturar en el tipo de reparacion, ej. "unit"
+  status: RepairStatusType
 }
 
 export interface TechnicianAssignment {

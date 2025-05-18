@@ -20,6 +20,7 @@ export const EXAMPLE_PROJECTS: ProjectData[] = [
         phases: 4,
         price: 1500,
         unitToCharge: 'Lt',
+        status: 'in-progress',
       },
       {
         repairTypeId: 15,
@@ -27,6 +28,7 @@ export const EXAMPLE_PROJECTS: ProjectData[] = [
         phases: 3,
         price: 1200,
         unitToCharge: 'm2',
+        status: 'in-progress',
       },
     ],
     technicians: [
@@ -68,6 +70,7 @@ export const EXAMPLE_PROJECTS: ProjectData[] = [
         phases: 4,
         price: 1500,
         unitToCharge: 'Lt',
+        status: 'in-progress',
       },
       {
         repairTypeId: 15,
@@ -75,6 +78,7 @@ export const EXAMPLE_PROJECTS: ProjectData[] = [
         phases: 3,
         price: 1200,
         unitToCharge: 'm2',
+        status: 'in-progress',
       },
     ],
     technicians: [
@@ -117,6 +121,7 @@ export const EXAMPLE_PROJECTS: ProjectData[] = [
         phases: 4,
         price: 1500,
         unitToCharge: 'Lt',
+        status: 'in-progress',
       },
       {
         repairTypeId: 15,
@@ -124,6 +129,7 @@ export const EXAMPLE_PROJECTS: ProjectData[] = [
         phases: 3,
         price: 1200,
         unitToCharge: 'm2',
+        status: 'in-progress',
       },
     ],
     technicians: [

@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 
-import { RepairStatusType, RepairData } from '@/types/repair-type'
+import { RepairDataStatusType, RepairData } from '@/types/repair-type'
 
 interface RepairDetailModalProps {
   open: boolean
@@ -25,7 +25,7 @@ interface RepairDetailModalProps {
   repair: RepairData
   onStatusUpdate?: (
     repairId: RepairData['id'],
-    status: RepairStatusType
+    status: RepairDataStatusType
   ) => void
 }
 
@@ -91,7 +91,7 @@ export function RepairDetailModal({
             </Label>
             <Select
               value={status}
-              onValueChange={(status: RepairStatusType) => setStatus(status)}
+              onValueChange={(status: RepairDataStatusType) => setStatus(status)}
             >
               <SelectTrigger id="status" className="mt-1">
                 <SelectValue placeholder="Select status" />

@@ -26,7 +26,7 @@ export interface RepairType {
   status: 'active' | 'inactive'
 }
 
-export type RepairStatusType = 'approved' | 'pending' | 'rejected'
+export type RepairDataStatusType = 'approved' | 'pending' | 'rejected'
 
 export interface RepairData {
   id: string // podria ser el ID del proyecto + el ID de la reparación
@@ -39,6 +39,6 @@ export interface RepairData {
   measurements: Record<string, number>
   technician: string
   technicianId: number
-  status: RepairStatusType
+  status: RepairDataStatusType
   images: { survey: Blob; progress: Blob[]; finish: Blob }
 }
