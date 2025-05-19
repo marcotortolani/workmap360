@@ -23,10 +23,13 @@ interface RepairDetailModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   repair: RepairData
-  onStatusUpdate?: (
-    repairId: RepairData['id'],
+  onStatusUpdate?: ({
+    repairId,
+    status,
+  }: {
+    repairId: number
     status: RepairDataStatusType
-  ) => void
+  }) => void
 }
 
 export function RepairDetailModal({
@@ -38,7 +41,7 @@ export function RepairDetailModal({
   const [status, setStatus] = useState(repair.status)
 
   const handleStatusUpdate = () => {
-    onStatusUpdate?.(repair.id, status)
+    onStatusUpdate?.({ repairId: repair.id, status })
     onOpenChange(false)
   }
 
@@ -59,10 +62,10 @@ export function RepairDetailModal({
               </Label>
               <p className="font-medium">{repair.projectId}</p>
             </div>
-            <div>
+            {/* <div>
               <Label className="text-sm font-medium text-gray-500">Date</Label>
               <p className="font-medium">{repair.timestamp}</p>
-            </div>
+            </div> */}
             <div>
               <Label className="text-sm font-medium text-gray-500">Drop</Label>
               <p className="font-medium">{repair.drop}</p>
@@ -77,12 +80,6 @@ export function RepairDetailModal({
               </Label>
               <p className="font-medium">{repair.repairType}</p>
             </div>
-            <div>
-              <Label className="text-sm font-medium text-gray-500">
-                Technician
-              </Label>
-              <p className="font-medium">{repair.technician}</p>
-            </div>
           </div>
 
           <div className="mt-4">
@@ -91,7 +88,9 @@ export function RepairDetailModal({
             </Label>
             <Select
               value={status}
-              onValueChange={(status: RepairDataStatusType) => setStatus(status)}
+              onValueChange={(status: RepairDataStatusType) =>
+                setStatus(status)
+              }
             >
               <SelectTrigger id="status" className="mt-1">
                 <SelectValue placeholder="Select status" />
@@ -102,6 +101,15 @@ export function RepairDetailModal({
                 <SelectItem value="Rejected">Rejected</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          {/* Images Slider */}
+          <div>
+            {/* <div>
+              <Label className="text-sm font-medium text-gray-500">
+                Technician
+              </Label>
+              <p className="font-medium">{repair.technician}</p>
+            </div> */}
           </div>
         </div>
 

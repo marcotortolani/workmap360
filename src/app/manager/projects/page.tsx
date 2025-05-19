@@ -133,7 +133,7 @@ export default function ManagerProjectsPage() {
                 <TableHead>Elevations</TableHead>
                 <TableHead>Repairs</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Creado</TableHead>
+                <TableHead>Created at</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -181,8 +181,6 @@ export default function ManagerProjectsPage() {
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric',
-                      hour: 'numeric',
-                      minute: 'numeric',
                     })}
                   </TableCell>
                   {/* Actions (View - Edit - Delete)*/}

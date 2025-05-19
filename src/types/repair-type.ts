@@ -13,8 +13,8 @@ export interface UnitConversion {
 
 export interface RepairType {
   id: number // ID único (incremental)
-  variation: string // Nombre del tipo de reparación, ej. "Concrete Repair Custom 20mm"
-  type: string // Código único, ej. "CR-Custom1"
+  variation: string // Nombre del tipo de reparación, ej. "Concrete Repair Custom 10mm"
+  type: string // Código único, ej. "CR1"
   description: string // Descripción (opcional)
   unitMeasure: UnitMeasure // Unidad de medición
   unitToCharge: string // Unidad de cobro
@@ -29,16 +29,35 @@ export interface RepairType {
 export type RepairDataStatusType = 'approved' | 'pending' | 'rejected'
 
 export interface RepairData {
-  id: string // podria ser el ID del proyecto + el ID de la reparación
-  timestamp: number
+  id: number // ID de reparacion en BD
+  repairCode: string // Codigo de reparacion: D11.L2.MR
   projectId: number
+  projectName: string
+  elevation: string
   drop: number
   level: number
   repairType: string
   repairTypeId: number
   measurements: Record<string, number>
-  technician: string
-  technicianId: number
   status: RepairDataStatusType
-  images: { survey: Blob; progress: Blob[]; finish: Blob }
+  phases: {
+    survey: {
+      createdByUserName: string
+      createdByUserId: number
+      createdAt: number
+      image: Blob
+    }
+    progress: {
+      createdByUserName: string
+      createdByUserId: number
+      createdAt: number
+      image: Blob
+    }[]
+    finish: {
+      createdByUserName: string
+      createdByUserId: number
+      createdAt: number
+      image: Blob
+    }
+  }
 }

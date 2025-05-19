@@ -1,5 +1,6 @@
 // data/data-example.ts
 import type { ProjectData } from '@/types/project-types'
+import { RepairData } from '@/types/repair-type'
 
 export const EXAMPLE_PROJECTS: ProjectData[] = [
   {
@@ -152,5 +153,143 @@ export const EXAMPLE_PROJECTS: ProjectData[] = [
     createdByUserId: 123,
     createdAt: 1698777600000,
     updatedAt: 1698777600000,
+  },
+]
+
+export const EXAMPLE_REPAIRS: RepairData[] = [
+  {
+    id: 1,
+    repairCode: 'D3.L7.CR1',
+    projectId: 1,
+    projectName: '123 Main St',
+    elevation: 'Norte',
+    drop: 3,
+    level: 7,
+    repairType: 'CR1',
+    repairTypeId: 1,
+    measurements: {
+      length: 100,
+      width: 50,
+      height: 200,
+    },
+    status: 'pending',
+    phases: {
+      survey: {
+        createdByUserName: 'John Doe',
+        createdByUserId: 1,
+        createdAt: 1698777600000,
+        image: new Blob(),
+      },
+      progress: [
+        {
+          createdByUserName: 'John Doe',
+          createdByUserId: 1,
+          createdAt: 1698777600000,
+          image: new Blob(),
+        },
+        {
+          createdByUserName: 'John Doe',
+          createdByUserId: 1,
+          createdAt: 1698777600000,
+          image: new Blob(),
+        },
+      ],
+      finish: {
+        createdByUserName: 'John Doe',
+        createdByUserId: 1,
+        createdAt: 1698777600000,
+        image: new Blob(),
+      },
+    },
+  },
+  {
+    id: 2,
+    repairCode: 'D6.L2.MR',
+    projectId: 2,
+    projectName: '957 Park Av.',
+    elevation: 'South',
+    drop: 6,
+    level: 2,
+    repairType: 'MR',
+    repairTypeId: 1,
+    measurements: {
+      length: 100,
+      width: 50,
+      height: 200,
+    },
+    status: 'pending',
+    phases: {
+      survey: {
+        createdByUserName: 'John Doe',
+        createdByUserId: 1,
+        createdAt: 1698777600000,
+        image: new Blob(),
+      },
+      progress: [
+        {
+          createdByUserName: 'John Doe',
+          createdByUserId: 1,
+          createdAt: 1698777600000,
+          image: new Blob(),
+        },
+        {
+          createdByUserName: 'John Doe',
+          createdByUserId: 1,
+          createdAt: 1698777600000,
+          image: new Blob(),
+        },
+      ],
+      finish: {
+        createdByUserName: 'John Doe',
+        createdByUserId: 1,
+        createdAt: 1698777600000,
+        image: new Blob(),
+      },
+    },
+  },
+  {
+    id: 3,
+    repairCode: 'D12.L8.RR',
+    projectId: 3,
+    projectName: '789 Oak St',
+    elevation: 'West',
+    drop: 12,
+    level: 8,
+    repairType: 'RR',
+    repairTypeId: 1,
+    measurements: {
+      length: 100,
+      width: 50,
+      height: 200,
+    },
+    status: 'pending',
+    phases: {
+      survey: {
+        createdByUserName: 'John Doe',
+        createdByUserId: 1,
+        createdAt: 1698777600000,
+        image: new Blob(),
+      },
+      progress: [
+        {
+          createdByUserName: 'John Doe',
+          createdByUserId: 1,
+          createdAt: 1698777600000,
+          image: new Blob(),
+        },
+        {
+          createdByUserName: 'John Doe',
+          createdByUserId: 1,
+          createdAt: 1698777600000,
+          image: new Blob(),
+        },
+      ],
+      finish: {
+        createdByUserName: 'John Doe',
+        createdByUserId: 1,
+        createdAt: 1698777600000,
+        image: new Blob(),
+      },
+    },
   },
 ]

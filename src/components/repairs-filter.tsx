@@ -11,15 +11,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+// import {
+//   Popover,
+//   PopoverContent,
+//   PopoverTrigger,
+// } from '@/components/ui/popover'
 import { Label } from '@/components/ui/label'
-import { Calendar } from '@/components/ui/calendar'
-import { format } from 'date-fns'
-import { cn } from '@/lib/utils'
+// import { Calendar } from '@/components/ui/calendar'
+// import { format } from 'date-fns'
+// import { cn } from '@/lib/utils'
 
 interface RepairsFilterProps {
   onFilter: (filters: any) => void
@@ -27,7 +27,7 @@ interface RepairsFilterProps {
 }
 
 export function RepairsFilter({ onFilter, onSort }: RepairsFilterProps) {
-  const [date, setDate] = useState<Date | undefined>(undefined)
+  //const [date, setDate] = useState<Date | undefined>(undefined)
   const [filters, setFilters] = useState({
     projectId: '',
     repairType: '',
@@ -46,15 +46,15 @@ export function RepairsFilter({ onFilter, onSort }: RepairsFilterProps) {
     onFilter(newFilters)
   }
 
-  const handleDateSelect = (date: Date | undefined) => {
-    setDate(date)
-    if (date) {
-      const formattedDate = format(date, 'yyyy-MM-dd')
-      handleFilterChange('date', formattedDate)
-    } else {
-      handleFilterChange('date', '')
-    }
-  }
+  // const handleDateSelect = (date: Date | undefined) => {
+  //   setDate(date)
+  //   if (date) {
+  //     const formattedDate = format(date, 'yyyy-MM-dd')
+  //     handleFilterChange('date', formattedDate)
+  //   } else {
+  //     handleFilterChange('date', '')
+  //   }
+  // }
 
   const handleSortChange = (column: string, direction: string) => {
     const newSort = { column, direction }
@@ -126,7 +126,7 @@ export function RepairsFilter({ onFilter, onSort }: RepairsFilterProps) {
           </Select>
         </div>
 
-        <div className="w-full sm:w-auto">
+        {/* <div className="w-full sm:w-auto">
           <Label htmlFor="date" className="mb-1 block text-sm">
             Date
           </Label>
@@ -152,7 +152,7 @@ export function RepairsFilter({ onFilter, onSort }: RepairsFilterProps) {
               />
             </PopoverContent>
           </Popover>
-        </div>
+        </div> */}
 
         <div className="w-full sm:w-auto">
           <Label htmlFor="sort" className="mb-1 block text-sm">
@@ -191,7 +191,7 @@ export function RepairsFilter({ onFilter, onSort }: RepairsFilterProps) {
               status: 'all',
               date: '',
             })
-            setDate(undefined)
+            //setDate(undefined)
             onFilter({
               projectId: 'all',
               repairType: 'all',
