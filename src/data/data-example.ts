@@ -159,7 +159,6 @@ export const EXAMPLE_PROJECTS: ProjectData[] = [
 export const EXAMPLE_REPAIRS: RepairData[] = [
   {
     id: 1,
-    repairCode: 'D3.L7.CR1',
     projectId: 1,
     projectName: '123 Main St',
     elevation: 'Norte',
@@ -167,11 +166,7 @@ export const EXAMPLE_REPAIRS: RepairData[] = [
     level: 7,
     repairType: 'CR1',
     repairTypeId: 1,
-    measurements: {
-      length: 100,
-      width: 50,
-      height: 200,
-    },
+    repairIndex: 1,
     status: 'pending',
     phases: {
       survey: {
@@ -179,6 +174,11 @@ export const EXAMPLE_REPAIRS: RepairData[] = [
         createdByUserId: 1,
         createdAt: 1698777600000,
         image: new Blob(),
+        measurements: {
+          length: 100,
+          width: 50,
+          depth: 10,
+        },
       },
       progress: [
         {
@@ -186,25 +186,76 @@ export const EXAMPLE_REPAIRS: RepairData[] = [
           createdByUserId: 1,
           createdAt: 1698777600000,
           image: new Blob(),
+          measurements: null,
         },
         {
           createdByUserName: 'John Doe',
           createdByUserId: 1,
-          createdAt: 1698777600000,
+          createdAt: 0,
           image: new Blob(),
+          measurements: null,
         },
       ],
       finish: {
         createdByUserName: 'John Doe',
         createdByUserId: 1,
-        createdAt: 1698777600000,
+        createdAt: 0,
         image: new Blob(),
+        measurements: null,
       },
     },
   },
   {
     id: 2,
-    repairCode: 'D6.L2.MR',
+    projectId: 1,
+    projectName: '123 Main St',
+    elevation: 'Norte',
+    drop: 3,
+    level: 7,
+    repairType: 'CR1',
+    repairTypeId: 1,
+    repairIndex: 2,
+
+    status: 'pending',
+    phases: {
+      survey: {
+        createdByUserName: 'John Doe',
+        createdByUserId: 1,
+        createdAt: 1698777600000,
+        image: new Blob(),
+        measurements: {
+          length: 100,
+          width: 50,
+          height: 10,
+        },
+      },
+      progress: [
+        {
+          createdByUserName: 'John Doe',
+          createdByUserId: 1,
+          createdAt: 0,
+          image: new Blob(),
+          measurements: null,
+        },
+        {
+          createdByUserName: 'John Doe',
+          createdByUserId: 1,
+          createdAt: 0,
+          image: new Blob(),
+          measurements: null,
+        },
+      ],
+      finish: {
+        createdByUserName: 'John Doe',
+        createdByUserId: 1,
+        createdAt: 0,
+        image: new Blob(),
+        measurements: null,
+      },
+    },
+  },
+  {
+    id: 3,
     projectId: 2,
     projectName: '957 Park Av.',
     elevation: 'South',
@@ -212,11 +263,7 @@ export const EXAMPLE_REPAIRS: RepairData[] = [
     level: 2,
     repairType: 'MR',
     repairTypeId: 1,
-    measurements: {
-      length: 100,
-      width: 50,
-      height: 200,
-    },
+    repairIndex: 1,
     status: 'pending',
     phases: {
       survey: {
@@ -224,32 +271,32 @@ export const EXAMPLE_REPAIRS: RepairData[] = [
         createdByUserId: 1,
         createdAt: 1698777600000,
         image: new Blob(),
+        measurements: {
+          length: 100,
+          width: 50,
+          height: 200,
+        },
       },
       progress: [
         {
           createdByUserName: 'John Doe',
           createdByUserId: 1,
-          createdAt: 1698777600000,
+          createdAt: 0,
           image: new Blob(),
-        },
-        {
-          createdByUserName: 'John Doe',
-          createdByUserId: 1,
-          createdAt: 1698777600000,
-          image: new Blob(),
+          measurements: null,
         },
       ],
       finish: {
         createdByUserName: 'John Doe',
         createdByUserId: 1,
-        createdAt: 1698777600000,
+        createdAt: 0,
         image: new Blob(),
+        measurements: null,
       },
     },
   },
   {
-    id: 3,
-    repairCode: 'D12.L8.RR',
+    id: 4,
     projectId: 3,
     projectName: '789 Oak St',
     elevation: 'West',
@@ -257,18 +304,19 @@ export const EXAMPLE_REPAIRS: RepairData[] = [
     level: 8,
     repairType: 'RR',
     repairTypeId: 1,
-    measurements: {
-      length: 100,
-      width: 50,
-      height: 200,
-    },
-    status: 'pending',
+    repairIndex: 1,
+    status: 'approved',
     phases: {
       survey: {
         createdByUserName: 'John Doe',
         createdByUserId: 1,
         createdAt: 1698777600000,
         image: new Blob(),
+        measurements: {
+          length: 100,
+          width: 50,
+          height: 200,
+        },
       },
       progress: [
         {
@@ -276,12 +324,14 @@ export const EXAMPLE_REPAIRS: RepairData[] = [
           createdByUserId: 1,
           createdAt: 1698777600000,
           image: new Blob(),
+          measurements: null,
         },
         {
           createdByUserName: 'John Doe',
           createdByUserId: 1,
           createdAt: 1698777600000,
           image: new Blob(),
+          measurements: null,
         },
       ],
       finish: {
@@ -289,6 +339,7 @@ export const EXAMPLE_REPAIRS: RepairData[] = [
         createdByUserId: 1,
         createdAt: 1698777600000,
         image: new Blob(),
+        measurements: null,
       },
     },
   },

@@ -30,7 +30,7 @@ export type RepairDataStatusType = 'approved' | 'pending' | 'rejected'
 
 export interface RepairData {
   id: number // ID de reparacion en BD
-  repairCode: string // Codigo de reparacion: D11.L2.MR
+  // repairCode: string // Codigo de reparacion: D11.L2.MR
   projectId: number
   projectName: string
   elevation: string
@@ -38,25 +38,28 @@ export interface RepairData {
   level: number
   repairType: string
   repairTypeId: number
-  measurements: Record<string, number>
+  repairIndex: number
   status: RepairDataStatusType
   phases: {
     survey: {
       createdByUserName: string
       createdByUserId: number
       createdAt: number
+      measurements: Record<string, number>
       image: Blob
     }
     progress: {
       createdByUserName: string
       createdByUserId: number
       createdAt: number
+      measurements?: Record<string, number> | null
       image: Blob
     }[]
     finish: {
       createdByUserName: string
       createdByUserId: number
       createdAt: number
+      measurements?: Record<string, number> | null
       image: Blob
     }
   }

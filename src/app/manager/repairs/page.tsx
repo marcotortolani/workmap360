@@ -70,11 +70,13 @@ export default function ManagerRepairsPage() {
               <TableRow>
                 <TableHead className="w-12">ID</TableHead>
                 <TableHead className="w-20">Type</TableHead>
+                <TableHead className="w-10">Index</TableHead>
                 <TableHead>Repair Code</TableHead>
                 <TableHead>Project Name</TableHead>
                 <TableHead>Elevation</TableHead>
                 <TableHead>Drop</TableHead>
                 <TableHead>Level</TableHead>
+                <TableHead>Phases</TableHead>
                 {/* <TableHead>Technicians</TableHead> */}
                 {/* <TableHead>Date</TableHead> */}
                 <TableHead>Status</TableHead>
@@ -84,18 +86,56 @@ export default function ManagerRepairsPage() {
             <TableBody>
               {repairs.map((repair) => (
                 <TableRow key={repair.id}>
-                  <TableCell className="font-medium">{repair.id}</TableCell>
+                  <TableCell className="font-medium">#{repair.id}</TableCell>
                   <TableCell>
                     {/* {repair.repairType}{' '} */}
                     <span className="mx-1 px-2 py-0.5 bg-neutral-500 text-white rounded-md">
                       {repair.repairType}
                     </span>
                   </TableCell>
-                  <TableCell>{repair.repairCode}</TableCell>
+                  <TableCell>{repair.repairIndex}</TableCell>
+                  <TableCell>
+                    D{repair.drop}.L{repair.level}.{repair.repairType}.
+                    {repair.repairIndex}
+                  </TableCell>
                   <TableCell>{repair.projectName}</TableCell>
                   <TableCell>{repair.elevation}</TableCell>
                   <TableCell>{repair.drop}</TableCell>
                   <TableCell>{repair.level}</TableCell>
+                  <TableCell>
+                    <div className=" flex items-center gap-2">
+                      <span
+                        className={`inline-flex items-center rounded px-2.5 py-0.5 text-xs font-medium ${
+                          repair.phases.survey.createdAt !== 0
+                            ? 'bg-green-300 text-green-900'
+                            : 'bg-transparent text-black'
+                        }`}
+                      >
+                        S
+                      </span>
+                      {repair.phases.progress.map((phase, index) => (
+                        <span
+                          key={index}
+                          className={`inline-flex items-center rounded px-2.5 py-0.5 text-xs font-medium ${
+                            phase.createdAt !== 0
+                              ? 'bg-green-300 text-green-900'
+                              : 'bg-transparent text-black'
+                          }`}
+                        >
+                          P{index + 1}
+                        </span>
+                      ))}
+                      <span
+                        className={`inline-flex items-center rounded px-2.5 py-0.5 text-xs font-medium ${
+                          repair.phases.finish.createdAt !== 0
+                            ? 'bg-green-300 text-green-900'
+                            : 'bg-transparent text-black'
+                        }`}
+                      >
+                        F
+                      </span>
+                    </div>
+                  </TableCell>
                   {/* <TableCell>{repair.technician}</TableCell> */}
                   {/* <TableCell>
                     {new Date(
