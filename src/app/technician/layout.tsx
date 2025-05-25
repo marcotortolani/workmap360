@@ -14,9 +14,9 @@ const sidebarItems = [
     icon: 'pen-tool',
   },
   {
-    title: 'Reparations',
+    title: 'Repairs',
     href: '/technician/reparations',
-    icon: 'table',
+    icon: 'wrench',
   },
   {
     title: "Map's View",

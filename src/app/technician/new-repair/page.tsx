@@ -12,18 +12,19 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { LogoutButton } from '@/components/logout-button'
-import { TabsNavigation } from '@/components/tabs'
+// import { TabsNavigation } from '@/components/tabs'
 
-const technicianTabs = [
-  { value: 'projects', label: 'My Projects', href: '/technician/projects' },
-  { value: 'new-repair', label: 'New Repair', href: '/technician/new-repair' },
-  { value: 'profile', label: 'Profile', href: '/technician/profile' },
-]
+// const technicianTabs = [
+//   { value: 'projects', label: 'My Projects', href: '/technician/projects' },
+//   { value: 'new-repair', label: 'New Repair', href: '/technician/new-repair' },
+//   { value: 'profile', label: 'Profile', href: '/technician/profile' },
+// ]
 
 type ImageOrigin = 'camera' | 'uploaded'
 
 type FormData = {
   projectId: string
+  elevation: string
   drop: string
   level: string
   repairType: string
@@ -35,6 +36,7 @@ type FormData = {
 export default function TechnicianNewRepairPage() {
   const [formData, setFormData] = useState<FormData>({
     projectId: '',
+    elevation: '',
     drop: '',
     level: '',
     repairType: '',
@@ -45,6 +47,7 @@ export default function TechnicianNewRepairPage() {
 
   const isFormComplete =
     formData.projectId &&
+    formData.elevation &&
     formData.drop &&
     formData.level &&
     formData.repairType &&
@@ -61,16 +64,14 @@ export default function TechnicianNewRepairPage() {
         <LogoutButton />
       </div>
 
-      <TabsNavigation tabs={technicianTabs} basePath="/technician" />
+      {/* <TabsNavigation tabs={technicianTabs} basePath="/technician" /> */}
 
       <div className=" w-full lg:w-1/2  rounded-lg border bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-xl font-semibold">New Repair</h2>
         <form className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-4">
             <div className="sm:col-span-4">
-              <label className="mb-2 block text-sm font-medium">
-                Project ID
-              </label>
+              <label className="mb-2 block text-sm font-medium">Project</label>
               <Select
                 value={formData.projectId}
                 onValueChange={(value) =>
@@ -90,6 +91,28 @@ export default function TechnicianNewRepairPage() {
                   <SelectItem value="PRJ-003">
                     PRJ-003 (Drop: 5-15, Level: 2-6)
                   </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="mb-2 block text-sm font-medium">
+                Elevation
+              </label>
+              <Select
+                value={formData.elevation}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, elevation: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select elevation" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="North">North</SelectItem>
+                  <SelectItem value="South">South</SelectItem>
+                  <SelectItem value="West">West</SelectItem>
+                  <SelectItem value="East">East</SelectItem>
                 </SelectContent>
               </Select>
             </div>

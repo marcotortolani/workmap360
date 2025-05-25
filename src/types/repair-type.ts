@@ -33,11 +33,9 @@ export interface RepairData {
   // repairCode: string // Codigo de reparacion: D11.L2.MR
   projectId: number
   projectName: string
-  elevation: string
+  elevationName: string
   drop: number
   level: number
-  repairType: string
-  repairTypeId: number
   repairIndex: number
   status: RepairDataStatusType
   phases: {
@@ -45,22 +43,31 @@ export interface RepairData {
       createdByUserName: string
       createdByUserId: number
       createdAt: number
+      repairType: string
+      repairTypeId: number
       measurements: Record<string, number>
       image: Blob
+      comments?: string
     }
     progress: {
       createdByUserName: string
       createdByUserId: number
       createdAt: number
+      repairType?: string | null
+      repairTypeId?: number | null
       measurements?: Record<string, number> | null
       image: Blob
+      comments?: string
     }[]
     finish: {
       createdByUserName: string
       createdByUserId: number
       createdAt: number
+      repairType?: string | null
+      repairTypeId?: number | null
       measurements?: Record<string, number> | null
       image: Blob
+      comments?: string
     }
   }
 }
