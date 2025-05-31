@@ -19,6 +19,8 @@ import { Label } from '@/components/ui/label'
 
 import { RepairDataStatusType, RepairData } from '@/types/repair-type'
 
+import { getRepairType } from '@/lib/utils'
+
 interface RepairDetailModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -78,7 +80,7 @@ export function RepairDetailModal({
               <Label className="text-sm font-medium text-gray-500">
                 Repair Type
               </Label>
-              <p className="font-medium">{repair.repairType}</p>
+              <p className="font-medium">{getRepairType(repair.phases)}</p>
             </div>
           </div>
 
