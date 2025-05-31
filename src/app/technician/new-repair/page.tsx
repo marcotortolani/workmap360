@@ -798,6 +798,9 @@ export default function TechnicianNewRepairPage() {
     'S' | `P${number}` | 'F' | null
   >(null)
 
+  console.log("status repair phases: ", statusRepairPhases);
+  
+
   const {
     register,
     handleSubmit,
