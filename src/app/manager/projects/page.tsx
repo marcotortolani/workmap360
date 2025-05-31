@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRepairListStore } from '@/stores/repair-list-store'
+import { useRepairTypeStore } from '@/stores/repair-type-store'
 import { useProjectsListStore } from '@/stores/projects-list-store'
 // import { useToast } from '@/hooks/use-toast'
 // import { ToastAction } from '@/components/ui/toast'
@@ -358,7 +358,7 @@ const ProjectForm = ({
 
   // Zustand stores
   const { projectsList, addProject, updateProject } = useProjectsListStore()
-  const { repairList } = useRepairListStore()
+  const { repairTypeList } = useRepairTypeStore()
   //const { technicians: technicianList } = useTechniciansStore()
 
   // Manejador para agregar una elevation
@@ -421,7 +421,7 @@ const ProjectForm = ({
 
   // Manejador para seleccionar un tipo de reparación
   const handleRepairTypeChange = (repairID: string) => {
-    const selectedRepairType = repairList.find(
+    const selectedRepairType = repairTypeList.find(
       (repairType) => repairType.id === Number(repairID)
     )
     if (selectedRepairType) {
@@ -898,15 +898,15 @@ const ProjectForm = ({
                     </span>
                     <span>
                       {
-                        repairList.find((r) => r.id === rt.repairTypeId)
+                        repairTypeList.find((r) => r.id === rt.repairTypeId)
                           ?.variation
                       }{' '}
-                      {repairList.find((r) => r.id === rt.repairTypeId)
+                      {repairTypeList.find((r) => r.id === rt.repairTypeId)
                         ?.unitMeasure?.defaultValues?.depth ? (
                         <span>
                           (
                           {
-                            repairList.find((r) => r.id === rt.repairTypeId)
+                            repairTypeList.find((r) => r.id === rt.repairTypeId)
                               ?.unitMeasure?.defaultValues?.depth
                           }{' '}
                           mm)
@@ -980,7 +980,7 @@ const ProjectForm = ({
                     <SelectValue placeholder="Select repair type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {repairList
+                    {repairTypeList
                       .filter((r) => r.status === 'active')
                       .map((repair) => (
                         <SelectItem
@@ -1228,7 +1228,7 @@ const ProjectDataModal = ({
   projectData?: ProjectData | null
   onClose: () => void
 }) => {
-  const { repairList } = useRepairListStore()
+  const { repairTypeList } = useRepairTypeStore()
 
   if (!projectData) return null
 
@@ -1366,15 +1366,15 @@ const ProjectDataModal = ({
                     </span>
                     <span>
                       {
-                        repairList.find((r) => r.id === rt.repairTypeId)
+                        repairTypeList.find((r) => r.id === rt.repairTypeId)
                           ?.variation
                       }{' '}
-                      {repairList.find((r) => r.id === rt.repairTypeId)
+                      {repairTypeList.find((r) => r.id === rt.repairTypeId)
                         ?.unitMeasure?.defaultValues?.depth ? (
                         <span>
                           (
                           {
-                            repairList.find((r) => r.id === rt.repairTypeId)
+                            repairTypeList.find((r) => r.id === rt.repairTypeId)
                               ?.unitMeasure?.defaultValues?.depth
                           }{' '}
                           mm)

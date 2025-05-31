@@ -3,7 +3,7 @@ import type { RepairType } from '@/types/repair-type'
 
 const MM3_TO_LITERS = 0.000001 // 1 mm³ = 0.000001 litros
 
-export const REPAIR_LIST: RepairType[] = [
+export const REPAIR_TYPE_LIST: RepairType[] = [
   {
     id: 1,
     variation: 'Concrete Repair 1',

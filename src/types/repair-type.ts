@@ -43,8 +43,8 @@ export interface RepairData {
       createdByUserName: string
       createdByUserId: number
       createdAt: number
-      repairType: string
-      repairTypeId: number
+      repairType: RepairType['type']
+      repairTypeId: RepairType['id']
       measurements: Record<string, number>
       image: Blob
       comments?: string

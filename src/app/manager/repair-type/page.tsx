@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRepairListStore } from '@/stores/repair-list-store'
+import { useRepairTypeStore } from '@/stores/repair-type-store'
 import { Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -22,7 +22,7 @@ export default function ManagerRepairsPage() {
   const [selectedRepair, setSelectedRepair] = useState<RepairType | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const { repairList, setRepairList } = useRepairListStore()
+  const { repairTypeList, setRepairTypeList } = useRepairTypeStore()
 
   // const handleFilter = (filters: any) => {
   //   console.log('Applying filters:', filters)
@@ -47,8 +47,8 @@ export default function ManagerRepairsPage() {
   ) => {
     console.log(`Updated repair ${repairId} status to ${status}`)
     // In a real app, you would update the status in your data
-    setRepairList(
-      repairList.map((repair) =>
+    setRepairTypeList(
+      repairTypeList.map((repair) =>
         repair.id === repairId
           ? { ...repair, status: status as RepairType['status'] }
           : repair
@@ -82,7 +82,7 @@ export default function ManagerRepairsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {repairList
+              {repairTypeList
                 .filter((repair) => repair.status === 'active')
                 .map((repair) => (
                   <TableRow key={repair.id}>
@@ -145,7 +145,7 @@ export default function ManagerRepairsPage() {
               </TableRow>
             </TableHeader>
             <TableBody className=" bg-neutral-300 text-neutral-500 ">
-              {repairList
+              {repairTypeList
                 .filter((repair) => repair.status === 'inactive')
                 .map((repair) => (
                   <TableRow key={repair.id} className=" hover:bg-neutral-200">
