@@ -14,6 +14,7 @@ import {
 import { RepairsFilter } from '@/components/repairs-filter'
 import { RepairDetailModal } from '@/components/repair-detail-modal'
 import { RepairData, RepairDataStatusType } from '@/types/repair-type'
+import { getRepairType } from '@/lib/utils'
 
 import { EXAMPLE_REPAIRS } from '@/data/data-example'
 
@@ -90,16 +91,16 @@ export default function ManagerRepairsPage() {
                   <TableCell>
                     {/* {repair.repairType}{' '} */}
                     <span className="mx-1 px-2 py-0.5 bg-neutral-500 text-white rounded-md">
-                      {repair.repairType}
+                      {getRepairType(repair.phases)}
                     </span>
                   </TableCell>
                   <TableCell>{repair.repairIndex}</TableCell>
                   <TableCell>
-                    D{repair.drop}.L{repair.level}.{repair.repairType}.
-                    {repair.repairIndex}
+                    D{repair.drop}.L{repair.level}.
+                    {getRepairType(repair.phases)}.{repair.repairIndex}
                   </TableCell>
                   <TableCell>{repair.projectName}</TableCell>
-                  <TableCell>{repair.elevation}</TableCell>
+                  <TableCell>{repair.elevationName}</TableCell>
                   <TableCell>{repair.drop}</TableCell>
                   <TableCell>{repair.level}</TableCell>
                   <TableCell>
