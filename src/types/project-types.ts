@@ -20,6 +20,8 @@ export interface ProjectRepairType {
   phases: number // Cantidad de fases (mín: 3, máx: 10)
   price: number // Precio de la reparación para este proyecto, ej. 1500
   unitToCharge: string // Unidad usada para facturar en el tipo de reparacion, ej. "unit"
+  minimumChargePerRepair: number // Cantidad mínima a facturar por reparación, ej. 2
+  minimumChargePerDrop: number // Cantidad mínima a facturar por drop, ej. 1
   status: RepairStatusType
 }
 
@@ -35,13 +37,13 @@ export interface ProjectData {
   name: string // Nombre del proyecto (dirección), ej. "957 George Av"
   clientName: string // Nombre del cliente, ej. "Walter Perez"
   clientId: number // ID del cliente, ej. 100
-  elevations: Elevation[] // Array de caras del edificio (mín: 1, máx: 6)
+  elevations: Elevation[] // Array de caras del edificio (mín: 1, máx: 20)
   repairTypes: ProjectRepairType[] // Tipos de reparación permitidos en el proyecto
   technicians: TechnicianAssignment[] // Técnicos asignados al proyecto
-  googleDriveUrl: string // URL de la carpeta de Google Drive, ej. "https://drive.google.com/folder/xyz"
+  // googleDriveUrl: string // URL de la carpeta de Google Drive, ej. "https://drive.google.com/folder/xyz"
   createdByUserName: string // Nombre del Manager que creó el proyecto
   createdByUserId: number // ID del Manager que creó el proyecto
   createdAt: number // Timestamp de creación
-  updatedAt?: number // Timestamp de última actualización
+  updatedAt: number // Timestamp de última actualización
   status: ProjectStatusType // Estado del proyecto
 }

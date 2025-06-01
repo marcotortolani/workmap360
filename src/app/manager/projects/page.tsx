@@ -40,8 +40,8 @@ import {
   ProjectData,
   ProjectRepairType,
   TechnicianAssignment,
-  RepairStatusType,
-  REPAIR_STATUS_OPTIONS,
+  // RepairStatusType,
+  // REPAIR_STATUS_OPTIONS,
 } from '@/types/project-types'
 import { Separator } from '@/components/ui/separator'
 import { TechnicianType } from '@/types/roles-types'
@@ -49,7 +49,7 @@ import { TechnicianType } from '@/types/roles-types'
 import { Label } from '@/components/ui/label'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ProjectsFilter } from '@/components/projects-filter'
-import Link from 'next/link'
+//import Link from 'next/link'
 
 const clientList = [
   { id: 1, name: 'ABC Corporation' },
@@ -126,14 +126,16 @@ export default function ManagerProjectsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Project ID</TableHead>
+                <TableHead>ID</TableHead>
                 <TableHead>Project Name</TableHead>
+                <TableHead>Created by</TableHead>
                 <TableHead>Client</TableHead>
-                <TableHead>Total Drops</TableHead>
-                <TableHead>Elevations</TableHead>
+                {/* <TableHead>Total Drops</TableHead>
+                <TableHead>Elevations</TableHead> */}
                 <TableHead>Repairs</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Created at</TableHead>
+                <TableHead>Updated at</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -142,14 +144,17 @@ export default function ManagerProjectsPage() {
                 <TableRow key={project?.id}>
                   <TableCell className="font-medium">{project?.id}</TableCell>
                   <TableCell className="font-medium">{project?.name}</TableCell>
+                  <TableCell>{project?.createdByUserName}</TableCell>
+                  {/* Client name */}
                   <TableCell>{project?.clientName}</TableCell>
-                  <TableCell>
+                  {/* Total drops amount */}
+                  {/* <TableCell>
                     {project?.elevations
                       ?.map((elevation) => elevation.drops)
                       ?.reduce((a, b) => a + b, 0)}
-                  </TableCell>
+                  </TableCell> */}
                   {/* Elevations amount */}
-                  <TableCell>{project?.elevations?.length}</TableCell>
+                  {/* <TableCell>{project?.elevations?.length}</TableCell> */}
                   {/* Repairs type */}
                   <TableCell>
                     {project?.repairTypes?.map((repair) => (
@@ -178,6 +183,14 @@ export default function ManagerProjectsPage() {
                   {/* Created At */}
                   <TableCell>
                     {new Date(project?.createdAt).toLocaleString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </TableCell>
+                  {/* Updated At */}
+                  <TableCell>
+                    {new Date(project?.updatedAt).toLocaleString('en-US', {
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric',
@@ -314,8 +327,8 @@ const ProjectForm = ({
   const [elevations, setElevations] = useState<Elevation[]>([])
   const [repairTypes, setRepairTypes] = useState<ProjectData['repairTypes']>([])
   const [technicians, setTechnicians] = useState<ProjectData['technicians']>([])
-  const [googleDriveUrl, setGoogleDriveUrl] =
-    useState<ProjectData['googleDriveUrl']>('')
+  // const [googleDriveUrl, setGoogleDriveUrl] =
+  //   useState<ProjectData['googleDriveUrl']>('')
   const [status, setStatus] = useState<ProjectData['status']>('pending')
 
   const [newElevation, setNewElevation] = useState<Elevation>({
@@ -337,6 +350,8 @@ const ProjectForm = ({
     repairType: '',
     phases: 3,
     price: 0,
+    minimumChargePerRepair: 0,
+    minimumChargePerDrop: 0,
     unitToCharge: '',
     status: 'active',
   })
@@ -363,8 +378,8 @@ const ProjectForm = ({
 
   // Manejador para agregar una elevation
   const handleAddElevation = () => {
-    if (elevations.length >= 6) {
-      alert('Maximum 6 elevations allowed')
+    if (elevations.length > 20) {
+      alert('Maximum 20 elevations allowed')
       return
     }
     if (
@@ -452,6 +467,8 @@ const ProjectForm = ({
       phases: newRepairType.phases!,
       price: newRepairType.price!,
       unitToCharge: newRepairType.unitToCharge!,
+      minimumChargePerRepair: newRepairType.minimumChargePerRepair!,
+      minimumChargePerDrop: newRepairType.minimumChargePerDrop!,
       status: newRepairType.status!,
     }
 
@@ -472,6 +489,8 @@ const ProjectForm = ({
       repairType: '',
       phases: 3,
       price: 0,
+      minimumChargePerRepair: 0,
+      minimumChargePerDrop: 0,
       unitToCharge: '',
       status: 'active',
     })
@@ -496,6 +515,8 @@ const ProjectForm = ({
       repairType: '',
       phases: 3,
       price: 0,
+      minimumChargePerRepair: 0,
+      minimumChargePerDrop: 0,
       unitToCharge: '',
       status: 'active',
     })
@@ -597,7 +618,7 @@ const ProjectForm = ({
         elevations,
         repairTypes,
         technicians,
-        googleDriveUrl,
+        //googleDriveUrl,
         status,
         createdByUserName: projectData.createdByUserName,
         createdByUserId: projectData.createdByUserId,
@@ -614,7 +635,7 @@ const ProjectForm = ({
         elevations,
         repairTypes,
         technicians,
-        googleDriveUrl,
+        //googleDriveUrl,
         status,
         createdByUserName: 'John Doe',
         createdByUserId: 123,
@@ -638,7 +659,7 @@ const ProjectForm = ({
       setElevations(projectData.elevations)
       setRepairTypes(projectData.repairTypes)
       setTechnicians(projectData.technicians)
-      setGoogleDriveUrl(projectData.googleDriveUrl)
+      // setGoogleDriveUrl(projectData.googleDriveUrl)
     } else {
       setProjectName('')
       setClientName('')
@@ -646,7 +667,7 @@ const ProjectForm = ({
       setElevations([])
       setRepairTypes([])
       setTechnicians([])
-      setGoogleDriveUrl('')
+      //setGoogleDriveUrl('')
       setSameLevelsForAll(false)
       setCommonLevels(0)
       setEditingTechnicianIndex(null)
@@ -739,7 +760,7 @@ const ProjectForm = ({
 
         {/* Elevations */}
         <div className=" col-span-2">
-          <h3 className="text-lg font-medium">Elevations (1 min - 6 max)</h3>
+          <h3 className="text-lg font-medium">Elevations (1 min - 20 max)</h3>
           <p className="text-sm text-muted-foreground">
             Add elevations to the project
           </p>
@@ -918,6 +939,7 @@ const ProjectForm = ({
                     orientation="vertical"
                     className="w-0.5 h-6 bg-neutral-300"
                   />
+
                   <div className=" flex items-center gap-2">
                     <span>{rt.phases} phases</span>
                     <Separator
@@ -997,7 +1019,8 @@ const ProjectForm = ({
                 </Select>
               </div>
 
-              <div className=" w-1/3">
+              {/* Status Repair Selector */}
+              {/* <div className=" w-1/3">
                 <Label htmlFor="repairStatus">Status</Label>
                 <Select
                   name="repairStatus"
@@ -1019,14 +1042,9 @@ const ProjectForm = ({
                         {status}
                       </SelectItem>
                     ))}
-                    {/* <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="in-progress" defaultChecked>
-                      In Progress
-                    </SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem> */}
                   </SelectContent>
                 </Select>
-              </div>
+              </div> */}
 
               <div className=" space-x-2 ">
                 <Label htmlFor="phases">Phases (3-10):</Label>
@@ -1046,27 +1064,76 @@ const ProjectForm = ({
                   className=" w-28"
                 />
               </div>
+              <div className="">
+                <Label htmlFor="price">Price:</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="price"
+                    type="number"
+                    value={newRepairType.price || ''}
+                    onChange={(e) =>
+                      setNewRepairType({
+                        ...newRepairType,
+                        price: Number(e.target.value),
+                      })
+                    }
+                    placeholder="Price"
+                    min="0"
+                  />
+                  {newRepairType.unitToCharge && (
+                    <span>/{newRepairType.unitToCharge}</span>
+                  )}
+                </div>
+              </div>
             </div>
             <div className=" flex justify-between">
-              <div className="flex items-center gap-2">
-                <Label htmlFor="price">Price:</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  value={newRepairType.price || ''}
-                  onChange={(e) =>
-                    setNewRepairType({
-                      ...newRepairType,
-                      price: Number(e.target.value),
-                    })
-                  }
-                  placeholder="Price"
-                  min="0"
-                />
-                {newRepairType.unitToCharge && (
-                  <span>/{newRepairType.unitToCharge}</span>
-                )}
+              {/* Minimum Charge per Repair */}
+              <div className="">
+                <Label htmlFor="minChargePerRepair">
+                  Min Charge per Repair:
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="minChargePerRepair"
+                    type="number"
+                    value={newRepairType.minimumChargePerRepair || ''}
+                    onChange={(e) =>
+                      setNewRepairType({
+                        ...newRepairType,
+                        minimumChargePerRepair: Number(e.target.value),
+                      })
+                    }
+                    placeholder="MC/R"
+                    min="0"
+                  />
+                  {newRepairType.unitToCharge && (
+                    <span>/{newRepairType.unitToCharge}</span>
+                  )}
+                </div>
               </div>
+              {/* Minimum Charge per Drop */}
+              <div className="">
+                <Label htmlFor="minChargePerDrop">Min Charge per Drop:</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="minChargePerDrop"
+                    type="number"
+                    value={newRepairType.minimumChargePerDrop || ''}
+                    onChange={(e) =>
+                      setNewRepairType({
+                        ...newRepairType,
+                        minimumChargePerDrop: Number(e.target.value),
+                      })
+                    }
+                    placeholder="MC/D"
+                    min="0"
+                  />
+                  {newRepairType.unitToCharge && (
+                    <span>/{newRepairType.unitToCharge}</span>
+                  )}
+                </div>
+              </div>
+
               <Button
                 type="button"
                 onClick={handleAddOrUpdateRepairType}
@@ -1189,7 +1256,7 @@ const ProjectForm = ({
         <Separator className=" w-full col-span-2 mt-4" />
 
         {/* Google Drive URL */}
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium">Google Drive URL</label>
           <input
             type="text"
@@ -1199,7 +1266,7 @@ const ProjectForm = ({
             required
             className="border rounded p-2 w-full"
           />
-        </div>
+        </div> */}
 
         <div className="space-x-2 sm:col-span-2">
           <Button
@@ -1452,7 +1519,7 @@ const ProjectDataModal = ({
         <Separator className=" w-full col-span-2 mt-4" />
 
         {/* Google Drive URL */}
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium">Google Drive URL</label>
           <Link
             href={projectData?.googleDriveUrl || ''}
@@ -1460,7 +1527,7 @@ const ProjectDataModal = ({
           >
             {projectData?.googleDriveUrl || 'No URL provided'}
           </Link>
-        </div>
+        </div> */}
 
         <div className="space-x-2 sm:col-span-2">
           <Button
