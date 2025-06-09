@@ -105,7 +105,7 @@ export async function PUT(
   if (status) updateData.status = status
   if (avatar) updateData.avatar = avatar
 
-  const { data, error: updateError } = await supabase
+  const { error: updateError } = await supabase
     .from('users')
     .update(updateData)
     .eq('id', targetId)
@@ -115,8 +115,7 @@ export async function PUT(
     return NextResponse.json({ error: updateError.message }, { status: 500 })
   }
 
-  return NextResponse.json(
-    { user: data?.[0], message: 'Usuario actualizado exitosamente' },
-    { status: 200 }
-  )
+  return NextResponse.json({
+    message: 'Usuario actualizado exitosamente',
+  })
 }
