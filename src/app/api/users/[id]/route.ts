@@ -6,7 +6,7 @@ import { getServiceSupabase } from '@/lib/supabaseAuth'
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   const { supabase, user, role, error } = await getSupabaseAuthWithRole(req)
 
@@ -20,7 +20,7 @@ export async function DELETE(
   const deny = checkPermissionOrFail(role, 'users', 'delete')
   if (deny) return deny
 
-  const { id } = await params
+  const { id } = await context.params
 
   // 1. Buscar el usuario por ID en tu tabla `users` y obtener su UID (auth ID)
   const { data: targetUser, error: fetchError } = await supabase
@@ -105,7 +105,7 @@ export async function PUT(
   if (status) updateData.status = status
   if (avatar) updateData.avatar = avatar
 
-  const { error: updateError } = await supabase
+  const { data, error: updateError } = await supabase
     .from('users')
     .update(updateData)
     .eq('id', targetId)
@@ -115,7 +115,8 @@ export async function PUT(
     return NextResponse.json({ error: updateError.message }, { status: 500 })
   }
 
-  return NextResponse.json({
-    message: 'Usuario actualizado exitosamente',
-  })
+  return NextResponse.json(
+    { user: data?.[0], message: 'Usuario actualizado exitosamente' },
+    { status: 200 }
+  )
 }
