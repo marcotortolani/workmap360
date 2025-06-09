@@ -1,6 +1,5 @@
 // app/api/users/[id]/route.ts
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import { getSupabaseAuthWithRole } from '@/lib/getSupabaseAuthWithRole'
 import { checkPermissionOrFail } from '@/lib/auth/permissions'
 import { getServiceSupabase } from '@/lib/supabaseAuth'
@@ -69,7 +68,7 @@ export async function DELETE(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   const { supabase, user, role, error } = await getSupabaseAuthWithRole(req)
 
@@ -80,7 +79,7 @@ export async function PUT(
     )
   }
 
-  const { id: targetId } = await params
+  const { id: targetId } = context.params
 
   // Si el usuario no es admin y está editando a otro, denegar
   if (user.id !== targetId) {

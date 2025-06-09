@@ -2,6 +2,10 @@ import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   /* config options here */
+  webpack: (config) => {
+    config.module.exprContextCritical = false
+    return config
+  },
   images: {
     // minimumCacheTTL: 60,
     // formats: ['image/webp'],
