@@ -1,5 +1,6 @@
 // app/api/users/[id]/route.ts
 import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 import { getSupabaseAuthWithRole } from '@/lib/getSupabaseAuthWithRole'
 import { checkPermissionOrFail } from '@/lib/auth/permissions'
 import { getServiceSupabase } from '@/lib/supabaseAuth'
@@ -67,7 +68,7 @@ export async function DELETE(
 }
 
 export async function PUT(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const { supabase, user, role, error } = await getSupabaseAuthWithRole(req)
@@ -115,5 +116,8 @@ export async function PUT(
     return NextResponse.json({ error: updateError.message }, { status: 500 })
   }
 
-  return NextResponse.json({ user: data?.[0] }, { status: 200 })
+  return NextResponse.json(
+    { user: data?.[0], message: 'Usuario actualizado exitosamente' },
+    { status: 200 }
+  )
 }
