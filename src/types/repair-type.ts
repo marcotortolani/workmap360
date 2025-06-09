@@ -46,7 +46,7 @@ export interface RepairData {
       repairType: RepairType['type']
       repairTypeId: RepairType['id']
       measurements: Record<string, number>
-      image: Blob
+      images: Blob[]
       comments?: string
     }
     progress: {
@@ -63,11 +63,11 @@ export interface RepairData {
       createdByUserName: string
       createdByUserId: number
       createdAt: number
-      repairType?: string | null
-      repairTypeId?: number | null
-      measurements?: Record<string, number> | null
-      image: Blob
+      images: Blob[]
       comments?: string
+      // repairType?: string | null
+      // repairTypeId?: number | null
+      // measurements?: Record<string, number> | null
     }
   }
 }

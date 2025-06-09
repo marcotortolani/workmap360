@@ -33,7 +33,6 @@ export function getRepairStatus(repair: RepairData) {
 }
 
 export function getRepairType(phases: RepairData['phases']) {
-  if (phases.finish.repairType) return phases.finish.repairType
   if (phases.progress.some((p) => p.repairType))
     return phases.progress[0].repairType
   if (phases.survey.repairType) return phases.survey.repairType

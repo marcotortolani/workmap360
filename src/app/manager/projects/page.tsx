@@ -44,7 +44,7 @@ import {
   // REPAIR_STATUS_OPTIONS,
 } from '@/types/project-types'
 import { Separator } from '@/components/ui/separator'
-import { TechnicianType } from '@/types/roles-types'
+import { UserType } from '@/types/user-types'
 
 import { Label } from '@/components/ui/label'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -59,14 +59,14 @@ const clientList = [
   { id: 5, name: 'JKL Enterprises' },
 ]
 
-const techniciansList: TechnicianType[] = [
+const techniciansList: UserType[] = [
   {
     id: 1,
     firstName: 'John',
     lastName: 'Doe',
     email: 'oT0Y4@example.com',
-    role: 'Admin',
-    createdDate: '2023-01-15',
+    role: 'technician',
+    createdAt: '2023-01-15',
     status: 'active',
     avatar: 'https://avatar.iran.liara.run/public/42',
   },
@@ -75,8 +75,8 @@ const techniciansList: TechnicianType[] = [
     firstName: 'Jane',
     lastName: 'Smith',
     email: 'jane.smith@example.com',
-    role: 'Manager',
-    createdDate: '2023-02-20',
+    role: 'technician',
+    createdAt: '2023-02-20',
     status: 'active',
     avatar: 'https://avatar.iran.liara.run/public/15',
   },
@@ -85,8 +85,8 @@ const techniciansList: TechnicianType[] = [
     firstName: 'Robert',
     lastName: 'Johnson',
     email: 'robert.johnson@example.com',
-    role: 'Technician',
-    createdDate: '2023-03-10',
+    role: 'technician',
+    createdAt: '2023-03-10',
     status: 'active',
     avatar: 'https://avatar.iran.liara.run/public/42',
   },
@@ -218,6 +218,7 @@ export default function ManagerProjectsPage() {
                         setSelectedProject(project)
                         setActionSelected('edit')
                       }}
+                      disabled={project.status === PROJECT_STATUS['completed']}
                     >
                       <Edit className="mr-2 h-4 w-4" />
                       Edit
@@ -1104,7 +1105,7 @@ const ProjectForm = ({
                       })
                     }
                     placeholder="MC/R"
-                    min="0"
+                    min="1"
                   />
                   {newRepairType.unitToCharge && (
                     <span>/{newRepairType.unitToCharge}</span>
@@ -1126,7 +1127,7 @@ const ProjectForm = ({
                       })
                     }
                     placeholder="MC/D"
-                    min="0"
+                    min="1"
                   />
                   {newRepairType.unitToCharge && (
                     <span>/{newRepairType.unitToCharge}</span>
@@ -1427,6 +1428,11 @@ const ProjectDataModal = ({
                   key={index}
                   className=" p-2 flex items-center gap-4 border rounded-lg"
                 >
+                  <span
+                    className={`inline-flex items-center rounded-full size-3 -mr-2 ${
+                      rt.status === 'active' ? 'bg-green-400' : 'bg-yellow-400'
+                    }`}
+                  ></span>
                   <div className=" flex items-center gap-2">
                     <span className="  bg-neutral-700 text-white font-semibold px-2 py-1 border rounded-md">
                       {rt.repairType}
@@ -1462,8 +1468,19 @@ const ProjectDataModal = ({
                     <span>
                       ${rt.price} ({rt.unitToCharge})
                     </span>
+                    <Separator
+                      orientation="vertical"
+                      className="w-0.5 h-6 bg-neutral-300"
+                    />
+                    <span>MC/R: {rt.minimumChargePerRepair}</span>
+                    <Separator
+                      orientation="vertical"
+                      className="w-0.5 h-6 bg-neutral-300"
+                    />
+                    <span>MC/D: {rt.minimumChargePerDrop}</span>
                   </div>
-                  <Separator
+
+                  {/* <Separator
                     orientation="vertical"
                     className="w-0.5 h-6 bg-neutral-300"
                   />
@@ -1475,7 +1492,7 @@ const ProjectDataModal = ({
                     }`}
                   >
                     {rt.status}
-                  </span>
+                  </span> */}
                 </div>
               ))}
           </div>
