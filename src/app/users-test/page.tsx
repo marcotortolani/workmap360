@@ -166,13 +166,14 @@ export default function UsersTestPage() {
     }
 
     try {
-      const res = await fetch(`/api/users/${editingUser.id}`, {
+      const res = await fetch(`/api/users/edit`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
+          id: editingUser.id,
           firstName: editValues.first_name,
           lastName: editValues.last_name,
           role: editValues.role,
@@ -245,7 +246,7 @@ export default function UsersTestPage() {
       } = await supabase.auth.getSession()
       if (!session) throw new Error('No hay sesión activa')
       const response = await fetch(
-        `/api/users/by-role/${role}?page=1&limit=20`,
+        `/api/users/by-role/?role=${role}&page=1&limit=20`,
         {
           headers: { Authorization: `Bearer ${session.access_token}` },
         }
@@ -290,11 +291,14 @@ export default function UsersTestPage() {
         throw new Error('No hay sesión activa')
       }
 
-      const response = await fetch(`/api/users/${userId}`, {
+      const response = await fetch(`/api/users/delete`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
         },
+        body: JSON.stringify({ id: userId }),
       })
 
       const result = await response.json()

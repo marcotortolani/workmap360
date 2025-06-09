@@ -3,11 +3,12 @@ import { NextResponse } from 'next/server'
 import { getSupabaseAuthWithRole } from '@/lib/getSupabaseAuthWithRole'
 import { checkPermissionOrFail } from '@/lib/auth/permissions'
 
-export async function GET(
-  req: Request,
-  { params }: { params: { role: string } }
-) {
-  const { role: targetRole } = params
+export async function GET(req: Request) {
+  // Obtener query params de paginación
+  const { searchParams } = new URL(req.url)
+  const page = parseInt(searchParams.get('page') || '1')
+  const limit = parseInt(searchParams.get('limit') || '10')
+  const targetRole = searchParams.get('role') || 'guest'
 
   const validRoles = ['admin', 'manager', 'technician', 'client', 'guest']
   if (!validRoles.includes(targetRole)) {
@@ -32,11 +33,6 @@ export async function GET(
       { status: 403 }
     )
   }
-
-  // Obtener query params de paginación
-  const { searchParams } = new URL(req.url)
-  const page = parseInt(searchParams.get('page') || '1')
-  const limit = parseInt(searchParams.get('limit') || '10')
 
   const from = (page - 1) * limit
   const to = from + limit - 1

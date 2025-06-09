@@ -62,31 +62,31 @@ const clientList = [
 const techniciansList: UserType[] = [
   {
     id: 1,
-    firstName: 'John',
-    lastName: 'Doe',
+    first_name: 'John',
+    last_name: 'Doe',
     email: 'oT0Y4@example.com',
     role: 'technician',
-    createdAt: '2023-01-15',
+    created_at: '2023-01-15',
     status: 'active',
     avatar: 'https://avatar.iran.liara.run/public/42',
   },
   {
     id: 2,
-    firstName: 'Jane',
-    lastName: 'Smith',
+    first_name: 'Jane',
+    last_name: 'Smith',
     email: 'jane.smith@example.com',
     role: 'technician',
-    createdAt: '2023-02-20',
+    created_at: '2023-02-20',
     status: 'active',
     avatar: 'https://avatar.iran.liara.run/public/15',
   },
   {
     id: 3,
-    firstName: 'Robert',
-    lastName: 'Johnson',
+    first_name: 'Robert',
+    last_name: 'Johnson',
     email: 'robert.johnson@example.com',
     role: 'technician',
-    createdAt: '2023-03-10',
+    created_at: '2023-03-10',
     status: 'active',
     avatar: 'https://avatar.iran.liara.run/public/42',
   },
@@ -533,8 +533,8 @@ const ProjectForm = ({
     if (selectedTechnician) {
       setNewTechnician({
         technicianId: selectedId,
-        technicianFirstName: selectedTechnician.firstName,
-        technicianLastName: selectedTechnician.lastName,
+        technicianFirstName: selectedTechnician.first_name,
+        technicianLastName: selectedTechnician.last_name,
         technicianAvatar: selectedTechnician.avatar,
       })
     }
@@ -1229,7 +1229,7 @@ const ProjectForm = ({
                         .map((tech) => tech.technicianId)
                         .includes(tech.id)}
                     >
-                      {tech.firstName} {tech.lastName} (ID: {tech.id})
+                      {tech.first_name} {tech.last_name} (ID: {tech.id})
                     </SelectItem>
                   ))}
                 </SelectContent>
