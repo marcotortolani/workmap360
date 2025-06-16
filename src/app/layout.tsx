@@ -2,6 +2,8 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
+import { createBrowserClient } from '@supabase/ssr'
+import { SessionContextProvider } from '@supabase/auth-helpers-react'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

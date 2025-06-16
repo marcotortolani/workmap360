@@ -136,7 +136,6 @@ export default function ManagerUsersPage() {
 
   const handleDeleteButton = (userId: UserType['id']) => {
     setUserToDelete(userId)
-    // deleteUser(userId)
   }
 
   // const handleSubmit = (user: UserType) => {
