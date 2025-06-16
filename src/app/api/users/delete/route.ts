@@ -32,6 +32,12 @@ export async function DELETE(req: Request) {
       { status: 404 }
     )
   }
+  if (targetUser.role === 'admin') {
+    return NextResponse.json(
+      { error: 'No puedes eliminar a un administrador' },
+      { status: 403 }
+    )
+  }
 
   // 2. Eliminar de `auth.users` usando el cliente con Service Role
   const serviceClient = getServiceSupabase()

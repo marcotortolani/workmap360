@@ -20,12 +20,18 @@ import { FallbackAvatar } from './fallback-avatar'
 import { LoaderPinwheelIcon } from 'lucide-react'
 
 interface UserFormProps {
+  adminPermissions?: boolean
   user: UserType | null
   onSubmit?: (user: UserType) => void
   onCancel?: () => void
 }
 
-export function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
+export function UserForm({
+  adminPermissions,
+  user,
+  onSubmit,
+  onCancel,
+}: UserFormProps) {
   const [formData, setFormData] = useState({
     id: user?.id || null,
     first_name: user?.first_name || '',
@@ -105,40 +111,44 @@ export function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              placeholder="Enter email address"
-              required
-            />
-          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                placeholder="Enter email address"
+                required
+              />
+            </div>
 
-          <div>
-            <Label htmlFor="role">Role</Label>
-            <Select
-              value={formData.role}
-              onValueChange={(value) =>
-                setFormData({ ...formData, role: value })
-              }
-              required
-            >
-              <SelectTrigger id="role">
-                <SelectValue placeholder="Select role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="admin">Admin</SelectItem>
-                <SelectItem value="manager">Manager</SelectItem>
-                <SelectItem value="technician">Technician</SelectItem>
-                <SelectItem value="client">Client</SelectItem>
-                <SelectItem value="guest">Guest</SelectItem>
-              </SelectContent>
-            </Select>
+            <div>
+              <Label htmlFor="role">Role</Label>
+              <Select
+                value={formData.role}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, role: value })
+                }
+                required
+              >
+                <SelectTrigger id="role">
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  {adminPermissions && (
+                    <SelectItem value="admin">Admin</SelectItem>
+                  )}
+                  <SelectItem value="manager">Manager</SelectItem>
+                  <SelectItem value="technician">Technician</SelectItem>
+                  <SelectItem value="client">Client</SelectItem>
+                  <SelectItem value="guest">Guest</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="flex items-center gap-4">
@@ -161,7 +171,7 @@ export function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
           </div>
         </div>
       </div>
-      <div className=" space-x-6">
+      <div className=" w-full flex items-center justify-between">
         <Button variant="default" className="mt-4 " onClick={onCancel}>
           Cancel
         </Button>

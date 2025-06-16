@@ -403,6 +403,7 @@ export default function ManagerUsersPage() {
                             size="sm"
                             className="text-red-500 hover:bg-red-50 hover:text-red-600"
                             onClick={() => handleDeleteButton(user.id)}
+                            disabled={user.role === 'admin'}
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete
@@ -430,11 +431,12 @@ export default function ManagerUsersPage() {
           {loading && <p>Cargando...</p>}
         </div>
       ) : (
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <div className="w-full max-w-3xl rounded-lg border bg-white p-6 shadow-sm shadow-neutral-600 border-neutral-400">
           <h2 className="mb-4 text-xl font-semibold">
             {editingUser ? 'Edit User' : 'Create User'}
           </h2>
           <UserForm
+            adminPermissions={false}
             user={editingUser}
             onSubmit={editingUser ? confirmEdit : createUser}
             onCancel={() => setShowForm(false)}

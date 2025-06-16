@@ -435,6 +435,7 @@ export default function ManagerUsersPage() {
             {editingUser ? 'Edit User' : 'Create User'}
           </h2>
           <UserForm
+            adminPermissions={true}
             user={editingUser}
             onSubmit={editingUser ? confirmEdit : createUser}
             onCancel={() => setShowForm(false)}
