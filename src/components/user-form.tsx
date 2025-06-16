@@ -1,36 +1,35 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { AvatarUpload } from "@/components/avatar-upload"
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+import { AvatarUpload } from '@/components/avatar-upload'
+import { UserType } from '@/types/user-types'
 
 interface UserFormProps {
-  user?: {
-    id?: string
-    firstName: string
-    lastName: string
-    email: string
-    role: string
-    status: "active" | "inactive"
-    avatar?: string
-  }
+  user: UserType | null
   onSubmit?: (user: any) => void
 }
 
 export function UserForm({ user, onSubmit }: UserFormProps) {
   const [formData, setFormData] = useState({
-    firstName: user?.firstName || "",
-    lastName: user?.lastName || "",
-    email: user?.email || "",
-    role: user?.role || "",
-    status: user?.status || "active",
+    firstName: user?.first_name || '',
+    lastName: user?.last_name || '',
+    email: user?.email || '',
+    role: user?.role || '',
+    status: user?.status || 'active',
     avatar: user?.avatar || null,
   })
 
@@ -54,7 +53,9 @@ export function UserForm({ user, onSubmit }: UserFormProps) {
               <Input
                 id="firstName"
                 value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, firstName: e.target.value })
+                }
                 placeholder="Enter first name"
                 required
               />
@@ -65,7 +66,9 @@ export function UserForm({ user, onSubmit }: UserFormProps) {
               <Input
                 id="lastName"
                 value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, lastName: e.target.value })
+                }
                 placeholder="Enter last name"
                 required
               />
@@ -78,7 +81,9 @@ export function UserForm({ user, onSubmit }: UserFormProps) {
               id="email"
               type="email"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
               placeholder="Enter email address"
               required
             />
@@ -86,7 +91,13 @@ export function UserForm({ user, onSubmit }: UserFormProps) {
 
           <div>
             <Label htmlFor="role">Role</Label>
-            <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })} required>
+            <Select
+              value={formData.role}
+              onValueChange={(value) =>
+                setFormData({ ...formData, role: value })
+              }
+              required
+            >
               <SelectTrigger id="role">
                 <SelectValue placeholder="Select role" />
               </SelectTrigger>
@@ -104,19 +115,28 @@ export function UserForm({ user, onSubmit }: UserFormProps) {
             <div className="flex items-center gap-2">
               <Switch
                 id="status"
-                checked={formData.status === "active"}
-                onCheckedChange={(checked) => setFormData({ ...formData, status: checked ? "active" : "inactive" })}
+                checked={formData.status === 'active'}
+                onCheckedChange={(checked) =>
+                  setFormData({
+                    ...formData,
+                    status: checked ? 'active' : 'inactive',
+                  })
+                }
               />
-              <span className="text-sm font-medium">{formData.status === "active" ? "Active" : "Inactive"}</span>
+              <span className="text-sm font-medium">
+                {formData.status === 'active' ? 'Active' : 'Inactive'}
+              </span>
             </div>
           </div>
         </div>
       </div>
 
-      <Button type="submit" className="w-full bg-orange-500 text-white hover:bg-orange-400 sm:w-auto">
+      <Button
+        type="submit"
+        className="w-full bg-orange-500 text-white hover:bg-orange-400 sm:w-auto"
+      >
         Save User
       </Button>
     </form>
   )
 }
-

@@ -34,7 +34,7 @@ export default function UsersTestPage() {
     avatar: '',
   })
 
-  console.log('users: ', users)
+  // console.log('users: ', users)
 
   useEffect(() => {
     async function getUser() {
