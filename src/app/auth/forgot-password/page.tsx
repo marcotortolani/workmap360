@@ -47,7 +47,7 @@ export default function Page() {
     <PageWrapper backgroundImage="/images/bg-wall-brutalism-01.jpg">
       <div className="w-full max-w-sm">
         <div className="flex flex-col gap-6">
-          {!success ? (
+          {success ? (
             <Card className="w-full max-w-md bg-white/30  drop-shadow-xl backdrop-blur-lg border-neutral-400">
               <CardHeader>
                 <CardTitle className="text-2xl">Check Your Email</CardTitle>
