@@ -51,9 +51,10 @@ export default function ManagerUsersPage() {
   }
 
   const listUsers = async () => {
+    const token = await getSessionToken()
+    if (!token) throw new Error('No hay sesión activa')
+      
     withLoading(async () => {
-      const token = await getSessionToken()
-      if (!token) throw new Error('No hay sesión activa')
       const response = await fetch('/api/users/list?page=1&limit=20', {
         method: 'GET',
         headers: {
