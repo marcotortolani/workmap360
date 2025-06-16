@@ -28,7 +28,7 @@ import {
 
 import { FallbackAvatar } from '@/components/fallback-avatar'
 
-export const getSessionToken = async (): Promise<string> => {
+const getSessionToken = async (): Promise<string> => {
   const {
     data: { session },
   } = await supabase.auth.getSession()
