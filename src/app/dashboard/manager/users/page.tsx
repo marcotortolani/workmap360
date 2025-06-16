@@ -59,18 +59,18 @@ export default function ManagerUsersPage() {
   }
 
   const listUsers = async () => {
-    // const {
-    //   data: { session },
-    // } = await supabase.auth.getSession()
-    // if (!session) throw new Error('No hay sesión activa')
-    const token = await getSessionToken()
-    if (!token) throw new Error('No hay sesión activa')
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+    if (!session) throw new Error('No hay sesión activa')
+    // const token = await getSessionToken()
+    // if (!token) throw new Error('No hay sesión activa')
 
     withLoading(async () => {
       const response = await fetch('/api/users/list?page=1&limit=20', {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
       })
       const { users, pagination, error } = await response.json()
@@ -88,13 +88,18 @@ export default function ManagerUsersPage() {
       listUsers()
       return
     }
-    const token = await getSessionToken()
-    if (!token) throw new Error('No hay sesión activa')
+    // const token = await getSessionToken()
+    // if (!token) throw new Error('No hay sesión activa')
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+    if (!session) throw new Error('No hay sesión activa')
+
     withLoading(async () => {
       const response = await fetch(
         `/api/users/by-role/?role=${role}&page=1&limit=20`,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${session.access_token}` },
         }
       )
       const { users, pagination, error } = await response.json()
