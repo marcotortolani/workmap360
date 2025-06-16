@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   const redirectTo = new URL(req.url).origin + `/dashboard`
 
   try {
-    const { user, role, error } = await getSupabaseAuthWithRole()
+    const { user, role, error } = await getSupabaseAuthWithRole(req)
 
     if (error || !user || !role) {
       return NextResponse.json({ error }, { status: 401 })
