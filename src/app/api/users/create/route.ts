@@ -6,10 +6,9 @@ import { getServiceSupabase } from '@/lib/supabaseAuth'
 
 export async function POST(req: Request) {
   const redirectTo = new URL(req.url).origin + `/dashboard`
-  console.log("Redirecting to:", redirectTo);
-  
+
   try {
-    const { user, role, error } = await getSupabaseAuthWithRole(req)
+    const { user, role, error } = await getSupabaseAuthWithRole()
 
     if (error || !user || !role) {
       return NextResponse.json({ error }, { status: 401 })
@@ -65,7 +64,10 @@ export async function POST(req: Request) {
       await serviceClient.auth.signUp(authPayload)
 
     if (authError?.message?.includes('User already registered')) {
-      return NextResponse.json({ error: 'Email already registered' }, { status: 409 })
+      return NextResponse.json(
+        { error: 'Email already registered' },
+        { status: 409 }
+      )
     }
 
     if (authError || !authUser?.user) {
@@ -99,9 +101,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ user: data }, { status: 201 })
   } catch (err) {
     console.error('Error:', err)
-    return NextResponse.json(
-      { error: 'Error creating user' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Error creating user' }, { status: 500 })
   }
 }

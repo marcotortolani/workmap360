@@ -17,13 +17,13 @@ const permissions: PermissionMatrix = {
     projects: ['read', 'create', 'update', 'delete'],
   },
   manager: {
-    users: ['read', 'create', 'update'],
+    users: ['read', 'create', 'update', 'delete'],
     repair_types: ['read', 'create', 'update', 'delete'],
     repairs: ['read', 'create', 'update', 'delete'],
     projects: ['read', 'create', 'update', 'delete'],
   },
   technician: {
-    users: ['read'],
+    users: ['read', 'update'],
     repair_types: ['read'],
     repairs: ['read', 'create', 'update'],
     projects: ['read'],

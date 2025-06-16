@@ -42,6 +42,7 @@ export default function LoginPage() {
       })
       if (error) throw error
       // Update this route to redirect to an authenticated route. The user already has an active session.
+      await new Promise((resolve) => setTimeout(resolve, 100)) // Espera mínima
       router.push('/dashboard')
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
