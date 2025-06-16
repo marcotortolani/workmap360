@@ -6,7 +6,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-black p-4">
       <div className="mb-12 text-center">
-        <h1 className="text-4xl font-bold text-white">Trazalot</h1>
+        <h1 className="text-4xl font-bold text-white">Workmap360</h1>
         <p className="mt-2 text-gray-400">Select your role to continue</p>
       </div>
 

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Stamp & Label App',
+  title: 'Workmap360',
   description: 'Description',
 }
 

@@ -60,17 +60,19 @@ export default function LoginPage() {
         }}
       ></div>
       <div className="mb-8 text-center">
-        <h1 className="text-4xl font-bold text-white md:text-5xl">Trazalot</h1>
-        <p className="mt-2 text-gray-400">Sistema de Gestión de Proyectos</p>
+        <h1 className="text-4xl font-bold text-white md:text-5xl">
+          Workmap360
+        </h1>
+        <p className="mt-2 text-gray-400">Project Management System</p>
       </div>
 
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
-            Iniciar Sesión
+            <LogIn className="mr-2 h-4 w-4" /> Login
           </CardTitle>
           <CardDescription className="text-center">
-            Ingrese sus credenciales para acceder al sistema
+            Enter your credentials to access the system
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -80,7 +82,7 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="usuario@trazalot.com"
+                placeholder="user@mail.com"
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
@@ -90,12 +92,12 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
+              <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Ingrese su contraseña"
+                  placeholder="••••••••"
                   value={formData.password}
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })

@@ -60,9 +60,7 @@ export function MobileNav({ items }: MobileNavProps) {
             className="flex items-center"
             onClick={() => setOpen(false)}
           >
-            <span className="text-xl font-bold text-white">
-              Stamp & Label
-            </span>
+            <span className="text-xl font-bold text-white">Workmap360</span>
           </Link>
           <Button
             variant="ghost"

@@ -50,13 +50,13 @@ export function Sidebar({ items, userData }: SidebarProps) {
   return (
     <div className="hidden h-screen w-64 pb-10 flex-col bg-black md:flex">
       <div className="p-6">
-        <h2 className="text-2xl font-bold text-white">Trazalot</h2>
+        <h2 className="text-2xl font-bold text-white">Workmap360</h2>
       </div>
       <nav className="flex-1 space-y-1 px-4 py-2">
         {items.map((item) => {
           const isActive = pathname.includes(item.href)
           // const Icon = item.icon
-          const Icon = item.icon ? iconMap[item.icon] : null // Mapeamos el string al ícono
+          const Icon = item.icon ? iconMap[item.icon] : null
 
           return (
             <Link
