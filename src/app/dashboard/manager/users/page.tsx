@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -115,17 +116,21 @@ export default function ManagerUsersPage() {
   }
 
   useEffect(() => {
-    listUsers()
-  }, [])
+    if (session) {
+      listUsers()
+    }
+  }, [session])
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session)
+      if (!session && data.session) {
+        setSession(data.session)
+      }
     })
 
     const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session)
+      (_event, newSession) => {
+        setSession(newSession)
       }
     )
 
