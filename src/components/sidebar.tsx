@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import Link from 'next/link'
@@ -16,6 +17,8 @@ import {
   ListOrderedIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { UserType } from '@/types/user-types'
+import Image from 'next/image'
 
 interface SidebarProps {
   items: {
@@ -23,13 +26,13 @@ interface SidebarProps {
     href: string
     icon?: string
   }[]
+  userData?: UserType
 }
 
-export function Sidebar({ items }: SidebarProps) {
+export function Sidebar({ items, userData }: SidebarProps) {
   const pathname = usePathname()
   // Mapeo de strings a íconos
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const iconMap: { [key: string]: React.ComponentType<any> } = {
     'folder-kanban': FolderKanban,
     'user-cog': UserCog,
@@ -45,9 +48,9 @@ export function Sidebar({ items }: SidebarProps) {
   }
 
   return (
-    <div className="hidden h-screen w-64 flex-col bg-black md:flex">
+    <div className="hidden h-screen w-64 pb-10 flex-col bg-black md:flex">
       <div className="p-6">
-        <h2 className="text-2xl font-bold text-white">Stamp & Label</h2>
+        <h2 className="text-2xl font-bold text-white">Trazalot</h2>
       </div>
       <nav className="flex-1 space-y-1 px-4 py-2">
         {items.map((item) => {
@@ -72,6 +75,29 @@ export function Sidebar({ items }: SidebarProps) {
           )
         })}
       </nav>
+      {userData && (
+        <div className="p-6">
+          {userData.avatar ? (
+            <Image
+              src={userData.avatar}
+              alt={userData.first_name}
+              className="h-12 w-12 rounded-full"
+              width={48}
+              height={48}
+            />
+          ) : (
+            <div className="h-10 w-10 flex items-center justify-center rounded-full bg-orange-500">
+              <span className=" font-bold ">
+                {userData.first_name.charAt(0) + userData.last_name.charAt(0)}
+              </span>
+            </div>
+          )}
+          <h2 className="text-lg font-normal text-white text-wrap">
+            {userData.first_name} {userData.last_name}
+          </h2>
+          <p className="text-sm font-light text-white">{userData.email}</p>
+        </div>
+      )}
     </div>
   )
 }

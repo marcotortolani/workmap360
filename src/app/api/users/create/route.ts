@@ -3,8 +3,6 @@ import { NextResponse } from 'next/server'
 import { getSupabaseAuthWithRole } from '@/lib/getSupabaseAuthWithRole'
 import { getServiceSupabase } from '@/lib/supabaseAuth'
 
-const redirectTo = 'https://protrak360.vercel.app/confirmacion-cuenta'
-
 export async function POST(req: Request) {
   try {
     const { user, role, error } = await getSupabaseAuthWithRole(req)
@@ -46,7 +44,10 @@ export async function POST(req: Request) {
     const serviceClient = getServiceSupabase()
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const authPayload: any = { email, redirectTo }
+    const authPayload: any = {
+      email,
+      redirectTo: `${window.location.origin}/auth/confirm`,
+    }
     if (useInviteFlow) {
       authPayload.sendEmailInvitation = true
       authPayload.password = `${firstName.toLowerCase()}123`

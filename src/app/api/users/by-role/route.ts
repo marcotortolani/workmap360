@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAuthWithRole } from '@/lib/getSupabaseAuthWithRole'
 import { checkPermissionOrFail } from '@/lib/auth/permissions'
+import { validRoles } from '@/data/roles'
 
 export async function GET(req: Request) {
   // Obtener query params de paginación
@@ -10,7 +11,6 @@ export async function GET(req: Request) {
   const limit = parseInt(searchParams.get('limit') || '10')
   const targetRole = searchParams.get('role') || 'guest'
 
-  const validRoles = ['admin', 'manager', 'technician', 'client', 'guest']
   if (!validRoles.includes(targetRole)) {
     return NextResponse.json({ error: 'Rol inválido' }, { status: 400 })
   }
