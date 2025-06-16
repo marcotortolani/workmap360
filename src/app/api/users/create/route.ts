@@ -5,7 +5,9 @@ import { getSupabaseAuthWithRole } from '@/lib/getSupabaseAuthWithRole'
 import { getServiceSupabase } from '@/lib/supabaseAuth'
 
 export async function POST(req: Request) {
-  const redirectTo = new URL(req.url).origin + `/auth/confirm`
+  const redirectTo = new URL(req.url).origin + `/dashboard`
+  console.log("Redirecting to:", redirectTo);
+  
   try {
     const { user, role, error } = await getSupabaseAuthWithRole(req)
 
@@ -15,7 +17,7 @@ export async function POST(req: Request) {
 
     if (!['admin', 'manager'].includes(role)) {
       return NextResponse.json(
-        { error: 'No tenés permisos para crear usuarios' },
+        { error: 'You dont have permission to create users' },
         { status: 403 }
       )
     }
@@ -47,8 +49,9 @@ export async function POST(req: Request) {
 
     const authPayload: any = {
       email,
-      redirectTo: redirectTo,
-      redirectToComplete: redirectTo,
+      options: {
+        emailRedirectTo: redirectTo,
+      },
     }
     if (useInviteFlow) {
       authPayload.sendEmailInvitation = true
@@ -58,15 +61,16 @@ export async function POST(req: Request) {
     }
 
     const { data: authUser, error: authError } =
-      await serviceClient.auth.admin.createUser(authPayload)
+      // await serviceClient.auth.admin.createUser(authPayload)
+      await serviceClient.auth.signUp(authPayload)
 
     if (authError?.message?.includes('User already registered')) {
-      return NextResponse.json({ error: 'Email ya en uso' }, { status: 409 })
+      return NextResponse.json({ error: 'Email already registered' }, { status: 409 })
     }
 
     if (authError || !authUser?.user) {
       return NextResponse.json(
-        { error: 'Error creando usuario en Auth' },
+        { error: 'Error creating user in auth' },
         { status: 500 }
       )
     }
@@ -96,7 +100,7 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error('Error:', err)
     return NextResponse.json(
-      { error: 'Error creando usuario' },
+      { error: 'Error creating user' },
       { status: 500 }
     )
   }

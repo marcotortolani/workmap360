@@ -86,7 +86,6 @@ export default function UsersTestPage() {
       const {
         data: { session },
       } = await supabase.auth.getSession()
-      console.log('Session in createUser:', session)
 
       if (!session) {
         throw new Error('No hay sesión activa')

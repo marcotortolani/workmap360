@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { PageWrapper } from '@/components/page-wrapper'
 
 export default function Page() {
   const [password, setPassword] = useState('')
@@ -39,13 +40,13 @@ export default function Page() {
   }
 
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+    <PageWrapper backgroundImage="/images/bg-building-bottom-view.jpg">
       <div className="w-full max-w-sm">
         <div className="flex flex-col gap-6">
-          <Card>
+          <Card className="w-full max-w-md bg-white/30  drop-shadow-xl backdrop-blur-lg border-neutral-400">
             <CardHeader>
               <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-              <CardDescription>
+              <CardDescription className=" text-neutral-800">
                 Please enter your new password below.
               </CardDescription>
             </CardHeader>
@@ -73,6 +74,6 @@ export default function Page() {
           </Card>
         </div>
       </div>
-    </div>
+    </PageWrapper>
   )
 }

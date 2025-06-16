@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+
+import { PageWrapper } from '@/components/page-wrapper'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -40,50 +42,51 @@ export default function Page() {
       setIsLoading(false)
     }
   }
+
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+    <PageWrapper backgroundImage="/images/bg-wall-brutalism-01.jpg">
       <div className="w-full max-w-sm">
         <div className="flex flex-col gap-6">
-          {success ? (
-            <Card>
+          {!success ? (
+            <Card className="w-full max-w-md bg-white/30  drop-shadow-xl backdrop-blur-lg border-neutral-400">
               <CardHeader>
                 <CardTitle className="text-2xl">Check Your Email</CardTitle>
-                <CardDescription>
+                <CardDescription className=" text-neutral-800">
                   Password reset instructions sent
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-neutral-700">
                   If you registered using your email and password, you will
                   receive a password reset email.
                 </p>
+                <div className=" mt-6 flex items-center gap-4">
+                  <Link href="/auth/login" className=" w-full ">
+                    <Button
+                      className="w-full bg-sky-500 text-white hover:bg-sky-400"
+                      size="lg"
+                    >
+                      <Key className="mr-2 h-4 w-4" />
+                      <span className=" mr-2 ">Login</span>
+                    </Button>
+                  </Link>
+                  <Link href="/" className=" w-full ">
+                    <Button
+                      className="w-full bg-neutral-900 text-white hover:bg-neutral-700"
+                      size="lg"
+                    >
+                      <Home className="mr-2 h-4 w-4" />
+                      <span className=" mr-2 ">Home</span>
+                    </Button>
+                  </Link>
+                </div>
               </CardContent>
-              <div className=" flex items-center gap-4">
-                <Link href="/auth/login" className=" w-full ">
-                  <Button
-                    className="w-full bg-orange-500 text-white hover:bg-orange-400"
-                    size="lg"
-                  >
-                    <Key className="mr-2 h-4 w-4" />
-                    Login
-                  </Button>
-                </Link>
-                <Link href="/" className=" w-full ">
-                  <Button
-                    className="w-full bg-neutral-900 text-white hover:bg-neutral-700"
-                    size="lg"
-                  >
-                    <Home className="mr-2 h-4 w-4" />
-                    Home
-                  </Button>
-                </Link>
-              </div>
             </Card>
           ) : (
-            <Card>
+            <Card className="w-full max-w-md bg-white/30  drop-shadow-xl backdrop-blur-lg border-neutral-400">
               <CardHeader>
                 <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-                <CardDescription>
+                <CardDescription className=" text-neutral-800">
                   Type in your email and we&apos;ll send you a link to reset
                   your password
                 </CardDescription>
@@ -96,7 +99,7 @@ export default function Page() {
                       <Input
                         id="email"
                         type="email"
-                        placeholder="m@example.com"
+                        placeholder="mail@example.com"
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -126,6 +129,6 @@ export default function Page() {
           )}
         </div>
       </div>
-    </div>
+    </PageWrapper>
   )
 }
