@@ -30,6 +30,19 @@ export async function getSupabaseAuth(req: Request) {
 export function getServiceSupabase() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY! 
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 }
+
+export const getSessionToken = async (): Promise<string> => {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+  if (!session) throw new Error('No hay sesión activa')
+  return session.access_token
+}
+
+export const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)

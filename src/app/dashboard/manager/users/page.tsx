@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+//import { supabase } from '@/lib/supabase'
+import { getSessionToken } from '@/lib/supabaseAuth'
+
 import { UserPlus, Edit, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+
 import { UserForm } from '@/components/user-form'
 import { UserRole, UserType } from '@/types/user-types'
 import { Label } from '@/components/ui/label'
@@ -24,46 +26,23 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
+import { FallbackAvatar } from '@/components/fallback-avatar'
+
 export default function ManagerUsersPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingUser, setEditingUser] = useState<UserType | null>(null)
+  const [userToDelete, setUserToDelete] = useState<UserType['id'] | null>(null)
   const [users, setUsers] = useState<UserType[]>([])
   const [role, setRole] = useState<UserRole | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const listUsers = async () => {
+  const withLoading = async (fn: () => Promise<void>) => {
+    setError(null)
     setLoading(true)
-    if (!supabase) return
-
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      console.log('Session:', session)
-
-      if (!session) {
-        throw new Error('No hay sesión activa')
-      }
-
-      const response = await fetch('/api/users/list?page=1&limit=20', {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      })
-
-      const { users, pagination, error } = await response.json()
-
-      if (!response.ok) {
-        throw new Error(error || 'Error en la solicitud')
-      }
-      console.log('Pagination:', pagination)
-
-      setUsers(users)
-      setError(null)
-    } catch (err: unknown) {
-      console.log('Error creating user:', err)
+      await fn()
+    } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
       setError(message)
     } finally {
@@ -71,54 +50,198 @@ export default function ManagerUsersPage() {
     }
   }
 
+  const listUsers = async () => {
+    withLoading(async () => {
+      const token = await getSessionToken()
+      if (!token) throw new Error('No hay sesión activa')
+      const response = await fetch('/api/users/list?page=1&limit=20', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      const { users, pagination, error } = await response.json()
+      if (!response.ok) throw new Error(error || 'Error en la solicitud')
+      console.log('Pagination:', pagination)
+      setUsers(users)
+      setError(null)
+    })
+  }
+
   const filterUsersByRole = async (role: UserRole) => {
-    setLoading(true)
     setRole(role)
-    if (!supabase) return
-    try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      if (!session) throw new Error('No hay sesión activa')
+
+    if (!role) {
+      listUsers()
+      return
+    }
+    withLoading(async () => {
+      const token = await getSessionToken()
+      if (!token) throw new Error('No hay sesión activa')
       const response = await fetch(
         `/api/users/by-role/?role=${role}&page=1&limit=20`,
         {
-          headers: { Authorization: `Bearer ${session.access_token}` },
+          headers: { Authorization: `Bearer ${token}` },
         }
       )
       const { users, pagination, error } = await response.json()
       if (!response.ok) throw new Error(error)
       setUsers(users)
       console.log('pagination', pagination)
-
       setError(null)
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err)
-      setError(message)
-    } finally {
-      setLoading(false)
-    }
+    })
   }
 
   useEffect(() => {
     listUsers()
   }, [])
 
-  const handleCreateUser = () => {
+  const handleCreateButton = () => {
     setEditingUser(null)
     setShowForm(true)
   }
 
-  const handleEditUser = (user: UserType) => {
+  const handleEditButton = (user: UserType) => {
     setEditingUser(user)
     setShowForm(true)
   }
 
-  const handleSubmit = (user: UserType) => {
-    // Handle form submission
-    console.log('Submitted user:', user)
-    setShowForm(false)
+  const handleDeleteButton = (userId: UserType['id']) => {
+    setUserToDelete(userId)
+    // deleteUser(userId)
   }
+
+  // const handleSubmit = (user: UserType) => {
+  //   // Handle form submission
+  //   console.log('Submitted user:', user)
+  //   setShowForm(false)
+  // }
+
+  const createUser = async (user: UserType) => {
+    setError(null)
+    setLoading(true)
+    // if (!supabase) return
+    if (!user.first_name || !user.last_name || !user.email) {
+      setError('All fields are required.')
+      return
+    }
+
+    try {
+      // const {
+      //   data: { session },
+      // } = await supabase.auth.getSession()
+      const token = await getSessionToken()
+
+      if (!token) {
+        throw new Error('There is no active session.')
+      }
+      const newRandomAvatar =
+        'https://avatar.iran.liara.run/public/' +
+        Math.floor(Math.random() * 49 + 1).toString()
+
+      const response = await fetch('/api/users/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          firstName: user.first_name,
+          lastName: user.last_name,
+          email: user.email,
+          role: user.role,
+          createdAt: new Date().toISOString(),
+          status: user.status,
+          avatar: newRandomAvatar,
+        }),
+      })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error)
+      alert('Usuario creado: ' + JSON.stringify(result.user))
+      await listUsers() // refrescar lista
+    } catch (err: unknown) {
+      console.log('Error creating user:', err)
+      const message = err instanceof Error ? err.message : String(err)
+      setError(message)
+    } finally {
+      setLoading(false)
+      setShowForm(false)
+    }
+  }
+
+  const confirmEdit = async (user: UserType) => {
+    setError(null)
+    setLoading(true)
+    // if (!supabase) return
+
+    if (
+      !user.id ||
+      !user.first_name ||
+      !user.last_name ||
+      !user.role ||
+      !user.status ||
+      !user.avatar
+    ) {
+      setError('All fields are required.')
+      return
+    }
+    // const {
+    //   data: { session },
+    // } = await supabase.auth.getSession()
+    const token = await getSessionToken()
+
+    if (!token) {
+      throw new Error('There is no active session.')
+    }
+
+    try {
+      const res = await fetch(`/api/users/edit`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          id: user.id,
+          firstName: user.first_name,
+          lastName: user.last_name,
+          role: user.role,
+          status: user.status,
+          avatar: user.avatar,
+        }),
+      })
+
+      const resJson = await res.json()
+      console.log('PUT response status:', res.status)
+      console.log('PUT response body:', resJson)
+
+      if (!res.ok) throw new Error('Error editing user')
+      await listUsers() // refrescar lista
+      setEditingUser(null) // cerrar formulario
+    } catch (err) {
+      console.error(err)
+      setError('Error editing user')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const deleteUser = (userId: UserType['id']) =>
+    withLoading(async () => {
+      const token = await getSessionToken()
+      const res = await fetch('/api/users/delete', {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: userId }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error)
+      await listUsers()
+    })
 
   return (
     <div className="flex flex-col gap-8 p-2 md:p-4 lg:p-8">
@@ -127,8 +250,8 @@ export default function ManagerUsersPage() {
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-xl font-semibold">Users</h2>
             <Button
-              className="bg-orange-500 text-white hover:bg-orange-400"
-              onClick={handleCreateUser}
+              className="bg-sky-600 text-white hover:bg-sky-500"
+              onClick={handleCreateButton}
             >
               <UserPlus className="mr-2 h-4 w-4" />
               Create User
@@ -161,7 +284,10 @@ export default function ManagerUsersPage() {
               {role && (
                 <Button
                   className="bg-orange-500 text-white hover:bg-orange-400"
-                  onClick={() => listUsers()}
+                  onClick={() => {
+                    setRole(null)
+                    listUsers()
+                  }}
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Clean Filter
@@ -189,13 +315,14 @@ export default function ManagerUsersPage() {
                   users.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell>
-                        <Avatar>
-                          <AvatarImage src={user.avatar} />
-                          <AvatarFallback className="bg-orange-100 text-orange-800">
-                            {user.first_name.charAt(0)}
-                            {user.last_name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
+                        <FallbackAvatar
+                          src={user.avatar}
+                          fallbackInitials={
+                            user.first_name.charAt(0) + user.last_name.charAt(0)
+                          }
+                          className="md:h-12 md:w-12 rounded-full"
+                          alt={user.first_name + ' User Avatar'}
+                        />
                       </TableCell>
                       <TableCell>{user.first_name}</TableCell>
                       <TableCell>{user.last_name}</TableCell>
@@ -223,7 +350,7 @@ export default function ManagerUsersPage() {
                             variant="outline"
                             size="sm"
                             className="text-orange-500 hover:bg-orange-50 hover:text-orange-600"
-                            onClick={() => handleEditUser(user)}
+                            onClick={() => handleEditButton(user)}
                           >
                             <Edit className="mr-2 h-4 w-4" />
                             Edit
@@ -232,6 +359,7 @@ export default function ManagerUsersPage() {
                             variant="outline"
                             size="sm"
                             className="text-red-500 hover:bg-red-50 hover:text-red-600"
+                            onClick={() => handleDeleteButton(user.id)}
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete
@@ -263,59 +391,51 @@ export default function ManagerUsersPage() {
           <h2 className="mb-4 text-xl font-semibold">
             {editingUser ? 'Edit User' : 'Create User'}
           </h2>
-          <UserForm user={editingUser} onSubmit={handleSubmit} />
-          <Button
-            variant="outline"
-            className="mt-4"
-            onClick={() => setShowForm(false)}
-          >
-            Cancel
-          </Button>
+          <UserForm
+            user={editingUser}
+            onSubmit={editingUser ? confirmEdit : createUser}
+            onCancel={() => setShowForm(false)}
+          />
+        </div>
+      )}
+      {/* create a modal component to ensure the delete of the user selected */}
+      {userToDelete && (
+        <div>
+          <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden outline-none focus:outline-none">
+            <div className="relative mx-auto my-6 w-auto max-w-3xl">
+              <div className="relative flex w-full flex-col rounded-lg bg-white shadow-lg outline-none focus:outline-none">
+                <div className="flex items-start justify-between rounded-t border-b border-solid border-slate-200 p-5">
+                  <h3 className="text-3xl font-semibold">Delete User</h3>
+                </div>
+                <div className="relative flex-auto p-6">
+                  <p className="mb-8 text-slate-500">
+                    Are you sure you want to delete this user?
+                  </p>
+                  <div className="flex justify-end">
+                    <Button
+                      variant="outline"
+                      className="mr-2"
+                      onClick={() => setUserToDelete(null)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => {
+                        deleteUser(userToDelete)
+                        setUserToDelete(null)
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="fixed inset-0 z-40 bg-black opacity-25"></div>
         </div>
       )}
     </div>
   )
 }
-
-// const users = [
-//   {
-//     id: '1',
-//     firstName: 'John',
-//     lastName: 'Doe',
-//     email: 'john.doe@example.com',
-//     role: 'Admin',
-//     createdDate: '2023-01-15',
-//     status: 'active',
-//     avatar: 'https://avatar.iran.liara.run/public/42',
-//   },
-//   {
-//     id: '2',
-//     firstName: 'Jane',
-//     lastName: 'Smith',
-//     email: 'jane.smith@example.com',
-//     role: 'Manager',
-//     createdDate: '2023-02-20',
-//     status: 'active',
-//     avatar: 'https://avatar.iran.liara.run/public/15',
-//   },
-//   {
-//     id: '3',
-//     firstName: 'Robert',
-//     lastName: 'Johnson',
-//     email: 'robert.johnson@example.com',
-//     role: 'Technician',
-//     createdDate: '2023-03-10',
-//     status: 'active',
-//     avatar: 'https://avatar.iran.liara.run/public/47',
-//   },
-//   {
-//     id: '4',
-//     firstName: 'Emily',
-//     lastName: 'Williams',
-//     email: 'emily.williams@example.com',
-//     role: 'Client',
-//     createdDate: '2023-04-05',
-//     status: 'inactive',
-//     avatar: 'https://avatar.iran.liara.run/public/24',
-//   },
-// ]

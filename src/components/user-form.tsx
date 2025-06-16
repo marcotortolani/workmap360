@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import type React from 'react'
@@ -15,18 +14,22 @@ import {
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { AvatarUpload } from '@/components/avatar-upload'
+
 import { UserType } from '@/types/user-types'
+import { FallbackAvatar } from './fallback-avatar'
+import { LoaderPinwheelIcon } from 'lucide-react'
 
 interface UserFormProps {
   user: UserType | null
-  onSubmit?: (user: any) => void
+  onSubmit?: (user: UserType) => void
+  onCancel?: () => void
 }
 
-export function UserForm({ user, onSubmit }: UserFormProps) {
+export function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
   const [formData, setFormData] = useState({
-    firstName: user?.first_name || '',
-    lastName: user?.last_name || '',
+    id: user?.id || null,
+    first_name: user?.first_name || '',
+    last_name: user?.last_name || '',
     email: user?.email || '',
     role: user?.role || '',
     status: user?.status || 'active',
@@ -35,16 +38,43 @@ export function UserForm({ user, onSubmit }: UserFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit?.(formData)
+    onSubmit?.(formData as UserType)
+    onCancel?.()
+  }
+
+  const handleRandomAvatar = () => {
+    const newRandomAvatar =
+      'https://avatar.iran.liara.run/public/' +
+      Math.floor(Math.random() * 49 + 1).toString()
+    setFormData({ ...formData, avatar: newRandomAvatar })
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="flex flex-col items-center sm:flex-row sm:items-start sm:gap-8">
-        <AvatarUpload
-          initialImage={formData.avatar || undefined}
+        {/* <AvatarUpload
+          initialImage={formData.avatar || newRandomAvatar}
           onImageChange={(image) => setFormData({ ...formData, avatar: image })}
-        />
+        /> */}
+        <div>
+          <FallbackAvatar
+            src={formData.avatar || ''}
+            fallbackInitials={
+              formData.first_name[0] + formData.last_name[0] || 'U'
+            }
+            className="h-24 w-24"
+            alt="Avatar"
+          />
+          <Button
+            type="button"
+            onClick={handleRandomAvatar}
+            variant="outline"
+            className="mt-4"
+          >
+            <LoaderPinwheelIcon className="h-4 w-4 " />
+            Random
+          </Button>
+        </div>
 
         <div className="mt-6 w-full space-y-4 sm:mt-0">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -52,9 +82,9 @@ export function UserForm({ user, onSubmit }: UserFormProps) {
               <Label htmlFor="firstName">First Name</Label>
               <Input
                 id="firstName"
-                value={formData.firstName}
+                value={formData.first_name}
                 onChange={(e) =>
-                  setFormData({ ...formData, firstName: e.target.value })
+                  setFormData({ ...formData, first_name: e.target.value })
                 }
                 placeholder="Enter first name"
                 required
@@ -65,9 +95,9 @@ export function UserForm({ user, onSubmit }: UserFormProps) {
               <Label htmlFor="lastName">Last Name</Label>
               <Input
                 id="lastName"
-                value={formData.lastName}
+                value={formData.last_name}
                 onChange={(e) =>
-                  setFormData({ ...formData, lastName: e.target.value })
+                  setFormData({ ...formData, last_name: e.target.value })
                 }
                 placeholder="Enter last name"
                 required
@@ -106,6 +136,7 @@ export function UserForm({ user, onSubmit }: UserFormProps) {
                 <SelectItem value="manager">Manager</SelectItem>
                 <SelectItem value="technician">Technician</SelectItem>
                 <SelectItem value="client">Client</SelectItem>
+                <SelectItem value="guest">Guest</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -130,13 +161,17 @@ export function UserForm({ user, onSubmit }: UserFormProps) {
           </div>
         </div>
       </div>
-
-      <Button
-        type="submit"
-        className="w-full bg-orange-500 text-white hover:bg-orange-400 sm:w-auto"
-      >
-        Save User
-      </Button>
+      <div className=" space-x-6">
+        <Button variant="default" className="mt-4 " onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          className="w-full bg-green-600 text-white hover:bg-green-500 sm:w-auto transition-all duration-200 ease-in-out"
+        >
+          Save User
+        </Button>
+      </div>
     </form>
   )
 }
