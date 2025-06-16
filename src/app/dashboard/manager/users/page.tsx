@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-//import { supabase } from '@/lib/supabase'
-import { getSessionToken } from '@/lib/supabaseAuth'
+import { supabase } from '@/lib/supabase'
+//import { getSessionToken } from '@/lib/supabaseAuth'
 
 import { UserPlus, Edit, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -28,6 +28,14 @@ import {
 
 import { FallbackAvatar } from '@/components/fallback-avatar'
 
+export const getSessionToken = async (): Promise<string> => {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+  if (!session) throw new Error('No hay sesión activa')
+  return session.access_token
+}
+
 export default function ManagerUsersPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingUser, setEditingUser] = useState<UserType | null>(null)
@@ -51,9 +59,13 @@ export default function ManagerUsersPage() {
   }
 
   const listUsers = async () => {
+    // const {
+    //   data: { session },
+    // } = await supabase.auth.getSession()
+    // if (!session) throw new Error('No hay sesión activa')
     const token = await getSessionToken()
     if (!token) throw new Error('No hay sesión activa')
-      
+
     withLoading(async () => {
       const response = await fetch('/api/users/list?page=1&limit=20', {
         method: 'GET',
@@ -76,9 +88,9 @@ export default function ManagerUsersPage() {
       listUsers()
       return
     }
+    const token = await getSessionToken()
+    if (!token) throw new Error('No hay sesión activa')
     withLoading(async () => {
-      const token = await getSessionToken()
-      if (!token) throw new Error('No hay sesión activa')
       const response = await fetch(
         `/api/users/by-role/?role=${role}&page=1&limit=20`,
         {
