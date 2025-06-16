@@ -114,6 +114,16 @@ export default function ManagerUsersPage() {
     listUsers()
   }, [])
 
+  useEffect(() => {
+    async function getUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      console.log('Usuario autenticado:', user)
+    }
+    getUser()
+  }, [])
+
   const handleCreateButton = () => {
     setEditingUser(null)
     setShowForm(true)
