@@ -226,9 +226,8 @@ export default function ManagerUsersPage() {
     // const {
     //   data: { session },
     // } = await supabase.auth.getSession()
-    const token = await getSessionToken()
 
-    if (!token) {
+    if (!session) {
       throw new Error('There is no active session.')
     }
 
@@ -237,7 +236,7 @@ export default function ManagerUsersPage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           id: user.id,

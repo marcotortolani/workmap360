@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { supabase } from '@/lib/supabase'
+
+import { createSupabaseBrowserClient } from '@/lib/supabase'
+
 import { Button } from '@/components/ui/button'
 
 import { UserRole, UserType } from '@/types/user-types'
@@ -11,6 +13,7 @@ import { Edit } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 
 export default function UsersTestPage() {
+  const supabase = createSupabaseBrowserClient()
   const [user, setUser] = useState<User | null>(null)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
