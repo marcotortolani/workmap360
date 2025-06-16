@@ -13,19 +13,13 @@ export async function getSupabaseAuth(req: Request) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       global: { headers: { Authorization: `Bearer ${token}` } },
-      auth: {
-        autoRefreshToken: true,
-        persistSession: true,
-        storage: localStorage,
-        storageKey: 'supabase_auth_token',
-      },
     }
   )
 
   const {
     data: { user },
     error,
-  } = await supabase.auth.getUser(token)
+  } = await supabase.auth.getUser()
   if (error || !user)
     return { error: 'Token inválido o usuario no autenticado' }
 

@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { createSupabaseBrowserClient } from '@/lib/supabase'
+import { Session } from '@supabase/supabase-js'
 //import { getSessionToken } from '@/lib/supabaseAuth'
 
 import { UserPlus, Edit, Trash2 } from 'lucide-react'
@@ -28,15 +29,18 @@ import {
 
 import { FallbackAvatar } from '@/components/fallback-avatar'
 
-const getSessionToken = async (): Promise<string> => {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) throw new Error('No hay sesión activa')
-  return session.access_token
-}
+// const getSessionToken = async (): Promise<string> => {
+//   const {
+//     data: { session },
+//   } = await supabase.auth.getSession()
+//   if (!session) throw new Error('No hay sesión activa')
+//   return session.access_token
+// }
 
 export default function ManagerUsersPage() {
+  const [supabase] = useState(() => createSupabaseBrowserClient())
+  const [session, setSession] = useState<Session | null>(null)
+
   const [showForm, setShowForm] = useState(false)
   const [editingUser, setEditingUser] = useState<UserType | null>(null)
   const [userToDelete, setUserToDelete] = useState<UserType['id'] | null>(null)
@@ -59,9 +63,9 @@ export default function ManagerUsersPage() {
   }
 
   const listUsers = async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
+    // const {
+    //   data: { session },
+    // } = await supabase.auth.getSession()
     if (!session) throw new Error('No hay sesión activa')
     // const token = await getSessionToken()
     // if (!token) throw new Error('No hay sesión activa')
@@ -90,9 +94,9 @@ export default function ManagerUsersPage() {
     }
     // const token = await getSessionToken()
     // if (!token) throw new Error('No hay sesión activa')
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
+    // const {
+    //   data: { session },
+    // } = await supabase.auth.getSession()
     if (!session) throw new Error('No hay sesión activa')
 
     await withLoading(async () => {
@@ -115,13 +119,19 @@ export default function ManagerUsersPage() {
   }, [])
 
   useEffect(() => {
-    async function getUser() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      console.log('Usuario autenticado:', user)
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session)
+    })
+
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session)
+      }
+    )
+
+    return () => {
+      listener.subscription.unsubscribe()
     }
-    getUser()
   }, [])
 
   const handleCreateButton = () => {
@@ -157,9 +167,9 @@ export default function ManagerUsersPage() {
       // const {
       //   data: { session },
       // } = await supabase.auth.getSession()
-      const token = await getSessionToken()
+      // const token = await getSessionToken()
 
-      if (!token) {
+      if (!session) {
         throw new Error('There is no active session.')
       }
       const newRandomAvatar =
@@ -171,7 +181,7 @@ export default function ManagerUsersPage() {
         headers: {
           'Content-Type': 'application/json',
           Accept: 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           firstName: user.first_name,
@@ -256,11 +266,13 @@ export default function ManagerUsersPage() {
 
   const deleteUser = async (userId: UserType['id']) =>
     await withLoading(async () => {
-      const token = await getSessionToken()
+      if (!userId) return
+      if (!session) throw new Error('No hay sesión activa')
+
       const res = await fetch('/api/users/delete', {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ id: userId }),
