@@ -1,3 +1,501 @@
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
+import { Camera, Upload } from 'lucide-react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { createFormSchema } from '@/lib/schemas/new-repair-form-schema'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+
+import { useProjectsListStore } from '@/stores/projects-list-store'
+import { useRepairsDataStore } from '@/stores/repairs-data-store'
+import { RepairData } from '@/types/repair-type'
+
+type FormData = z.infer<ReturnType<typeof createFormSchema>>
+
+export default function TechnicianNewRepairPage() {
+  const { projectsList } = useProjectsListStore()
+  const {
+    repairsDataList,
+    // addRepair,
+    // updateRepair
+  } = useRepairsDataStore()
+
+  // Referencias para validación
+  const maxDropsRef = useRef<number | undefined>(undefined)
+  const maxLevelsRef = useRef<number | undefined>(undefined)
+  const [statusRepairPhases, setStatusRepairPhases] = useState<
+    'S' | `P${number}` | 'F' | null
+  >(null)
+
+  console.log('status repair phases: ', statusRepairPhases)
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    setValue,
+    watch,
+    reset,
+  } = useForm<FormData>({
+    resolver: zodResolver(createFormSchema({ maxDropsRef, maxLevelsRef })),
+    defaultValues: {
+      projectId: 0,
+      elevation: '',
+      drop: 1,
+      level: 1,
+      repairType: '',
+      repairIndex: 1,
+      surveyImage: '',
+      progressImage: [],
+      finishImage: '',
+    },
+    mode: 'onChange',
+  })
+
+  const projectId = watch('projectId')
+  const elevation = watch('elevation')
+  const drop = watch('drop')
+  const level = watch('level')
+  const repairType = watch('repairType')
+  const repairIndex = watch('repairIndex')
+
+  console.log('repair index: ', repairIndex)
+
+  // Calcular valores máximos
+  const maxDrops = elevation
+    ? projectsList
+        .find((project) => project.id === projectId)
+        ?.elevations.find((elev) => elev.name === elevation)?.drops
+    : undefined
+
+  const maxLevels = elevation
+    ? projectsList
+        .find((project) => project.id === projectId)
+        ?.elevations.find((elev) => elev.name === elevation)?.levels
+    : undefined
+
+  const phases = projectsList
+    .find((project) => project.id === projectId)
+    ?.repairTypes.find((rt) => rt.repairType === repairType)?.phases
+
+  // Actualizar referencias
+  useEffect(() => {
+    maxDropsRef.current = maxDrops
+    maxLevelsRef.current = maxLevels
+  }, [maxDrops, maxLevels])
+
+  // Reiniciar campos dependientes
+  useEffect(() => {
+    setValue('elevation', '')
+    setValue('drop', 1)
+    setValue('level', 1)
+    setValue('repairType', '')
+    setValue('repairIndex', 1)
+    setValue('progressImage', [])
+  }, [projectId, setValue])
+
+  useEffect(() => {
+    setValue('drop', 1)
+    setValue('level', 1)
+    setValue('repairType', '')
+    setValue('repairIndex', 1)
+    setValue('progressImage', [])
+  }, [elevation, setValue])
+
+  // Filtrar reparaciones existentes
+  const matchingRepairs = repairsDataList.filter(
+    (repair) =>
+      repair.projectId === projectId &&
+      repair.elevationName === elevation &&
+      repair.drop === drop &&
+      repair.level === level &&
+      repair.phases.survey.repairType === repairType
+  )
+
+  // Calcular el próximo repairIndex
+  const nextRepairIndex =
+    matchingRepairs.length > 0
+      ? Math.max(...matchingRepairs.map((r) => r.repairIndex)) + 1
+      : 1
+
+  console.log('nextRepairIndex', nextRepairIndex)
+
+  // Estado para manejar la creación de una nueva reparación
+  const [isNewRepair, setIsNewRepair] = useState<boolean | null>(null)
+
+  // Determinar el estado de una reparación
+  const getRepairStatus = (repair: RepairData) => {
+    if (repair.phases.finish.createdAt > 0) return 'finish'
+    if (repair.phases.progress.some((p) => p.createdAt > 0)) return 'progress'
+    if (repair.phases.survey.createdAt > 0) return 'survey'
+    return 'pending'
+  }
+
+  const onSubmit = (data: FormData) => {
+    console.log('Form submitted:', data)
+
+    // addRepair(data)
+    // updateRepair(data)
+    reset()
+  }
+
+  return (
+    <div className="flex flex-col gap-8 p-8">
+      <div className="w-full lg:w-1/2 rounded-lg border bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold">New Repair</h2>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="grid gap-4 sm:grid-cols-4">
+            <div className="sm:col-span-4">
+              <label className="mb-2 block text-sm font-medium">Project</label>
+              <Select
+                value={projectId === 0 ? '' : projectId.toString()}
+                onValueChange={(value) =>
+                  setValue('projectId', parseInt(value))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select project" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projectsList.map((project) => (
+                    <SelectItem key={project.id} value={project.id.toString()}>
+                      {project.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.projectId && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.projectId.message}
+                </p>
+              )}
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="mb-2 block text-sm font-medium">
+                Elevation
+              </label>
+              <Select
+                value={elevation}
+                onValueChange={(value) => setValue('elevation', value)}
+                disabled={!projectId}
+              >
+                <SelectTrigger className="disabled:border-neutral-400 disabled:bg-neutral-300">
+                  <SelectValue placeholder="Select elevation" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projectsList
+                    .find((project) => project.id === projectId)
+                    ?.elevations.map((elevation) => (
+                      <SelectItem key={elevation.name} value={elevation.name}>
+                        {elevation.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+              {errors.elevation && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.elevation.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium">
+                Drop{' '}
+                {elevation && <span>(min: 1 - max: {maxDrops || 'N/A'})</span>}
+              </label>
+              <Input
+                type="number"
+                placeholder="Enter drop"
+                disabled={!elevation}
+                {...register('drop', { valueAsNumber: true })}
+                max={maxDrops}
+                min={1}
+                step={1}
+                className="disabled:border-neutral-400 disabled:bg-neutral-300"
+              />
+              {errors.drop && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.drop.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium">
+                Level{' '}
+                {elevation && <span>(min: 1 - max: {maxLevels || 'N/A'})</span>}
+              </label>
+              <Input
+                type="number"
+                placeholder="Enter level"
+                disabled={!elevation}
+                {...register('level', { valueAsNumber: true })}
+                max={maxLevels}
+                min={1}
+                step={1}
+                className="disabled:border-neutral-400 disabled:bg-neutral-300"
+              />
+              {errors.level && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.level.message}
+                </p>
+              )}
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="mb-2 block text-sm font-medium">
+                Repair Type
+              </label>
+              <Select
+                value={repairType}
+                onValueChange={(value) => setValue('repairType', value)}
+                disabled={
+                  !projectId || elevation.length === 0 || !drop || !level
+                }
+              >
+                <SelectTrigger className="disabled:border-neutral-400 disabled:bg-neutral-300">
+                  <SelectValue placeholder="Select repair type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projectsList
+                    .find((project) => project.id === projectId)
+                    ?.repairTypes.map((repairType) => (
+                      <SelectItem
+                        key={repairType.repairTypeId}
+                        value={repairType.repairType}
+                      >
+                        {repairType.repairType}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+              {errors.repairType && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.repairType.message}
+                </p>
+              )}
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="mb-2 block text-sm font-medium">
+                Repair Index
+              </label>
+              <Select
+                value={watch('repairIndex')?.toString()}
+                onValueChange={(value) => {
+                  if (value === nextRepairIndex.toString()) {
+                    setIsNewRepair(true)
+                    setValue('repairIndex', nextRepairIndex)
+                    setStatusRepairPhases('S')
+                  } else {
+                    setIsNewRepair(false)
+                    setValue('repairIndex', parseInt(value))
+                  }
+                }}
+                disabled={!repairType}
+              >
+                <SelectTrigger className="disabled:border-neutral-400 disabled:bg-neutral-300">
+                  <SelectValue placeholder="Select repair index" />
+                </SelectTrigger>
+                <SelectContent>
+                  {matchingRepairs.map((repair) => (
+                    <SelectItem
+                      key={repair.id}
+                      value={repair.repairIndex.toString()}
+                    >
+                      Repair #{repair.repairIndex} ({getRepairStatus(repair)})
+                    </SelectItem>
+                  ))}
+                  <SelectItem value={nextRepairIndex.toString()}>
+                    Create new repair (Index: {nextRepairIndex})
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.repairIndex && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.repairIndex.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-3">
+            {isNewRepair && (
+              <div className="sm:col-span-3">
+                <h3 className="mb-2 block text-sm font-medium">
+                  Repair #{nextRepairIndex}
+                </h3>
+              </div>
+            )}
+
+            <div>
+              <label className="mb-2 block text-sm font-medium">
+                Survey Image
+              </label>
+              <div className="mt-1 flex flex-col gap-2">
+                <div className="flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pb-6 pt-5">
+                  <div className="space-y-1 text-center">
+                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                    <div className="flex text-sm text-gray-600">
+                      <label className="relative cursor-pointer rounded-md bg-white font-medium text-orange-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-orange-500 focus-within:ring-offset-2 hover:text-orange-400">
+                        <span>Upload a file</span>
+                        <Input
+                          type="file"
+                          className="sr-only"
+                          onChange={() =>
+                            setValue('surveyImage', 'uploaded', {
+                              shouldValidate: true,
+                            })
+                          }
+                        />
+                      </label>
+                    </div>
+                    <p className="text-xs text-gray-500">PNG, JPG up to 10MB</p>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex items-center justify-center"
+                  onClick={() =>
+                    setValue('surveyImage', 'camera', { shouldValidate: true })
+                  }
+                >
+                  <Camera className="mr-2 h-4 w-4" />
+                  Use Camera
+                </Button>
+              </div>
+              {errors.surveyImage && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.surveyImage.message}
+                </p>
+              )}
+            </div>
+
+            {new Array(phases ? phases - 2 : 0).fill(0).map((_, index) => (
+              <div key={index}>
+                <label className="mb-2 block text-sm font-medium">
+                  Progress {index + 1} Image
+                </label>
+                <div className="mt-1 flex flex-col gap-2">
+                  <div className="flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pb-6 pt-5">
+                    <div className="space-y-1 text-center">
+                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                      <div className="flex text-sm text-gray-600">
+                        <label className="relative cursor-pointer rounded-md bg-white font-medium text-orange-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-orange-500 focus-within:ring-offset-2 hover:text-orange-400">
+                          <span>Upload a file</span>
+                          <Input
+                            type="file"
+                            className="sr-only"
+                            onChange={() => {
+                              const currentImages = watch('progressImage') || []
+                              setValue(
+                                'progressImage',
+                                [...currentImages, 'uploaded'],
+                                { shouldValidate: true }
+                              )
+                            }}
+                          />
+                        </label>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        PNG, JPG up to 10MB
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex items-center justify-center"
+                    onClick={() => {
+                      const currentImages = watch('progressImage') || []
+                      setValue('progressImage', [...currentImages, 'camera'], {
+                        shouldValidate: true,
+                      })
+                    }}
+                  >
+                    <Camera className="mr-2 h-4 w-4" />
+                    Use Camera
+                  </Button>
+                </div>
+                {errors.progressImage && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.progressImage.message}
+                  </p>
+                )}
+              </div>
+            ))}
+
+            <div>
+              <label className="mb-2 block text-sm font-medium">
+                Finish Image
+              </label>
+              <div className="mt-1 flex flex-col gap-2">
+                <div className="flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pb-6 pt-5">
+                  <div className="space-y-1 text-center">
+                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                    <div className="flex text-sm text-gray-600">
+                      <label className="relative cursor-pointer rounded-md bg-white font-medium text-orange-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-orange-500 focus-within:ring-offset-2 hover:text-orange-400">
+                        <span>Upload a file</span>
+                        <Input
+                          type="file"
+                          className="sr-only"
+                          onChange={() =>
+                            setValue('finishImage', 'uploaded', {
+                              shouldValidate: true,
+                            })
+                          }
+                        />
+                      </label>
+                    </div>
+                    <p className="text-xs text-gray-500">PNG, JPG up to 10MB</p>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex items-center justify-center"
+                  onClick={() =>
+                    setValue('finishImage', 'camera', { shouldValidate: true })
+                  }
+                >
+                  <Camera className="mr-2 h-4 w-4" />
+                  Use Camera
+                </Button>
+              </div>
+              {errors.finishImage && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.finishImage.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full bg-orange-500 text-white hover:bg-orange-400 disabled:bg-gray-300"
+            disabled={!isValid}
+          >
+            Submit Repair
+          </Button>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 // 'use client'
 
 // import { useState } from 'react'
@@ -758,509 +1256,3 @@
 //     </div>
 //   )
 // }
-
-'use client'
-
-import { useEffect, useRef, useState } from 'react'
-import { Camera, Upload } from 'lucide-react'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { createFormSchema } from '@/lib/schemas/new-repair-form-schema'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { LogoutButton } from '@/components/logout-button'
-import { useProjectsListStore } from '@/stores/projects-list-store'
-import { useRepairsDataStore } from '@/stores/repairs-data-store'
-import { RepairData } from '@/types/repair-type'
-
-type FormData = z.infer<ReturnType<typeof createFormSchema>>
-
-export default function TechnicianNewRepairPage() {
-  const { projectsList } = useProjectsListStore()
-  const {
-    repairsDataList,
-    // addRepair,
-    // updateRepair
-  } = useRepairsDataStore()
-
-  // Referencias para validación
-  const maxDropsRef = useRef<number | undefined>(undefined)
-  const maxLevelsRef = useRef<number | undefined>(undefined)
-  const [statusRepairPhases, setStatusRepairPhases] = useState<
-    'S' | `P${number}` | 'F' | null
-  >(null)
-
-  console.log("status repair phases: ", statusRepairPhases);
-  
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid },
-    setValue,
-    watch,
-    reset,
-  } = useForm<FormData>({
-    resolver: zodResolver(createFormSchema({ maxDropsRef, maxLevelsRef })),
-    defaultValues: {
-      projectId: 0,
-      elevation: '',
-      drop: 1,
-      level: 1,
-      repairType: '',
-      repairIndex: 1,
-      surveyImage: '',
-      progressImage: [],
-      finishImage: '',
-    },
-    mode: 'onChange',
-  })
-
-  const projectId = watch('projectId')
-  const elevation = watch('elevation')
-  const drop = watch('drop')
-  const level = watch('level')
-  const repairType = watch('repairType')
-  const repairIndex = watch('repairIndex')
-
-  console.log('repair index: ', repairIndex)
-
-  // Calcular valores máximos
-  const maxDrops = elevation
-    ? projectsList
-        .find((project) => project.id === projectId)
-        ?.elevations.find((elev) => elev.name === elevation)?.drops
-    : undefined
-
-  const maxLevels = elevation
-    ? projectsList
-        .find((project) => project.id === projectId)
-        ?.elevations.find((elev) => elev.name === elevation)?.levels
-    : undefined
-
-  const phases = projectsList
-    .find((project) => project.id === projectId)
-    ?.repairTypes.find((rt) => rt.repairType === repairType)?.phases
-
-  // Actualizar referencias
-  useEffect(() => {
-    maxDropsRef.current = maxDrops
-    maxLevelsRef.current = maxLevels
-  }, [maxDrops, maxLevels])
-
-  // Reiniciar campos dependientes
-  useEffect(() => {
-    setValue('elevation', '')
-    setValue('drop', 1)
-    setValue('level', 1)
-    setValue('repairType', '')
-    setValue('repairIndex', 1)
-    setValue('progressImage', [])
-  }, [projectId, setValue])
-
-  useEffect(() => {
-    setValue('drop', 1)
-    setValue('level', 1)
-    setValue('repairType', '')
-    setValue('repairIndex', 1)
-    setValue('progressImage', [])
-  }, [elevation, setValue])
-
-  // Filtrar reparaciones existentes
-  const matchingRepairs = repairsDataList.filter(
-    (repair) =>
-      repair.projectId === projectId &&
-      repair.elevationName === elevation &&
-      repair.drop === drop &&
-      repair.level === level &&
-      repair.phases.survey.repairType === repairType
-  )
-
-  // Calcular el próximo repairIndex
-  const nextRepairIndex =
-    matchingRepairs.length > 0
-      ? Math.max(...matchingRepairs.map((r) => r.repairIndex)) + 1
-      : 1
-
-  console.log('nextRepairIndex', nextRepairIndex)
-
-  // Estado para manejar la creación de una nueva reparación
-  const [isNewRepair, setIsNewRepair] = useState<boolean | null>(null)
-
-  // Determinar el estado de una reparación
-  const getRepairStatus = (repair: RepairData) => {
-    if (repair.phases.finish.createdAt > 0) return 'finish'
-    if (repair.phases.progress.some((p) => p.createdAt > 0)) return 'progress'
-    if (repair.phases.survey.createdAt > 0) return 'survey'
-    return 'pending'
-  }
-
-  const onSubmit = (data: FormData) => {
-    console.log('Form submitted:', data)
-
-    // addRepair(data)
-    // updateRepair(data)
-    reset()
-  }
-
-  return (
-    <div className="flex flex-col gap-8 p-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-orange-500">
-          Technician Dashboard
-        </h1>
-        <LogoutButton />
-      </div>
-
-      <div className="w-full lg:w-1/2 rounded-lg border bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold">New Repair</h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-4">
-            <div className="sm:col-span-4">
-              <label className="mb-2 block text-sm font-medium">Project</label>
-              <Select
-                value={projectId === 0 ? '' : projectId.toString()}
-                onValueChange={(value) =>
-                  setValue('projectId', parseInt(value))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select project" />
-                </SelectTrigger>
-                <SelectContent>
-                  {projectsList.map((project) => (
-                    <SelectItem key={project.id} value={project.id.toString()}>
-                      {project.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.projectId && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.projectId.message}
-                </p>
-              )}
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="mb-2 block text-sm font-medium">
-                Elevation
-              </label>
-              <Select
-                value={elevation}
-                onValueChange={(value) => setValue('elevation', value)}
-                disabled={!projectId}
-              >
-                <SelectTrigger className="disabled:border-neutral-400 disabled:bg-neutral-300">
-                  <SelectValue placeholder="Select elevation" />
-                </SelectTrigger>
-                <SelectContent>
-                  {projectsList
-                    .find((project) => project.id === projectId)
-                    ?.elevations.map((elevation) => (
-                      <SelectItem key={elevation.name} value={elevation.name}>
-                        {elevation.name}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-              {errors.elevation && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.elevation.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium">
-                Drop{' '}
-                {elevation && <span>(min: 1 - max: {maxDrops || 'N/A'})</span>}
-              </label>
-              <Input
-                type="number"
-                placeholder="Enter drop"
-                disabled={!elevation}
-                {...register('drop', { valueAsNumber: true })}
-                max={maxDrops}
-                min={1}
-                step={1}
-                className="disabled:border-neutral-400 disabled:bg-neutral-300"
-              />
-              {errors.drop && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.drop.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium">
-                Level{' '}
-                {elevation && <span>(min: 1 - max: {maxLevels || 'N/A'})</span>}
-              </label>
-              <Input
-                type="number"
-                placeholder="Enter level"
-                disabled={!elevation}
-                {...register('level', { valueAsNumber: true })}
-                max={maxLevels}
-                min={1}
-                step={1}
-                className="disabled:border-neutral-400 disabled:bg-neutral-300"
-              />
-              {errors.level && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.level.message}
-                </p>
-              )}
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="mb-2 block text-sm font-medium">
-                Repair Type
-              </label>
-              <Select
-                value={repairType}
-                onValueChange={(value) => setValue('repairType', value)}
-                disabled={
-                  !projectId || elevation.length === 0 || !drop || !level
-                }
-              >
-                <SelectTrigger className="disabled:border-neutral-400 disabled:bg-neutral-300">
-                  <SelectValue placeholder="Select repair type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {projectsList
-                    .find((project) => project.id === projectId)
-                    ?.repairTypes.map((repairType) => (
-                      <SelectItem
-                        key={repairType.repairTypeId}
-                        value={repairType.repairType}
-                      >
-                        {repairType.repairType}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-              {errors.repairType && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.repairType.message}
-                </p>
-              )}
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="mb-2 block text-sm font-medium">
-                Repair Index
-              </label>
-              <Select
-                value={watch('repairIndex')?.toString()}
-                onValueChange={(value) => {
-                  if (value === nextRepairIndex.toString()) {
-                    setIsNewRepair(true)
-                    setValue('repairIndex', nextRepairIndex)
-                    setStatusRepairPhases('S')
-                  } else {
-                    setIsNewRepair(false)
-                    setValue('repairIndex', parseInt(value))
-                  }
-                }}
-                disabled={!repairType}
-              >
-                <SelectTrigger className="disabled:border-neutral-400 disabled:bg-neutral-300">
-                  <SelectValue placeholder="Select repair index" />
-                </SelectTrigger>
-                <SelectContent>
-                  {matchingRepairs.map((repair) => (
-                    <SelectItem
-                      key={repair.id}
-                      value={repair.repairIndex.toString()}
-                    >
-                      Repair #{repair.repairIndex} ({getRepairStatus(repair)})
-                    </SelectItem>
-                  ))}
-                  <SelectItem value={nextRepairIndex.toString()}>
-                    Create new repair (Index: {nextRepairIndex})
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.repairIndex && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.repairIndex.message}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-3">
-            {isNewRepair && (
-              <div className="sm:col-span-3">
-                <h3 className="mb-2 block text-sm font-medium">
-                  Repair #{nextRepairIndex}
-                </h3>
-              </div>
-            )}
-
-            <div>
-              <label className="mb-2 block text-sm font-medium">
-                Survey Image
-              </label>
-              <div className="mt-1 flex flex-col gap-2">
-                <div className="flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pb-6 pt-5">
-                  <div className="space-y-1 text-center">
-                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                    <div className="flex text-sm text-gray-600">
-                      <label className="relative cursor-pointer rounded-md bg-white font-medium text-orange-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-orange-500 focus-within:ring-offset-2 hover:text-orange-400">
-                        <span>Upload a file</span>
-                        <Input
-                          type="file"
-                          className="sr-only"
-                          onChange={() =>
-                            setValue('surveyImage', 'uploaded', {
-                              shouldValidate: true,
-                            })
-                          }
-                        />
-                      </label>
-                    </div>
-                    <p className="text-xs text-gray-500">PNG, JPG up to 10MB</p>
-                  </div>
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex items-center justify-center"
-                  onClick={() =>
-                    setValue('surveyImage', 'camera', { shouldValidate: true })
-                  }
-                >
-                  <Camera className="mr-2 h-4 w-4" />
-                  Use Camera
-                </Button>
-              </div>
-              {errors.surveyImage && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.surveyImage.message}
-                </p>
-              )}
-            </div>
-
-            {new Array(phases ? phases - 2 : 0).fill(0).map((_, index) => (
-              <div key={index}>
-                <label className="mb-2 block text-sm font-medium">
-                  Progress {index + 1} Image
-                </label>
-                <div className="mt-1 flex flex-col gap-2">
-                  <div className="flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pb-6 pt-5">
-                    <div className="space-y-1 text-center">
-                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                      <div className="flex text-sm text-gray-600">
-                        <label className="relative cursor-pointer rounded-md bg-white font-medium text-orange-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-orange-500 focus-within:ring-offset-2 hover:text-orange-400">
-                          <span>Upload a file</span>
-                          <Input
-                            type="file"
-                            className="sr-only"
-                            onChange={() => {
-                              const currentImages = watch('progressImage') || []
-                              setValue(
-                                'progressImage',
-                                [...currentImages, 'uploaded'],
-                                { shouldValidate: true }
-                              )
-                            }}
-                          />
-                        </label>
-                      </div>
-                      <p className="text-xs text-gray-500">
-                        PNG, JPG up to 10MB
-                      </p>
-                    </div>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="flex items-center justify-center"
-                    onClick={() => {
-                      const currentImages = watch('progressImage') || []
-                      setValue('progressImage', [...currentImages, 'camera'], {
-                        shouldValidate: true,
-                      })
-                    }}
-                  >
-                    <Camera className="mr-2 h-4 w-4" />
-                    Use Camera
-                  </Button>
-                </div>
-                {errors.progressImage && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {errors.progressImage.message}
-                  </p>
-                )}
-              </div>
-            ))}
-
-            <div>
-              <label className="mb-2 block text-sm font-medium">
-                Finish Image
-              </label>
-              <div className="mt-1 flex flex-col gap-2">
-                <div className="flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pb-6 pt-5">
-                  <div className="space-y-1 text-center">
-                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                    <div className="flex text-sm text-gray-600">
-                      <label className="relative cursor-pointer rounded-md bg-white font-medium text-orange-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-orange-500 focus-within:ring-offset-2 hover:text-orange-400">
-                        <span>Upload a file</span>
-                        <Input
-                          type="file"
-                          className="sr-only"
-                          onChange={() =>
-                            setValue('finishImage', 'uploaded', {
-                              shouldValidate: true,
-                            })
-                          }
-                        />
-                      </label>
-                    </div>
-                    <p className="text-xs text-gray-500">PNG, JPG up to 10MB</p>
-                  </div>
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex items-center justify-center"
-                  onClick={() =>
-                    setValue('finishImage', 'camera', { shouldValidate: true })
-                  }
-                >
-                  <Camera className="mr-2 h-4 w-4" />
-                  Use Camera
-                </Button>
-              </div>
-              {errors.finishImage && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.finishImage.message}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <Button
-            type="submit"
-            className="w-full bg-orange-500 text-white hover:bg-orange-400 disabled:bg-gray-300"
-            disabled={!isValid}
-          >
-            Submit Repair
-          </Button>
-        </form>
-      </div>
-    </div>
-  )
-}

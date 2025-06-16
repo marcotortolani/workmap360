@@ -2,6 +2,7 @@
 import type React from 'react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -15,8 +16,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Eye, EyeOff, LogIn } from 'lucide-react'
-import Link from 'next/link'
+import { Eye, EyeOff, LogIn, Loader2 } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -50,28 +50,32 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative z-0 flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-neutral-700 to-neutral-900 p-4">
+    <div className="relative z-0 flex min-h-screen flex-col items-center justify-center p-4">
       <div
-        className=" absolute top-0 left-0 z-[-1] h-full w-full opacity-40"
+        className=" absolute top-0 left-0 z-[-1] h-full w-full"
         style={{
-          backgroundImage: 'url("/images/bg-black-bricks.jpg")',
+          // backgroundImage: 'url("/images/bg-sky-building-concrete.jpg")',
+          // backgroundImage: 'url("/images/bg-wall-brutalism-01.jpg")',
+          backgroundImage: 'url("/images/bg-wall-concrete-glass.jpg")',
           backgroundPosition: 'center',
           backgroundSize: 'cover',
         }}
       ></div>
       <div className="mb-8 text-center">
-        <h1 className="text-4xl font-bold text-white md:text-5xl">
+        <h1 className="text-4xl font-stretch-75% font-bold text-neutral-200 text-shadow text-shadow-md text-shadow-black/60 md:text-5xl">
           Workmap360
         </h1>
-        <p className="mt-2 text-gray-400">Project Management System</p>
+        <p className="mt-2 text-neutral-200 text-shadow text-shadow-2xs text-shadow-black/60">
+          Project Management System
+        </p>
       </div>
 
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md bg-white/30  drop-shadow-xl backdrop-blur-lg border-neutral-400">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
-            <LogIn className="mr-2 h-4 w-4" /> Login
+            Login
           </CardTitle>
-          <CardDescription className="text-center">
+          <CardDescription className="text-center text-neutral-800">
             Enter your credentials to access the system
           </CardDescription>
         </CardHeader>
@@ -120,7 +124,7 @@ export default function LoginPage() {
               </div>
               <Link
                 href="/auth/forgot-password"
-                className="my-2 text-sky-600 inline-block text-sm underline-offset-4 hover:underline"
+                className="my-2 text-sky-700 inline-block text-sm underline-offset-4 hover:underline"
               >
                 Forgot your password?
               </Link>
@@ -134,15 +138,18 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full bg-orange-500 text-white hover:bg-orange-400"
+              className="w-full bg-sky-600 text-white hover:bg-sky-400"
               disabled={isLoading}
             >
               {isLoading ? (
-                'Logging in...'
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <span className=" mr-2">Logging in...</span>
+                </>
               ) : (
                 <>
                   <LogIn className="mr-2 h-4 w-4" />
-                  Login
+                  <span className=" mr-2">Login</span>
                 </>
               )}
             </Button>

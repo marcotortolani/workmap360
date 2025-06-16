@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // /app/api/users/create/route.ts
 import { NextResponse } from 'next/server'
 import { getSupabaseAuthWithRole } from '@/lib/getSupabaseAuthWithRole'
 import { getServiceSupabase } from '@/lib/supabaseAuth'
 
 export async function POST(req: Request) {
+  const redirectTo = new URL(req.url).origin + `/auth/confirm`
   try {
     const { user, role, error } = await getSupabaseAuthWithRole(req)
 
@@ -43,10 +45,10 @@ export async function POST(req: Request) {
 
     const serviceClient = getServiceSupabase()
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const authPayload: any = {
       email,
-      redirectTo: `${window.location.origin}/auth/confirm`,
+      redirectTo: redirectTo,
+      redirectToComplete: redirectTo,
     }
     if (useInviteFlow) {
       authPayload.sendEmailInvitation = true

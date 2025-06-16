@@ -219,7 +219,6 @@ export default function UsersTestPage() {
       })
 
       const { users, pagination, error } = await response.json()
-      console.log('Fetch result:', users)
 
       if (!response.ok) {
         throw new Error(error || 'Error en la solicitud')
