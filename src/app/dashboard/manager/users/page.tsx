@@ -66,7 +66,7 @@ export default function ManagerUsersPage() {
     // const token = await getSessionToken()
     // if (!token) throw new Error('No hay sesión activa')
 
-    withLoading(async () => {
+    await withLoading(async () => {
       const response = await fetch('/api/users/list?page=1&limit=20', {
         method: 'GET',
         headers: {
@@ -95,7 +95,7 @@ export default function ManagerUsersPage() {
     } = await supabase.auth.getSession()
     if (!session) throw new Error('No hay sesión activa')
 
-    withLoading(async () => {
+    await withLoading(async () => {
       const response = await fetch(
         `/api/users/by-role/?role=${role}&page=1&limit=20`,
         {
@@ -255,8 +255,8 @@ export default function ManagerUsersPage() {
     }
   }
 
-  const deleteUser = (userId: UserType['id']) =>
-    withLoading(async () => {
+  const deleteUser = async (userId: UserType['id']) =>
+    await withLoading(async () => {
       const token = await getSessionToken()
       const res = await fetch('/api/users/delete', {
         method: 'DELETE',
