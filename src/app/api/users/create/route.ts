@@ -3,9 +3,14 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAuthWithRole } from '@/lib/getSupabaseAuthWithRole'
 import { getServiceSupabase } from '@/lib/supabaseAuth'
+import { validRoles } from '@/data/roles'
 
 export async function POST(req: Request) {
-  const redirectTo = new URL(req.url).origin + `/dashboard`
+  if (req.method !== 'POST') {
+    return NextResponse.json({ error: 'Method not allowed' }, { status: 405 })
+  }
+
+  const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
 
   try {
     const { user, role, error } = await getSupabaseAuthWithRole(req)
@@ -39,7 +44,7 @@ export async function POST(req: Request) {
       )
     }
 
-    const validRoles = ['admin', 'manager', 'technician', 'client', 'guest']
+    // const validRoles = ['admin', 'manager', 'technician', 'client', 'guest']
     if (!validRoles.includes(newUserRole)) {
       return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
     }
@@ -53,15 +58,22 @@ export async function POST(req: Request) {
       },
     }
     if (useInviteFlow) {
-      authPayload.sendEmailInvitation = true
       authPayload.password = `${firstName.toLowerCase()}123`
+      authPayload.email_confirm = false
+      authPayload.invited_by =
+        user.user_metadata.first_name + ' ' + user.user_metadata.last_name
+      authPayload.invited_by_email = user.email
+      authPayload.invited_by_role = role
+      authPayload.options.emailRedirectTo = redirectTo
+      authPayload.email_confirm = true // el correo se confirma automaticamente
     } else {
       authPayload.password = `${firstName.toLowerCase()}123`
+      authPayload.email_confirm = true // el correo se confirma automaticamente
     }
 
     const { data: authUser, error: authError } =
       // await serviceClient.auth.admin.createUser(authPayload)
-      await serviceClient.auth.signUp(authPayload)
+      await serviceClient.auth.admin.createUser(authPayload)
 
     if (authError?.message?.includes('User already registered')) {
       return NextResponse.json(
@@ -95,7 +107,15 @@ export async function POST(req: Request) {
       .single()
 
     if (insertError) {
-      return NextResponse.json({ error: insertError.message }, { status: 500 })
+      console.error(
+        'Error insertando usuario en la tabla users:',
+        insertError.message
+      )
+      await serviceClient.auth.admin.deleteUser(uid)
+      return NextResponse.json(
+        { error: 'Error guardando usuario' },
+        { status: 500 }
+      )
     }
 
     return NextResponse.json({ user: data }, { status: 201 })
