@@ -6,27 +6,64 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 // import { MobileTabs } from '@/components/mobile-tabs'
 
+const basePath = '/dashboard/admin'
+
 const sidebarItems = [
   {
     title: 'Projects',
-    href: '/dashboard/admin/projects',
+    href: `${basePath}/projects`,
     icon: 'folder-kanban',
   },
   {
     title: 'Roles',
-    href: '/dashboard/admin/roles',
+    href: `${basePath}/roles`,
     icon: 'user-cog',
   },
   {
     title: 'Users',
-    href: '/dashboard/admin/users',
+    href: `${basePath}/users`,
     icon: 'users',
   },
   {
+    title: 'New Repair',
+    href: `${basePath}/new-repair`,
+    icon: 'pen-tool',
+  },
+  {
     title: 'Repairs',
-    href: '/dashboard/admin/repairs',
+    href: `${basePath}/repairs`,
     icon: 'wrench',
   },
+  {
+    title: 'Repair Type',
+    href: `${basePath}/repair-type`,
+    icon: 'list-ordered',
+  },
+  {
+    title: "Map's View",
+    href: `${basePath}/maps-view`,
+    icon: 'map',
+  },
+  {
+    title: 'Reports',
+    href: `${basePath}/reports`,
+    icon: 'clipboard',
+  },
+  {
+    title: 'Profile',
+    href: `${basePath}/profile`,
+    icon: 'user-circle',
+  },
+  // {
+  //   title: 'Settings',
+  // href: `${basePath}/settings`,
+  //   icon: 'gear',
+  // },
+  // {
+  //   title: 'Logout',
+  // href: `${basePath}/logout`,
+  //   icon: 'logout',
+  // },
 ]
 
 export default async function AdminLayout({

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import Link from 'next/link'
@@ -15,7 +14,9 @@ import {
   MapIcon,
   TableIcon,
   ListOrderedIcon,
+  ChartBar,
 } from 'lucide-react'
+
 import { cn } from '@/lib/utils'
 import { UserType } from '@/types/user-types'
 import Image from 'next/image'
@@ -33,7 +34,9 @@ export function Sidebar({ items, userData }: SidebarProps) {
   const pathname = usePathname()
   // Mapeo de strings a íconos
 
-  const iconMap: { [key: string]: React.ComponentType<any> } = {
+  const iconMap: {
+    [key: string]: React.ComponentType<{ className?: string }>
+  } = {
     'folder-kanban': FolderKanban,
     'user-cog': UserCog,
     users: Users,
@@ -45,6 +48,7 @@ export function Sidebar({ items, userData }: SidebarProps) {
     map: MapIcon,
     table: TableIcon,
     'list-ordered': ListOrderedIcon,
+    clipboard: ChartBar,
   }
 
   return (

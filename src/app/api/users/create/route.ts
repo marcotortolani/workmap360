@@ -11,6 +11,7 @@ export async function POST(req: Request) {
   }
 
   const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
+  //const redirectTo = `${window.location.origin}/dashboard`
 
   try {
     const { user, role, error } = await getSupabaseAuthWithRole(req)
@@ -71,11 +72,15 @@ export async function POST(req: Request) {
       authPayload.email_confirm = true // el correo se confirma automaticamente
     }
 
+    console.log('payload', authPayload)
+
     const { data: authUser, error: authError } =
-      // await serviceClient.auth.admin.createUser(authPayload)
       await serviceClient.auth.admin.createUser(authPayload)
 
-    if (authError?.message?.includes('User already registered')) {
+    if (
+      authError?.message?.includes('User already registered') ||
+      authError?.code?.includes('email_exists')
+    ) {
       return NextResponse.json(
         { error: 'Email already registered' },
         { status: 409 }
@@ -84,7 +89,7 @@ export async function POST(req: Request) {
 
     if (authError || !authUser?.user) {
       return NextResponse.json(
-        { error: 'Error creating user in auth' },
+        { error: 'Error creating user' },
         { status: 500 }
       )
     }

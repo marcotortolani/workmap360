@@ -6,32 +6,54 @@ import { LogoutButton } from '@/components/logout-button'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
+const basePath = '/dashboard/manager'
+
 const sidebarItems = [
   {
     title: 'Projects',
-    href: '/dashboard/manager/projects',
+    href: `${basePath}/projects`,
     icon: 'folder-kanban',
   },
   {
     title: 'Roles',
-    href: '/dashboard/manager/roles',
+    href: `${basePath}/roles`,
     icon: 'user-cog',
   },
   {
     title: 'Users',
-    href: '/dashboard/manager/users',
+    href: `${basePath}/users`,
     icon: 'users',
   },
   {
     title: 'Repairs',
-    href: '/dashboard/manager/repairs',
+    href: `${basePath}/repairs`,
     icon: 'wrench',
   },
   {
     title: 'Repair Type',
-    href: '/dashboard/manager/repair-type',
+    href: `${basePath}/repair-type`,
     icon: 'list-ordered',
   },
+  {
+    title: "Map's View",
+    href: `${basePath}/maps-view`,
+    icon: 'map',
+  },
+  // {
+  //   title: 'Reports',
+  //   href: `${basePath}/reports`,
+  //   icon: 'clipboard',
+  // },
+  // {
+  //   title: 'Settings',
+  // href: `${basePath}/settings`,
+  //   icon: 'gear',
+  // },
+  // {
+  //   title: 'Logout',
+  // href: `${basePath}/logout`,
+  //   icon: 'logout',
+  // },
 ]
 
 // const managerTabs = [

@@ -171,13 +171,19 @@ export function UserForm({
           </div>
         </div>
       </div>
-      <div className=" w-full flex items-center justify-between">
-        <Button variant="default" className="mt-4 " onClick={onCancel}>
+      <div className=" w-full flex items-center justify-center gap-10">
+        <Button variant="default" className=" " onClick={onCancel}>
           Cancel
         </Button>
         <Button
           type="submit"
           className="w-full bg-green-600 text-white hover:bg-green-500 sm:w-auto transition-all duration-200 ease-in-out"
+          disabled={
+            !formData.first_name ||
+            !formData.last_name ||
+            !formData.email ||
+            !formData.role
+          }
         >
           Save User
         </Button>
