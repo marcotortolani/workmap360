@@ -96,7 +96,7 @@ export async function PUT(
     }
 
     const cloudinary = getCloudinary()
-    let updateData: any = { updated_at: new Date().toISOString() }
+    const updateData: any = { updated_at: new Date().toISOString() }
 
     if (file) {
       if (!file.startsWith('data:image/')) {
