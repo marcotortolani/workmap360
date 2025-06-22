@@ -1,7 +1,9 @@
+// src/components/pages/technician/new-repair-page.tsx
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Camera, Upload } from 'lucide-react'
+//import { CldImage, CldUploadWidget } from 'next-cloudinary'
+//import { Camera, Upload } from 'lucide-react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -19,6 +21,7 @@ import {
 import { useProjectsListStore } from '@/stores/projects-list-store'
 import { useRepairsDataStore } from '@/stores/repairs-data-store'
 import { RepairData } from '@/types/repair-type'
+import CustomImageUpload from '@/components/custom-image-upload'
 
 type FormData = z.infer<ReturnType<typeof createFormSchema>>
 
@@ -36,6 +39,7 @@ export default function TechnicianNewRepairPage() {
   const [statusRepairPhases, setStatusRepairPhases] = useState<
     'S' | `P${number}` | 'F' | null
   >(null)
+  const [folderName, setFolderName] = useState<string>('')
 
   console.log('status repair phases: ', statusRepairPhases)
 
@@ -87,6 +91,8 @@ export default function TechnicianNewRepairPage() {
   const phases = projectsList
     .find((project) => project.id === projectId)
     ?.repairTypes.find((rt) => rt.repairType === repairType)?.phases
+
+  console.log('phases new repair: ', phases)
 
   // Actualizar referencias
   useEffect(() => {
@@ -141,6 +147,14 @@ export default function TechnicianNewRepairPage() {
     return 'pending'
   }
 
+  // const handleFileName = () => {
+  //   if (!drop || !level || !repairType || !repairIndex) return
+  //   const name = `D${drop}.L${level}.${repairType}.${repairIndex}.100x100x40.S`
+  //   console.log('filename: ', name)
+
+  //   setFileName(name)
+  // }
+
   const onSubmit = (data: FormData) => {
     console.log('Form submitted:', data)
 
@@ -151,17 +165,21 @@ export default function TechnicianNewRepairPage() {
 
   return (
     <div className="flex flex-col gap-8 p-8">
-      <div className="w-full lg:w-1/2 rounded-lg border bg-white p-6 shadow-sm">
+      <div className="w-full lg:w-1/2 rounded-lg border bg-neutral-100 p-6 shadow-sm">
         <h2 className="mb-4 text-xl font-semibold">New Repair</h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 hidden">
           <div className="grid gap-4 sm:grid-cols-4">
             <div className="sm:col-span-4">
               <label className="mb-2 block text-sm font-medium">Project</label>
               <Select
                 value={projectId === 0 ? '' : projectId.toString()}
-                onValueChange={(value) =>
+                onValueChange={(value) => {
                   setValue('projectId', parseInt(value))
-                }
+                  setFolderName(
+                    projectsList.find((p) => p.id === parseInt(value))?.name ||
+                      ''
+                  )
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select project" />
@@ -340,7 +358,7 @@ export default function TechnicianNewRepairPage() {
               </div>
             )}
 
-            <div>
+            {/* <div>
               <label className="mb-2 block text-sm font-medium">
                 Survey Image
               </label>
@@ -480,7 +498,25 @@ export default function TechnicianNewRepairPage() {
                   {errors.finishImage.message}
                 </p>
               )}
-            </div>
+            </div> */}
+
+            <CustomImageUpload
+              fieldName="surveyImage"
+              fileNameData={{
+                drop,
+                level,
+                repairType,
+                repairIndex,
+                measures: '100x100x40',
+                phase: 'S',
+              }}
+              folderName={folderName}
+              userName="John Doe"
+              onUploadSuccess={(imageData) => {
+                // save data on supabase
+                console.log('success upload: ', imageData)
+              }}
+            />
           </div>
 
           <Button
@@ -492,9 +528,82 @@ export default function TechnicianNewRepairPage() {
           </Button>
         </form>
       </div>
+
+      <div>
+        <CustomImageUpload
+          fieldName="progressImage"          
+          fileNameData={{
+            drop: 15,
+            level: 6,
+            repairType: 'CR',
+            repairIndex: 1,
+            measures: '100x100x40',
+            phase: 'P2',
+          }}
+          folderName={"sample"}
+          userName="John Doe"
+          onUploadSuccess={(imageData) => {
+            console.log('success upload: ', imageData)
+          }}
+        />
+      </div>
     </div>
   )
 }
+
+// const CloudUploadImage = () => {
+//   return (
+//     <CldUploadWidget
+//       uploadPreset="signed_upload"
+//       options={{
+//         maxFiles: 1,
+//         sources: ['local', 'camera'],
+//         fieldName: 'image',
+//         multiple: false,
+//         resourceType: 'image',
+//         folder: 'sample',
+//       }}
+//       onUpload={(result) => {
+//         console.log(result)
+//       }}
+//       onOpen={() => {
+//         console.log('Widget opened')
+//       }}
+//       onClose={() => {
+//         console.log('Widget closed')
+//       }}
+//     >
+//       {({ open }) => {
+//         return (
+//           <Button
+//             type="button"
+//             className="flex items-center justify-center"
+//             onClick={() => open()}
+//           >
+//             <Camera className="mr-2 h-4 w-4" />
+//             Use Camera
+//           </Button>
+//         )
+//       }}
+//     </CldUploadWidget>
+//   )
+// }
+
+// const CloudImage = ({ image }: { image: string }) => {
+//   return (
+//     <CldImage
+//       className="h-full w-full"
+//       src="cld-sample-2" // Use this sample image or upload your own via the Media Explorer
+//       width="500" // Transform the image: auto-crop to square aspect_ratio
+//       height="500"
+//       crop={{
+//         type: 'auto',
+//         source: true,
+//       }}
+//       alt="Sample image"
+//     />
+//   )
+// }
 
 // 'use client'
 
