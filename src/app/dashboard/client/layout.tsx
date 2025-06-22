@@ -2,16 +2,9 @@ import type React from 'react'
 import { Sidebar } from '@/components/sidebar'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { MobileNav } from '@/components/mobile-nav'
+import { Header } from '@/components/header'
 import { LogoutButton } from '@/components/logout-button'
 
-const sidebarItems = [
-  {
-    title: 'My Projects',
-    href: '/dashboard/client/projects',
-    icon: 'folder-kanban',
-  },
-]
 
 export default async function ClientLayout({
   children,
@@ -39,14 +32,13 @@ export default async function ClientLayout({
 
   return (
     <div className="flex h-screen">
-      <Sidebar items={sidebarItems} userData={dbUser} />
-      {/* <MobileTabs tabs={adminTabs} /> */}
-      <MobileNav items={sidebarItems} />
+      <Header role="client" userData={dbUser} />
+      <Sidebar role="client" userData={dbUser} />
       <main className="py-8 px-10 flex-1 space-y-6 overflow-auto bg-gray-50">
-        <div className=" flex items-center justify-between ">
-          <h1 className=" text-3xl font-bold text-orange-500">
+        <div className="hidden md:flex items-center justify-between ">
+          <h2 className=" text-3xl font-bold text-orange-500">
             Client Dashboard
-          </h1>
+          </h2>
           <LogoutButton />
         </div>
         {/* <TabsNavigation tabs={managerTabs} basePath="/dashboard/manager" /> */}

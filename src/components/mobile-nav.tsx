@@ -1,59 +1,59 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import type React from 'react'
-
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useTabsNavStore } from '@/stores/tabs-nav-store'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { cn } from '@/lib/utils'
-
 import {
-  FolderKanban,
-  UserCog,
-  Users,
-  Wrench,
-  User,
-  PlusCircle,
-} from 'lucide-react'
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+  SheetDescription,
+} from '@/components/ui/sheet'
+import { cn } from '@/lib/utils'
+import { Role } from '@/types/database-types'
 
-interface MobileNavProps {
-  items: {
-    title: string
-    href: string
-    icon?: string
-  }[]
-}
+import { UserType } from '@/types/user-types'
+import Image from 'next/image'
 
-export function MobileNav({ items }: MobileNavProps) {
+export function MobileNav({
+  role = 'guest',
+  userData,
+}: {
+  role: Role
+  userData?: UserType
+}) {
+  const { tabsNavItems, setTabsNavItems } = useTabsNavStore()
   const [open, setOpen] = useState(false)
+
   const pathname = usePathname()
 
-  // Mapeo de strings a íconos
-  const iconMap: { [key: string]: React.ComponentType<any> } = {
-    'folder-kanban': FolderKanban,
-    'user-cog': UserCog,
-    users: Users,
-    wrench: Wrench,
-    user: User,
-    'plus-circle': PlusCircle,
-  }
+  useEffect(() => {
+    setTabsNavItems(role)
+  }, [role, setTabsNavItems])
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button
-          variant="ghost"
-          className="mr-2 px-0 text-white hover:bg-transparent md:hidden"
+          variant="default"
+          className="mr-2 px-4 text-black bg-transparent hover:bg-neutral-200 md:hidden"
         >
-          <Menu className="h-6 w-6" />
+          <Menu className="h-6 w-6 " />
           <span className="sr-only">Toggle menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="bg-black px-0 pt-0">
+      <SheetContent side="left" className="bg-black px-0 pt-0 overflow-scroll">
+        <div className="px-6 pt-4">
+          <SheetTitle className="sr-only">Nav Menu</SheetTitle>
+          <SheetDescription className="sr-only">
+            Sidebar Menu Navigation for mobile devices
+          </SheetDescription>
+        </div>
         <div className="flex h-16 items-center border-b border-gray-800 px-6">
           <Link
             href="/"
@@ -72,10 +72,9 @@ export function MobileNav({ items }: MobileNavProps) {
           </Button>
         </div>
         <nav className="flex flex-col gap-1 p-4">
-          {items.map((item) => {
+          {tabsNavItems.map((item) => {
             const isActive = pathname.includes(item.href)
-            // const Icon = item.icon
-            const Icon = item.icon ? iconMap[item.icon] : null // Mapeamos el string al ícono
+            const Icon = item.icon ? item.icon : null
 
             return (
               <Link
@@ -95,6 +94,32 @@ export function MobileNav({ items }: MobileNavProps) {
             )
           })}
         </nav>
+        {userData && (
+          <div className="p-6">
+            {userData.avatar ? (
+              <Image
+                src={userData.avatar}
+                alt={userData.first_name}
+                className="h-12 w-12 rounded-full"
+                width={48}
+                height={48}
+              />
+            ) : (
+              <div className="h-10 w-10 flex items-center justify-center rounded-full bg-orange-500">
+                <span className=" font-bold ">
+                  {userData.first_name.charAt(0) + userData.last_name.charAt(0)}
+                </span>
+              </div>
+            )}
+            <h2 className="text-lg font-normal text-white text-wrap">
+              {userData.first_name} {userData.last_name}
+            </h2>
+            <p className="text-sm font-light text-white">{userData.email}</p>
+            <p className="text-sm font-normal text-sky-300 capitalize">
+              {userData.role}
+            </p>
+          </div>
+        )}
       </SheetContent>
     </Sheet>
   )

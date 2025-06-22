@@ -220,6 +220,7 @@ export default function CustomImageUpload({
 
   // Check camera support
   const checkCameraSupport = () => {
+    if (typeof navigator === 'undefined') return false
     const extendedNavigator = navigator as ExtendedNavigator
 
     const hasGetUserMedia = !!(
@@ -251,6 +252,7 @@ export default function CustomImageUpload({
         return
       }
 
+      if (typeof navigator === 'undefined') return false
       const extendedNavigator = navigator as ExtendedNavigator
       const getUserMediaMethod =
         extendedNavigator.getUserMedia ||

@@ -1,38 +1,9 @@
 import type React from 'react'
-
 import { Sidebar } from '@/components/sidebar'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { LogoutButton } from '@/components/logout-button'
-import { MobileNav } from '@/components/mobile-nav'
-
-const sidebarItems = [
-  {
-    title: 'My Projects',
-    href: '/dashboard/technician/projects',
-    icon: 'folder-kanban',
-  },
-  {
-    title: 'New Repair',
-    href: '/dashboard/technician/new-repair',
-    icon: 'pen-tool',
-  },
-  {
-    title: 'Repairs',
-    href: '/dashboard/technician/reparations',
-    icon: 'wrench',
-  },
-  {
-    title: "Map's View",
-    href: '/dashboard/technician/maps-view',
-    icon: 'map',
-  },
-  {
-    title: 'Profile',
-    href: '/dashboard/technician/profile',
-    icon: 'user-circle',
-  },
-]
+import { Header } from '@/components/header'
 
 export default async function TechnicianLayout({
   children,
@@ -59,14 +30,13 @@ export default async function TechnicianLayout({
   }
   return (
     <div className="flex h-screen">
-      <Sidebar items={sidebarItems} userData={dbUser} />
-      {/* <MobileTabs tabs={adminTabs} /> */}
-      <MobileNav items={sidebarItems} />
+      <Header role="technician" userData={dbUser} />
+      <Sidebar role="technician" userData={dbUser} />
       <main className="py-8 px-10 flex-1 space-y-6 overflow-auto bg-gray-50">
-        <div className=" flex items-center justify-between ">
-          <h1 className=" text-3xl font-bold text-orange-500">
+        <div className="hidden md:flex items-center justify-between ">
+          <h2 className=" text-3xl font-bold text-orange-500">
             Technician Dashboard
-          </h1>
+          </h2>
           <LogoutButton />
         </div>
         {/* <TabsNavigation tabs={managerTabs} basePath="/dashboard/manager" /> */}

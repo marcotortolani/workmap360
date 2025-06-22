@@ -164,7 +164,7 @@ export default function TechnicianNewRepairPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8 p-8">
+    <div className="w-full flex flex-col gap-8 p-2 md:p-8 bg-sky-500">
       <div className="w-full lg:max-w-3xl rounded-lg border bg-neutral-100 p-6 shadow-sm">
         <h2 className="mb-4 text-xl font-semibold">New Repair</h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

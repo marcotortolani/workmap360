@@ -1,55 +1,28 @@
 'use client'
-
+import { useEffect } from 'react'
+import { useTabsNavStore } from '@/stores/tabs-nav-store'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import {
-  FolderKanban,
-  UserCog,
-  Users,
-  Wrench,
-  User,
-  PlusCircle,
-  UserCircle,
-  PenToolIcon,
-  MapIcon,
-  TableIcon,
-  ListOrderedIcon,
-  ChartBar,
-} from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import { UserType } from '@/types/user-types'
 import Image from 'next/image'
+import { Role } from '@/types/database-types'
 
 interface SidebarProps {
-  items: {
-    title: string
-    href: string
-    icon?: string
-  }[]
+  role: Role
   userData?: UserType
 }
 
-export function Sidebar({ items, userData }: SidebarProps) {
+export function Sidebar({ role = 'guest', userData }: SidebarProps) {
+  const { tabsNavItems, setTabsNavItems } = useTabsNavStore()
   const pathname = usePathname()
-  // Mapeo de strings a íconos
 
-  const iconMap: {
-    [key: string]: React.ComponentType<{ className?: string }>
-  } = {
-    'folder-kanban': FolderKanban,
-    'user-cog': UserCog,
-    users: Users,
-    wrench: Wrench,
-    user: User,
-    'plus-circle': PlusCircle,
-    'user-circle': UserCircle,
-    'pen-tool': PenToolIcon,
-    map: MapIcon,
-    table: TableIcon,
-    'list-ordered': ListOrderedIcon,
-    clipboard: ChartBar,
-  }
+  console.log('user data: ', userData)
+
+  useEffect(() => {
+    setTabsNavItems(role)
+  }, [role, setTabsNavItems])
 
   return (
     <div className="hidden h-screen w-64 pb-10 flex-col bg-black md:flex">
@@ -57,10 +30,9 @@ export function Sidebar({ items, userData }: SidebarProps) {
         <h2 className="text-2xl font-bold text-white">Workmap360</h2>
       </div>
       <nav className="flex-1 space-y-1 px-4 py-2">
-        {items.map((item) => {
+        {tabsNavItems?.map((item) => {
           const isActive = pathname.includes(item.href)
-          // const Icon = item.icon
-          const Icon = item.icon ? iconMap[item.icon] : null
+          const Icon = item.icon ? item.icon : null
 
           return (
             <Link
@@ -100,6 +72,9 @@ export function Sidebar({ items, userData }: SidebarProps) {
             {userData.first_name} {userData.last_name}
           </h2>
           <p className="text-sm font-light text-white">{userData.email}</p>
+          <p className="text-sm font-normal text-sky-300 capitalize">
+            {userData.role}
+          </p>
         </div>
       )}
     </div>

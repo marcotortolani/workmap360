@@ -9,6 +9,7 @@ export default async function page() {
   if (error || !data?.user) {
     redirect('/auth/login')
   }
+
   // get user role on supabase to redirect to the correct dashboard
   const { data: dbUser, error: dbError } = await supabase
     .from('users')
@@ -21,5 +22,5 @@ export default async function page() {
   if (!validRoles.includes(dbUser.role) || !dbUser || !dbUser.role) {
     redirect('/')
   }
-  redirect(`/dashboard/${dbUser.role}`) 
+  redirect(`/dashboard/${dbUser.role}`)
 }
