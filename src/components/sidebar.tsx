@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { UserType } from '@/types/user-types'
 import Image from 'next/image'
 import { Role } from '@/types/database-types'
+import { LogoutButton } from './logout-button'
 
 interface SidebarProps {
   role: Role
@@ -17,8 +18,6 @@ interface SidebarProps {
 export function Sidebar({ role = 'guest', userData }: SidebarProps) {
   const { tabsNavItems, setTabsNavItems } = useTabsNavStore()
   const pathname = usePathname()
-
-  console.log('user data: ', userData)
 
   useEffect(() => {
     setTabsNavItems(role)
@@ -51,6 +50,9 @@ export function Sidebar({ role = 'guest', userData }: SidebarProps) {
           )
         })}
       </nav>
+      <div className="p-6">
+        <LogoutButton variant="ghost" />
+      </div>
       {userData && (
         <div className="p-6">
           {userData.avatar ? (

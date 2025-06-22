@@ -1,4 +1,3 @@
-// create a zustand store to set the items of the navigation tabs
 import { create } from 'zustand'
 import { Role } from '@/types/database-types'
 

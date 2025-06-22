@@ -1,7 +1,6 @@
 import type React from 'react'
 import { Sidebar } from '@/components/sidebar'
 
-import { LogoutButton } from '@/components/logout-button'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Header } from '@/components/header'
@@ -39,7 +38,6 @@ export default async function AdminLayout({
           <h2 className=" text-3xl font-bold text-orange-500">
             Admin Dashboard
           </h2>
-          <LogoutButton />
         </div>
         {/* <TabsNavigation tabs={managerTabs} basePath="/dashboard/manager" /> */}
         {children}

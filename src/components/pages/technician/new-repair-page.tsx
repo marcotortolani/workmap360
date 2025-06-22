@@ -164,11 +164,11 @@ export default function TechnicianNewRepairPage() {
   }
 
   return (
-    <div className="w-full flex flex-col gap-8 p-2 md:p-8 bg-sky-500">
-      <div className="w-full lg:max-w-3xl rounded-lg border bg-neutral-100 p-6 shadow-sm">
+    <div className="w-full flex flex-col gap-8 p-2 md:p-8 ">
+      <div className="w-full lg:max-w-3xl rounded-lg border bg-neutral-100 p-2 md:p-6 shadow-sm">
         <h2 className="mb-4 text-xl font-semibold">New Repair</h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-4">
+          <div className="grid gap-4 grid-cols-2 sm:grid-cols-4">
             <div className="sm:col-span-4">
               <label className="mb-2 block text-sm font-medium">Project</label>
               <Select

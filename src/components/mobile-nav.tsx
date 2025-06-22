@@ -19,6 +19,7 @@ import { Role } from '@/types/database-types'
 
 import { UserType } from '@/types/user-types'
 import Image from 'next/image'
+import { LogoutButton } from './logout-button'
 
 export function MobileNav({
   role = 'guest',
@@ -71,7 +72,7 @@ export function MobileNav({
             <span className="sr-only">Close</span>
           </Button>
         </div>
-        <nav className="flex flex-col gap-1 p-4">
+        <nav className="flex flex-col gap-1 p-4 mb-4">
           {tabsNavItems.map((item) => {
             const isActive = pathname.includes(item.href)
             const Icon = item.icon ? item.icon : null
@@ -94,6 +95,7 @@ export function MobileNav({
             )
           })}
         </nav>
+        <LogoutButton variant="link" />
         {userData && (
           <div className="p-6">
             {userData.avatar ? (
