@@ -165,9 +165,9 @@ export default function TechnicianNewRepairPage() {
 
   return (
     <div className="flex flex-col gap-8 p-8">
-      <div className="w-full lg:w-1/2 rounded-lg border bg-neutral-100 p-6 shadow-sm">
+      <div className="w-full lg:max-w-3xl rounded-lg border bg-neutral-100 p-6 shadow-sm">
         <h2 className="mb-4 text-xl font-semibold">New Repair</h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 hidden">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-4">
             <div className="sm:col-span-4">
               <label className="mb-2 block text-sm font-medium">Project</label>
@@ -499,24 +499,25 @@ export default function TechnicianNewRepairPage() {
                 </p>
               )}
             </div> */}
-
-            <CustomImageUpload
-              fieldName="surveyImage"
-              fileNameData={{
-                drop,
-                level,
-                repairType,
-                repairIndex,
-                measures: '100x100x40',
-                phase: 'S',
-              }}
-              folderName={folderName}
-              userName="John Doe"
-              onUploadSuccess={(imageData) => {
-                // save data on supabase
-                console.log('success upload: ', imageData)
-              }}
-            />
+            <div className=" col-span-3">
+              <CustomImageUpload
+                fieldName="surveyImage"
+                fileNameData={{
+                  drop,
+                  level,
+                  repairType,
+                  repairIndex,
+                  measures: '100x100x40',
+                  phase: 'S',
+                }}
+                folderName={folderName}
+                userName="John Doe"
+                onUploadSuccess={(imageData) => {
+                  // save data on supabase
+                  console.log('success upload: ', imageData)
+                }}
+              />
+            </div>
           </div>
 
           <Button
@@ -529,12 +530,13 @@ export default function TechnicianNewRepairPage() {
         </form>
       </div>
 
-      <div>
+      {/* Testing */}
+      {/* <div>
         <CustomImageUpload
           fieldName="progressImage"
           fileNameData={{
             drop: 15,
-            level: 11,
+            level: 14,
             repairType: 'CR',
             repairIndex: 1,
             measures: '100x100x40',
@@ -546,7 +548,7 @@ export default function TechnicianNewRepairPage() {
             console.log('success upload: ', imageData)
           }}
         />
-      </div>
+      </div> */}
     </div>
   )
 }

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 // src/components/custom-image-upload.tsx
 'use client'
 
@@ -65,10 +64,10 @@ export default function CustomImageUpload({
   const [loading, setLoading] = useState(false)
   const [showCamera, setShowCamera] = useState(false)
   const [cameraSupported, setCameraSupported] = useState(true)
-  const [compressionInfo, setCompressionInfo] = useState<{
-    originalSize: number
-    compressedSize: number
-  } | null>(null)
+  // const [compressionInfo, setCompressionInfo] = useState<{
+  //   originalSize: number
+  //   compressedSize: number
+  // } | null>(null)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -172,25 +171,25 @@ export default function CustomImageUpload({
         compressedFile = await imageCompression(file, options)
       }
 
-      const compressedSize = compressedFile.size
-      const compressionRatio = (
-        ((originalSize - compressedSize) / originalSize) *
-        100
-      ).toFixed(1)
+      //const compressedSize = compressedFile.size
+      // const compressionRatio = (
+      //   ((originalSize - compressedSize) / originalSize) *
+      //   100
+      // ).toFixed(1)
 
-      console.log(`Compresión completada:`)
-      console.log(
-        `- Tamaño original: ${(originalSize / 1024 / 1024).toFixed(2)} MB`
-      )
-      console.log(
-        `- Tamaño comprimido: ${(compressedSize / 1024 / 1024).toFixed(2)} MB`
-      )
-      console.log(`- Reducción: ${compressionRatio}%`)
+      // console.log(`Compresión completada:`)
+      // console.log(
+      //   `- Tamaño original: ${(originalSize / 1024 / 1024).toFixed(2)} MB`
+      // )
+      // console.log(
+      //   `- Tamaño comprimido: ${(compressedSize / 1024 / 1024).toFixed(2)} MB`
+      // )
+      // console.log(`- Reducción: ${compressionRatio}%`)
 
-      setCompressionInfo({
-        originalSize,
-        compressedSize,
-      })
+      // setCompressionInfo({
+      //   originalSize,
+      //   compressedSize,
+      // })
 
       return compressedFile
     } catch (error) {
@@ -405,7 +404,7 @@ export default function CustomImageUpload({
   const processImage = async (inputFile: File) => {
     setError(null)
     setLoading(true)
-    setCompressionInfo(null)
+    //setCompressionInfo(null)
 
     try {
       // Validar tipo de archivo
@@ -609,7 +608,7 @@ export default function CustomImageUpload({
     setFile(null)
     setPreviewUrl(null)
     setError(null)
-    setCompressionInfo(null)
+    //setCompressionInfo(null)
     stopCamera()
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
@@ -629,9 +628,9 @@ export default function CustomImageUpload({
   const isFormValid =
     fileNameData?.repairType.length > 0 && fileNameData?.repairIndex
 
-  const formatFileSize = (bytes: number) => {
-    return (bytes / 1024 / 1024).toFixed(2) + ' MB'
-  }
+  // const formatFileSize = (bytes: number) => {
+  //   return (bytes / 1024 / 1024).toFixed(2) + ' MB'
+  // }
 
   return (
     <div className="space-y-4">
@@ -726,7 +725,7 @@ export default function CustomImageUpload({
             </Button>
 
             {/* Info de compresión */}
-            {compressionInfo && (
+            {/* {compressionInfo && (
               <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md text-xs">
                 <p className="text-green-700">
                   <strong>Compresión exitosa:</strong>
@@ -744,7 +743,7 @@ export default function CustomImageUpload({
                   </span>
                 </p>
               </div>
-            )}
+            )} */}
           </div>
         )}
 
