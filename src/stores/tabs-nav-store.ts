@@ -96,6 +96,11 @@ const NAV_TABS: {
       icon: Users,
     },
     {
+      title: 'New Repair',
+      href: '/dashboard/admin/new-repair',
+      icon: PenToolIcon,
+    },
+    {
       title: 'Repairs',
       href: '/dashboard/manager/repairs',
       icon: Wrench,
