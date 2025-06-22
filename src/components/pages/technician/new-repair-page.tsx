@@ -531,17 +531,17 @@ export default function TechnicianNewRepairPage() {
 
       <div>
         <CustomImageUpload
-          fieldName="progressImage"          
+          fieldName="progressImage"
           fileNameData={{
             drop: 15,
-            level: 6,
+            level: 11,
             repairType: 'CR',
             repairIndex: 1,
             measures: '100x100x40',
             phase: 'P2',
           }}
-          folderName={"sample"}
-          userName="John Doe"
+          folderName={'sample'}
+          userName="John Doe (id: 1)"
           onUploadSuccess={(imageData) => {
             console.log('success upload: ', imageData)
           }}
