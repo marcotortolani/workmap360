@@ -97,7 +97,7 @@ const NAV_TABS: {
     },
     {
       title: 'New Repair',
-      href: '/dashboard/admin/new-repair',
+      href: '/dashboard/manager/new-repair',
       icon: PenToolIcon,
     },
     {
