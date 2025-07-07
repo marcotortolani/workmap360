@@ -18,7 +18,7 @@ import {
 
 import { useProjectsListStore } from '@/stores/projects-list-store'
 import { useRepairsDataStore } from '@/stores/repairs-data-store'
-import { RepairData } from '@/types/repair-type'
+import { getRepairStatus } from "@/lib/utils"
 
 type FormData = z.infer<ReturnType<typeof createFormSchema>>
 
@@ -49,44 +49,44 @@ export default function TechnicianNewRepairPage() {
   } = useForm<FormData>({
     resolver: zodResolver(createFormSchema({ maxDropsRef, maxLevelsRef })),
     defaultValues: {
-      projectId: 0,
+      project_id: 0,
       elevation: '',
       drop: 1,
       level: 1,
-      repairType: '',
-      repairIndex: 1,
-      surveyImage: '',
-      progressImage: [],
-      finishImage: '',
+      repair_type: '',
+      repair_index: 1,
+      survey_image: '',
+      progress_image: [],
+      finish_image: '',
     },
     mode: 'onChange',
   })
 
-  const projectId = watch('projectId')
+  const project_id = watch('project_id')
   const elevation = watch('elevation')
   const drop = watch('drop')
   const level = watch('level')
-  const repairType = watch('repairType')
-  const repairIndex = watch('repairIndex')
+  const repair_type = watch('repair_type')
+  const repair_index = watch('repair_index')
 
-  console.log('repair index: ', repairIndex)
+  console.log('repair index: ', repair_index)
 
   // Calcular valores máximos
   const maxDrops = elevation
     ? projectsList
-        .find((project) => project.id === projectId)
+        .find((project) => project.id === project_id)
         ?.elevations.find((elev) => elev.name === elevation)?.drops
     : undefined
 
   const maxLevels = elevation
     ? projectsList
-        .find((project) => project.id === projectId)
+        .find((project) => project.id === project_id)
         ?.elevations.find((elev) => elev.name === elevation)?.levels
     : undefined
 
   const phases = projectsList
-    .find((project) => project.id === projectId)
-    ?.repairTypes.find((rt) => rt.repairType === repairType)?.phases
+    .find((project) => project.id === project_id)
+    ?.repair_types.find((rt) => rt.repair_type === repair_type)?.phases
 
   // Actualizar referencias
   useEffect(() => {
@@ -99,47 +99,39 @@ export default function TechnicianNewRepairPage() {
     setValue('elevation', '')
     setValue('drop', 1)
     setValue('level', 1)
-    setValue('repairType', '')
-    setValue('repairIndex', 1)
-    setValue('progressImage', [])
-  }, [projectId, setValue])
+    setValue('repair_type', '')
+    setValue('repair_index', 1)
+    setValue('progress_image', [])
+  }, [project_id, setValue])
 
   useEffect(() => {
     setValue('drop', 1)
     setValue('level', 1)
-    setValue('repairType', '')
-    setValue('repairIndex', 1)
-    setValue('progressImage', [])
+    setValue('repair_type', '')
+    setValue('repair_index', 1)
+    setValue('progress_image', [])
   }, [elevation, setValue])
 
   // Filtrar reparaciones existentes
   const matchingRepairs = repairsDataList.filter(
     (repair) =>
-      repair.projectId === projectId &&
-      repair.elevationName === elevation &&
+      repair.project_id === project_id &&
+      repair.elevation_name === elevation &&
       repair.drop === drop &&
       repair.level === level &&
-      repair.phases.survey.repairType === repairType
+      repair.phases.survey.repair_type === repair_type
   )
 
-  // Calcular el próximo repairIndex
+  // Calcular el próximo repair_index
   const nextRepairIndex =
     matchingRepairs.length > 0
-      ? Math.max(...matchingRepairs.map((r) => r.repairIndex)) + 1
+      ? Math.max(...matchingRepairs.map((r) => r.repair_index)) + 1
       : 1
 
   console.log('nextRepairIndex', nextRepairIndex)
 
   // Estado para manejar la creación de una nueva reparación
   const [isNewRepair, setIsNewRepair] = useState<boolean | null>(null)
-
-  // Determinar el estado de una reparación
-  const getRepairStatus = (repair: RepairData) => {
-    if (repair.phases.finish.createdAt > 0) return 'finish'
-    if (repair.phases.progress.some((p) => p.createdAt > 0)) return 'progress'
-    if (repair.phases.survey.createdAt > 0) return 'survey'
-    return 'pending'
-  }
 
   const onSubmit = (data: FormData) => {
     console.log('Form submitted:', data)
@@ -158,9 +150,9 @@ export default function TechnicianNewRepairPage() {
             <div className="sm:col-span-4">
               <label className="mb-2 block text-sm font-medium">Project</label>
               <Select
-                value={projectId === 0 ? '' : projectId.toString()}
+                value={project_id === 0 ? '' : project_id.toString()}
                 onValueChange={(value) =>
-                  setValue('projectId', parseInt(value))
+                  setValue('project_id', parseInt(value))
                 }
               >
                 <SelectTrigger>
@@ -174,9 +166,9 @@ export default function TechnicianNewRepairPage() {
                   ))}
                 </SelectContent>
               </Select>
-              {errors.projectId && (
+              {errors.project_id && (
                 <p className="mt-1 text-sm text-red-500">
-                  {errors.projectId.message}
+                  {errors.project_id.message}
                 </p>
               )}
             </div>
@@ -188,14 +180,14 @@ export default function TechnicianNewRepairPage() {
               <Select
                 value={elevation}
                 onValueChange={(value) => setValue('elevation', value)}
-                disabled={!projectId}
+                disabled={!project_id}
               >
                 <SelectTrigger className="disabled:border-neutral-400 disabled:bg-neutral-300">
                   <SelectValue placeholder="Select elevation" />
                 </SelectTrigger>
                 <SelectContent>
                   {projectsList
-                    .find((project) => project.id === projectId)
+                    .find((project) => project.id === project_id)
                     ?.elevations.map((elevation) => (
                       <SelectItem key={elevation.name} value={elevation.name}>
                         {elevation.name}
@@ -259,10 +251,10 @@ export default function TechnicianNewRepairPage() {
                 Repair Type
               </label>
               <Select
-                value={repairType}
-                onValueChange={(value) => setValue('repairType', value)}
+                value={repair_type}
+                onValueChange={(value) => setValue('repair_type', value)}
                 disabled={
-                  !projectId || elevation.length === 0 || !drop || !level
+                  !project_id || elevation.length === 0 || !drop || !level
                 }
               >
                 <SelectTrigger className="disabled:border-neutral-400 disabled:bg-neutral-300">
@@ -270,20 +262,20 @@ export default function TechnicianNewRepairPage() {
                 </SelectTrigger>
                 <SelectContent>
                   {projectsList
-                    .find((project) => project.id === projectId)
-                    ?.repairTypes.map((repairType) => (
+                    .find((project) => project.id === project_id)
+                    ?.repair_types.map((repair_type) => (
                       <SelectItem
-                        key={repairType.repairTypeId}
-                        value={repairType.repairType}
+                        key={repair_type.repair_type_id}
+                        value={repair_type.repair_type}
                       >
-                        {repairType.repairType}
+                        {repair_type.repair_type}
                       </SelectItem>
                     ))}
                 </SelectContent>
               </Select>
-              {errors.repairType && (
+              {errors.repair_type && (
                 <p className="mt-1 text-sm text-red-500">
-                  {errors.repairType.message}
+                  {errors.repair_type.message}
                 </p>
               )}
             </div>
@@ -293,18 +285,18 @@ export default function TechnicianNewRepairPage() {
                 Repair Index
               </label>
               <Select
-                value={watch('repairIndex')?.toString()}
+                value={watch('repair_index')?.toString()}
                 onValueChange={(value) => {
                   if (value === nextRepairIndex.toString()) {
                     setIsNewRepair(true)
-                    setValue('repairIndex', nextRepairIndex)
+                    setValue('repair_index', nextRepairIndex)
                     setStatusRepairPhases('S')
                   } else {
                     setIsNewRepair(false)
-                    setValue('repairIndex', parseInt(value))
+                    setValue('repair_index', parseInt(value))
                   }
                 }}
-                disabled={!repairType}
+                disabled={!repair_type}
               >
                 <SelectTrigger className="disabled:border-neutral-400 disabled:bg-neutral-300">
                   <SelectValue placeholder="Select repair index" />
@@ -313,9 +305,9 @@ export default function TechnicianNewRepairPage() {
                   {matchingRepairs.map((repair) => (
                     <SelectItem
                       key={repair.id}
-                      value={repair.repairIndex.toString()}
+                      value={repair.repair_index.toString()}
                     >
-                      Repair #{repair.repairIndex} ({getRepairStatus(repair)})
+                      Repair #{repair.repair_index} ({getRepairStatus(repair)})
                     </SelectItem>
                   ))}
                   <SelectItem value={nextRepairIndex.toString()}>
@@ -323,9 +315,9 @@ export default function TechnicianNewRepairPage() {
                   </SelectItem>
                 </SelectContent>
               </Select>
-              {errors.repairIndex && (
+              {errors.repair_index && (
                 <p className="mt-1 text-sm text-red-500">
-                  {errors.repairIndex.message}
+                  {errors.repair_index.message}
                 </p>
               )}
             </div>
@@ -355,7 +347,7 @@ export default function TechnicianNewRepairPage() {
                           type="file"
                           className="sr-only"
                           onChange={() =>
-                            setValue('surveyImage', 'uploaded', {
+                            setValue('survey_image', 'uploaded', {
                               shouldValidate: true,
                             })
                           }
@@ -370,16 +362,16 @@ export default function TechnicianNewRepairPage() {
                   variant="outline"
                   className="flex items-center justify-center"
                   onClick={() =>
-                    setValue('surveyImage', 'camera', { shouldValidate: true })
+                    setValue('survey_image', 'camera', { shouldValidate: true })
                   }
                 >
                   <Camera className="mr-2 h-4 w-4" />
                   Use Camera
                 </Button>
               </div>
-              {errors.surveyImage && (
+              {errors.survey_image && (
                 <p className="mt-1 text-sm text-red-500">
-                  {errors.surveyImage.message}
+                  {errors.survey_image.message}
                 </p>
               )}
             </div>
@@ -400,9 +392,9 @@ export default function TechnicianNewRepairPage() {
                             type="file"
                             className="sr-only"
                             onChange={() => {
-                              const currentImages = watch('progressImage') || []
+                              const currentImages = watch('progress_image') || []
                               setValue(
-                                'progressImage',
+                                'progress_image',
                                 [...currentImages, 'uploaded'],
                                 { shouldValidate: true }
                               )
@@ -420,8 +412,8 @@ export default function TechnicianNewRepairPage() {
                     variant="outline"
                     className="flex items-center justify-center"
                     onClick={() => {
-                      const currentImages = watch('progressImage') || []
-                      setValue('progressImage', [...currentImages, 'camera'], {
+                      const currentImages = watch('progress_image') || []
+                      setValue('progress_image', [...currentImages, 'camera'], {
                         shouldValidate: true,
                       })
                     }}
@@ -430,9 +422,9 @@ export default function TechnicianNewRepairPage() {
                     Use Camera
                   </Button>
                 </div>
-                {errors.progressImage && (
+                {errors.progress_image && (
                   <p className="mt-1 text-sm text-red-500">
-                    {errors.progressImage.message}
+                    {errors.progress_image.message}
                   </p>
                 )}
               </div>
@@ -453,7 +445,7 @@ export default function TechnicianNewRepairPage() {
                           type="file"
                           className="sr-only"
                           onChange={() =>
-                            setValue('finishImage', 'uploaded', {
+                            setValue('finish_image', 'uploaded', {
                               shouldValidate: true,
                             })
                           }
@@ -468,16 +460,16 @@ export default function TechnicianNewRepairPage() {
                   variant="outline"
                   className="flex items-center justify-center"
                   onClick={() =>
-                    setValue('finishImage', 'camera', { shouldValidate: true })
+                    setValue('finish_image', 'camera', { shouldValidate: true })
                   }
                 >
                   <Camera className="mr-2 h-4 w-4" />
                   Use Camera
                 </Button>
               </div>
-              {errors.finishImage && (
+              {errors.finish_image && (
                 <p className="mt-1 text-sm text-red-500">
-                  {errors.finishImage.message}
+                  {errors.finish_image.message}
                 </p>
               )}
             </div>
@@ -512,20 +504,20 @@ export default function TechnicianNewRepairPage() {
 // import { LogoutButton } from '@/components/logout-button'
 
 // import { useProjectsListStore } from '@/stores/projects-list-store'
-// import { RepairData, RepairType } from '@/types/repair-type'
+// import { RepairData, repair_type } from '@/types/repair-type'
 // import { ProjectData } from '@/types/project-types'
 
 // type ImageOrigin = 'camera' | 'uploaded'
 
 // type FormData = {
-//   projectId: string
+//   project_id: string
 //   elevation: string
 //   drop: string
 //   level: string
-//   repairType: string
-//   surveyImage: ImageOrigin | null
-//   progressImage: ImageOrigin | null
-//   finishImage: ImageOrigin | null
+//   repair_type: string
+//   survey_image: ImageOrigin | null
+//   progress_image: ImageOrigin | null
+//   finish_image: ImageOrigin | null
 // }
 
 // export default function TechnicianNewRepairPage() {
@@ -536,34 +528,34 @@ export default function TechnicianNewRepairPage() {
 //     null
 //   )
 //   const [elevationSelected, setElevationSelected] =
-//     useState<RepairData['elevationName']>('')
+//     useState<RepairData['elevation_name']>('')
 //   const [dropSelected, setDropSelected] = useState<RepairData['drop']>(0)
 //   const [levelSelected, setLevelSelected] = useState<RepairData['level']>(0)
-//   const [repairTypeSelected, setRepairTypeSelected] =
-//     useState<RepairType['type']>('')
-//   const [repairIndexSelected, setRepairIndexSelected] =
-//     useState<RepairData['repairIndex']>(1)
+//   const [repair_typeselected, setrepair_typeselected] =
+//     useState<repair_type['type']>('')
+//   const [repair_indexSelected, setrepair_indexSelected] =
+//     useState<RepairData['repair_index']>(1)
 
 //   const [formData, setFormData] = useState<FormData>({
-//     projectId: '',
+//     project_id: '',
 //     elevation: '',
 //     drop: '',
 //     level: '',
-//     repairType: '',
-//     surveyImage: null,
-//     progressImage: null,
-//     finishImage: null,
+//     repair_type: '',
+//     survey_image: null,
+//     progress_image: null,
+//     finish_image: null,
 //   })
 
 //   const isFormComplete =
-//     formData.projectId &&
+//     formData.project_id &&
 //     formData.elevation &&
 //     formData.drop &&
 //     formData.level &&
-//     formData.repairType &&
-//     formData.surveyImage &&
-//     formData.progressImage &&
-//     formData.finishImage
+//     formData.repair_type &&
+//     formData.survey_image &&
+//     formData.progress_image &&
+//     formData.finish_image
 
 //   return (
 //     <div className="flex flex-col gap-8 p-8">
@@ -683,9 +675,9 @@ export default function TechnicianNewRepairPage() {
 //                 Repair Type
 //               </label>
 //               <Select
-//                 value={formData.repairType}
+//                 value={formData.repair_type}
 //                 onValueChange={(value) =>
-//                   setFormData({ ...formData, repairType: value })
+//                   setFormData({ ...formData, repair_type: value })
 //                 }
 //               >
 //                 <SelectTrigger>
@@ -719,7 +711,7 @@ export default function TechnicianNewRepairPage() {
 //                           onChange={() =>
 //                             setFormData({
 //                               ...formData,
-//                               surveyImage: 'uploaded',
+//                               survey_image: 'uploaded',
 //                             })
 //                           }
 //                         />
@@ -735,7 +727,7 @@ export default function TechnicianNewRepairPage() {
 //                   variant="outline"
 //                   className="flex items-center justify-center"
 //                   onClick={() =>
-//                     setFormData({ ...formData, surveyImage: 'camera' })
+//                     setFormData({ ...formData, survey_image: 'camera' })
 //                   }
 //                 >
 //                   <Camera className="mr-2 h-4 w-4" />
@@ -761,7 +753,7 @@ export default function TechnicianNewRepairPage() {
 //                           onChange={() =>
 //                             setFormData({
 //                               ...formData,
-//                               progressImage: 'uploaded',
+//                               progress_image: 'uploaded',
 //                             })
 //                           }
 //                         />
@@ -777,7 +769,7 @@ export default function TechnicianNewRepairPage() {
 //                   variant="outline"
 //                   className="flex items-center justify-center"
 //                   onClick={() =>
-//                     setFormData({ ...formData, progressImage: 'camera' })
+//                     setFormData({ ...formData, progress_image: 'camera' })
 //                   }
 //                 >
 //                   <Camera className="mr-2 h-4 w-4" />
@@ -803,7 +795,7 @@ export default function TechnicianNewRepairPage() {
 //                           onChange={() =>
 //                             setFormData({
 //                               ...formData,
-//                               finishImage: 'uploaded',
+//                               finish_image: 'uploaded',
 //                             })
 //                           }
 //                         />
@@ -819,7 +811,7 @@ export default function TechnicianNewRepairPage() {
 //                   variant="outline"
 //                   className="flex items-center justify-center"
 //                   onClick={() =>
-//                     setFormData({ ...formData, finishImage: 'camera' })
+//                     setFormData({ ...formData, finish_image: 'camera' })
 //                   }
 //                 >
 //                   <Camera className="mr-2 h-4 w-4" />
@@ -883,47 +875,47 @@ export default function TechnicianNewRepairPage() {
 //   } = useForm<FormData>({
 //     resolver: zodResolver(createFormSchema({ maxDropsRef, maxLevelsRef })),
 //     defaultValues: {
-//       projectId: 0,
+//       project_id: 0,
 //       elevation: '',
 //       drop: 1,
 //       level: 1,
-//       repairType: '',
-//       surveyImage: '',
-//       progressImage: [],
-//       finishImage: '',
+//       repair_type: '',
+//       survey_image: '',
+//       progress_image: [],
+//       finish_image: '',
 //     },
 //     mode: 'onChange',
 //   })
 
-//   const projectId = watch('projectId')
+//   const project_id = watch('project_id')
 //   const elevation = watch('elevation')
-//   const repairTypeSelected = watch('repairType')
+//   const repair_typeselected = watch('repair_type')
 
 //   const phases = projectsList
-//     .find((project) => project.id === projectId)
-//     ?.repairTypes.find(
-//       (repairType) => repairType.repairType === repairTypeSelected
+//     .find((project) => project.id === project_id)
+//     ?.repair_types.find(
+//       (repair_type) => repair_type.repair_type === repair_typeselected
 //     )?.phases
 
 //   // console.log(
 //   //   projectsList
-//   //     .find((project) => project.id === projectId)
-//   //     ?.repairTypes.find(
-//   //       (repairType) => repairType.repairType === repairTypeSelected
+//   //     .find((project) => project.id === project_id)
+//   //     ?.repair_types.find(
+//   //       (repair_type) => repair_type.repair_type === repair_typeselected
 //   //     )?.phases
 //   // )
 
 //   // Calcular el valor máximo de drop
 //   const maxDrops = elevation
 //     ? projectsList
-//         .find((project) => project.id === projectId)
+//         .find((project) => project.id === project_id)
 //         ?.elevations.find((elev) => elev.name === elevation)?.drops
 //     : undefined
 
 //   // Calcular el valor máximo de level
 //   const maxLevels = elevation
 //     ? projectsList
-//         .find((project) => project.id === projectId)
+//         .find((project) => project.id === project_id)
 //         ?.elevations.find((elev) => elev.name === elevation)?.levels
 //     : undefined
 
@@ -938,7 +930,7 @@ export default function TechnicianNewRepairPage() {
 //     setValue('elevation', '')
 //     setValue('drop', 1)
 //     setValue('level', 1)
-//   }, [projectId, setValue])
+//   }, [project_id, setValue])
 
 //   // Reiniciar drop cuando cambie la elevation
 //   useEffect(() => {
@@ -968,9 +960,9 @@ export default function TechnicianNewRepairPage() {
 //             <div className="sm:col-span-4">
 //               <label className="mb-2 block text-sm font-medium">Project</label>
 //               <Select
-//                 value={projectId.toString() === '0' ? '' : projectId.toString()}
+//                 value={project_id.toString() === '0' ? '' : project_id.toString()}
 //                 onValueChange={(value) =>
-//                   setValue('projectId', parseInt(value))
+//                   setValue('project_id', parseInt(value))
 //                 }
 //               >
 //                 <SelectTrigger>
@@ -984,9 +976,9 @@ export default function TechnicianNewRepairPage() {
 //                   ))}
 //                 </SelectContent>
 //               </Select>
-//               {errors.projectId && (
+//               {errors.project_id && (
 //                 <p className="mt-1 text-sm text-red-500">
-//                   {errors.projectId.message}
+//                   {errors.project_id.message}
 //                 </p>
 //               )}
 //             </div>
@@ -998,14 +990,14 @@ export default function TechnicianNewRepairPage() {
 //               <Select
 //                 value={elevation}
 //                 onValueChange={(value) => setValue('elevation', value)}
-//                 disabled={!projectId}
+//                 disabled={!project_id}
 //               >
 //                 <SelectTrigger className="disabled:border-neutral-400 disabled:bg-neutral-300">
 //                   <SelectValue placeholder="Select elevation" />
 //                 </SelectTrigger>
 //                 <SelectContent>
 //                   {projectsList
-//                     .find((project) => project.id === projectId)
+//                     .find((project) => project.id === project_id)
 //                     ?.elevations.map((elevation) => (
 //                       <SelectItem key={elevation.name} value={elevation.name}>
 //                         {elevation.name}
@@ -1072,36 +1064,36 @@ export default function TechnicianNewRepairPage() {
 //                 Repair Type
 //               </label>
 //               <Select
-//                 value={watch('repairType')}
-//                 onValueChange={(value) => setValue('repairType', value)}
-//                 disabled={!projectId}
+//                 value={watch('repair_type')}
+//                 onValueChange={(value) => setValue('repair_type', value)}
+//                 disabled={!project_id}
 //               >
 //                 <SelectTrigger className="disabled:border-neutral-400 disabled:bg-neutral-300">
 //                   <SelectValue placeholder="Select repair type" />
 //                 </SelectTrigger>
 //                 <SelectContent>
 //                   {projectsList
-//                     .find((project) => project.id === projectId)
-//                     ?.repairTypes.map((repairType) => (
+//                     .find((project) => project.id === project_id)
+//                     ?.repair_types.map((repair_type) => (
 //                       <SelectItem
-//                         key={repairType.repairTypeId}
-//                         value={repairType.repairType}
+//                         key={repair_type.repair_type_id}
+//                         value={repair_type.repair_type}
 //                       >
-//                         {repairType.repairType}
+//                         {repair_type.repair_type}
 //                       </SelectItem>
 //                     ))}
 //                 </SelectContent>
 //               </Select>
-//               {errors.repairType && (
+//               {errors.repair_type && (
 //                 <p className="mt-1 text-sm text-red-500">
-//                   {errors.repairType.message}
+//                   {errors.repair_type.message}
 //                 </p>
 //               )}
 //             </div>
-//             {/* List of existing Repairs by repairIndex, clickeable to select repair and to continue process */}
+//             {/* List of existing Repairs by repair_index, clickeable to select repair and to continue process */}
 //             <div></div>
 
-//             {/* Create new Repair using repairIndex = 1 if no existing repairs, else create new repairIndex with incremental repairIndex */}
+//             {/* Create new Repair using repair_index = 1 if no existing repairs, else create new repair_index with incremental repair_index */}
 //           </div>
 
 //           <div className="grid gap-6 sm:grid-cols-3">
@@ -1120,7 +1112,7 @@ export default function TechnicianNewRepairPage() {
 //                           type="file"
 //                           className="sr-only"
 //                           onChange={() =>
-//                             setValue('surveyImage', 'uploaded', {
+//                             setValue('survey_image', 'uploaded', {
 //                               shouldValidate: true,
 //                             })
 //                           }
@@ -1135,16 +1127,16 @@ export default function TechnicianNewRepairPage() {
 //                   variant="outline"
 //                   className="flex items-center justify-center"
 //                   onClick={() =>
-//                     setValue('surveyImage', 'camera', { shouldValidate: true })
+//                     setValue('survey_image', 'camera', { shouldValidate: true })
 //                   }
 //                 >
 //                   <Camera className="mr-2 h-4 w-4" />
 //                   Use Camera
 //                 </Button>
 //               </div>
-//               {errors.surveyImage && (
+//               {errors.survey_image && (
 //                 <p className="mt-1 text-sm text-red-500">
-//                   {errors.surveyImage.message}
+//                   {errors.survey_image.message}
 //                 </p>
 //               )}
 //             </div>
@@ -1165,7 +1157,7 @@ export default function TechnicianNewRepairPage() {
 //                             type="file"
 //                             className="sr-only"
 //                             onChange={() =>
-//                               setValue('progressImage', 'uploaded', {
+//                               setValue('progress_image', 'uploaded', {
 //                                 shouldValidate: true,
 //                               })
 //                             }
@@ -1182,7 +1174,7 @@ export default function TechnicianNewRepairPage() {
 //                     variant="outline"
 //                     className="flex items-center justify-center"
 //                     onClick={() =>
-//                       setValue('progressImage', 'camera', {
+//                       setValue('progress_image', 'camera', {
 //                         shouldValidate: true,
 //                       })
 //                     }
@@ -1191,9 +1183,9 @@ export default function TechnicianNewRepairPage() {
 //                     Use Camera
 //                   </Button>
 //                 </div>
-//                 {errors.progressImage && (
+//                 {errors.progress_image && (
 //                   <p className="mt-1 text-sm text-red-500">
-//                     {errors.progressImage.message}
+//                     {errors.progress_image.message}
 //                   </p>
 //                 )}
 //               </div>
@@ -1214,7 +1206,7 @@ export default function TechnicianNewRepairPage() {
 //                           type="file"
 //                           className="sr-only"
 //                           onChange={() =>
-//                             setValue('finishImage', 'uploaded', {
+//                             setValue('finish_image', 'uploaded', {
 //                               shouldValidate: true,
 //                             })
 //                           }
@@ -1229,16 +1221,16 @@ export default function TechnicianNewRepairPage() {
 //                   variant="outline"
 //                   className="flex items-center justify-center"
 //                   onClick={() =>
-//                     setValue('finishImage', 'camera', { shouldValidate: true })
+//                     setValue('finish_image', 'camera', { shouldValidate: true })
 //                   }
 //                 >
 //                   <Camera className="mr-2 h-4 w-4" />
 //                   Use Camera
 //                 </Button>
 //               </div>
-//               {errors.finishImage && (
+//               {errors.finish_image && (
 //                 <p className="mt-1 text-sm text-red-500">
-//                   {errors.finishImage.message}
+//                   {errors.finish_image.message}
 //                 </p>
 //               )}
 //             </div>

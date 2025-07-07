@@ -26,15 +26,22 @@ export function getRepairPhases(phases: number): string[] {
 }
 
 export function getRepairStatus(repair: RepairData) {
-  if (repair.phases.finish.createdAt > 0) return 'finish'
-  if (repair.phases.progress.some((p) => p.createdAt > 0)) return 'progress'
-  if (repair.phases.survey.createdAt > 0) return 'survey'
+  if (repair.phases.finish && repair.phases.finish.created_at.length > 0)
+    return 'finish'
+  if (
+    repair.phases.progress &&
+    repair.phases.progress.some((p) => p.created_at.length > 0)
+  )
+    return 'progress'
+  if (repair.phases.survey && repair.phases.survey.created_at.length > 0)
+    return 'survey'
   return 'pending'
 }
 
 export function getRepairType(phases: RepairData['phases']) {
-  if (phases.progress.some((p) => p.repairType))
-    return phases.progress[0].repairType
-  if (phases.survey.repairType) return phases.survey.repairType
+  if (phases.progress && phases.progress.some((p) => p.repair_type))
+    return phases.progress[0].repair_type
+  if (phases.survey && phases.survey.repair_type)
+    return phases.survey.repair_type
   return null
 }

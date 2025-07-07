@@ -1,20 +1,28 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState } from "react"
-import { Upload, X } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { useState, useEffect } from 'react'
+import { Upload, X } from 'lucide-react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 interface AvatarUploadProps {
   initialImage?: string
   onImageChange?: (image: string | null) => void
 }
 
-export function AvatarUpload({ initialImage, onImageChange }: AvatarUploadProps) {
+export function AvatarUpload({
+  initialImage,
+  onImageChange,
+}: AvatarUploadProps) {
   const [image, setImage] = useState<string | null>(initialImage || null)
+
+  // Actualizar el estado interno cuando cambie initialImage
+  useEffect(() => {
+    setImage(initialImage || null)
+  }, [initialImage])
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -38,8 +46,10 @@ export function AvatarUpload({ initialImage, onImageChange }: AvatarUploadProps)
     <div className="flex flex-col items-center gap-4">
       <div className="relative">
         <Avatar className="h-24 w-24">
-          <AvatarImage src={image || ""} />
-          <AvatarFallback className="bg-orange-100 text-orange-800 text-xl">{image ? "" : "AA"}</AvatarFallback>
+          <AvatarImage src={image || ''} alt="User avatar" />
+          <AvatarFallback className="bg-orange-100 text-orange-800 text-xl">
+            AA
+          </AvatarFallback>
         </Avatar>
         {image && (
           <Button
@@ -57,10 +67,14 @@ export function AvatarUpload({ initialImage, onImageChange }: AvatarUploadProps)
         <label className="flex cursor-pointer items-center gap-2 rounded-md bg-orange-50 px-3 py-2 text-sm font-medium text-orange-600 hover:bg-orange-100">
           <Upload className="h-4 w-4" />
           Upload Avatar
-          <Input type="file" accept="image/*" className="sr-only" onChange={handleImageChange} />
+          <Input
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            onChange={handleImageChange}
+          />
         </label>
       </div>
     </div>
   )
 }
-

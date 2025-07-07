@@ -1,0 +1,48 @@
+Ejemplo de consultas a la tabla Projects:
+
+-- Buscar proyectos por técnico
+-- SELECT * FROM projects WHERE technicians @> '[{"technicianFirstName": "Jose"}]';
+
+-- Buscar proyectos por tipo de reparación
+-- SELECT * FROM projects WHERE repair_types @> '[{"repairType": "CR1"}]';
+
+-- Buscar proyectos por elevación
+-- SELECT * FROM projects WHERE elevations @> '[{"name": "Norte"}]';
+
+
+-- Ejemplos de consultas simples:
+
+-- 1. Obtener todos los proyectos (solo datos básicos)
+-- SELECT id, name, client_name, client_id, status, created_at FROM projects;
+
+-- 2. Obtener proyecto completo con todos los datos
+-- SELECT get_project_complete(1);
+
+-- 3. Obtener elevations de un proyecto
+-- SELECT name, drops, levels FROM project_elevations WHERE project_id = 1;
+
+-- 4. Obtener repair_types de un proyecto
+-- SELECT repair_type, phases, price FROM project_repair_types WHERE project_id = 1;
+
+-- 5. Obtener técnicos asignados a un proyecto
+-- SELECT technician_first_name, technician_last_name FROM project_technicians WHERE project_id = 1;
+
+-- 6. Obtener reparaciones de un proyecto
+-- SELECT elevation_name, drop, level, repair_index, status FROM repairs WHERE project_id = 1;
+
+-- Ejemplo de inserción manual (simple):
+-- 1. Insertar proyecto
+-- INSERT INTO projects (name, client_name, client_id, status, created_by_user_name, created_by_user_id, created_at, updated_at)
+-- VALUES ('123 Main St', 'John Doe', 100, 'pending', 'Manager Name', 1, 1698777600000, 1698777600000);
+
+-- 2. Insertar elevations (usando el ID del proyecto insertado)
+-- INSERT INTO project_elevations (project_id, name, drops, levels, created_at)
+-- VALUES (1, 'Norte', 10, 5, NOW());
+
+-- 3. Insertar repair_types
+-- INSERT INTO project_repair_types (project_id, repair_type_id, repair_type, phases, price, unit_to_charge, minimum_charge_per_repair, minimum_charge_per_drop, status, created_at)
+-- VALUES (1, 1, 'CR1', 4, 1500, 'Lt', 2, 1, 'active', NOW());
+
+-- 4. Insertar technicians
+-- INSERT INTO project_technicians (project_id, technician_id, technician_first_name, technician_last_name, technician_avatar, created_at)
+-- VALUES (1, 10, 'Jose', 'Hernandez', 'https://example.com/avatar.jpg', NOW());

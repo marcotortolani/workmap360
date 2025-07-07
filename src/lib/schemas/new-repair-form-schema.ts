@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { RefObject } from 'react'
+import { REPAIR_TYPE_LIST } from '@/data/repair-type-list'
 
 export const createFormSchema = ({
   maxDropsRef,
@@ -9,7 +10,7 @@ export const createFormSchema = ({
   maxLevelsRef?: RefObject<number | undefined>
 }) =>
   z.object({
-    projectId: z.number().min(1, 'Project is required'),
+    project_id: z.number().min(1, 'Project is required'),
     elevation: z.string().min(1, 'Elevation is required'),
     drop: z
       .number({ invalid_type_error: 'Drop must be a number' })
@@ -35,22 +36,37 @@ export const createFormSchema = ({
           message: `Level cannot exceed ${maxLevelsRef?.current ?? 'unknown'}`,
         })
       ),
-    repairType: z.string().min(1, 'Repair type is required'),
-    repairIndex: z.number().min(1, 'Repair index is required'),
-    surveyImage: z
+    repair_type: z.string().min(1, 'Repair type is required'),
+    repair_index: z.number().min(1, 'Repair index is required'),
+
+    measurements: z.object({}).refine(
+      (data ) => {
+        const repairTypeData = REPAIR_TYPE_LIST.find(
+          (rt) => rt.type === data.repair_type && rt.status === 'active'
+        )
+        if (!repairTypeData) return false
+        return repairTypeData.unit_measure.dimensions?.every(
+          (dim) =>
+            repairTypeData.unit_measure.default_values?.[dim] ||
+            (data[dim] && data[dim] > 0)
+        )
+      },
+      { message: 'All required measurements must be provided' }
+    ),
+    survey_image: z
       .string()
       .min(1, 'Survey image is required')
       .refine((val) => ['camera', 'uploaded'].includes(val), {
         message: 'Invalid survey image source',
       }),
-    progressImage: z
+    progress_image: z
       .array(
         z.string().refine((val) => ['camera', 'uploaded'].includes(val), {
           message: 'Invalid progress image source',
         })
       )
       .min(1, 'At least one progress image is required'),
-    finishImage: z
+    finish_image: z
       .string()
       .min(1, 'Finish image is required')
       .refine((val) => ['camera', 'uploaded'].includes(val), {

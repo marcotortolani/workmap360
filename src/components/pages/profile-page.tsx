@@ -2,29 +2,72 @@
 
 import type React from 'react'
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
+// import { useState, useEffect } from 'react'
+import { useCurrentUser } from '@/stores/user-store'
+//import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { AvatarUpload } from '@/components/avatar-upload'
 
 export default function ProfilePage() {
-  const [formData, setFormData] = useState({
-    firstName: 'Robert',
-    lastName: 'Johnson',
-    email: 'robert.johnson@example.com',
-    role: 'Technician',
-    password: '••••••••',
-    createdDate: '2023-03-10',
-    status: 'active',
-    avatar: '/placeholder.svg?height=120&width=120',
-  })
+  const { user } = useCurrentUser()
+
+  // const [formData, setFormData] = useState<UserType>({
+  //   id: 0,
+  //   first_name: '',
+  //   last_name: '',
+  //   email: '',
+  //   role: 'guest',
+  //   created_at: '0',
+  //   status: 'active',
+  //   avatar: '',
+  //   // password: '',
+  // })
+
+  //const [loading, setLoading] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Profile updated:', formData)
+    //console.log('Profile updated:', formData)
     // In a real app, you would update the profile in your backend
   }
+
+  // useEffect(() => {
+  //   const getDataUser = async () => {
+  //     try {
+  //       setLoading(true)
+
+  //       setFormData({
+  //         id: dbUser.id || 0,
+  //         first_name: dbUser.first_name || '',
+  //         last_name: dbUser.last_name || '',
+  //         email: dbUser.email || '',
+  //         role: dbUser.role || 'guest',
+  //         created_at: dbUser.created_at || '0', // ✅ Corregido: created_at en lugar de created_date
+  //         status: dbUser.status || 'active',
+  //         avatar: dbUser.avatar || '', // ✅ Esto debería mostrar la URL del avatar
+  //       })
+  //     } catch (error) {
+  //       console.error('Error fetching user data:', error)
+  //     } finally {
+  //       setLoading(false)
+  //     }
+  //   }
+
+  //   getDataUser()
+  // }, [])
+
+  // Mostrar loading mientras se cargan los datos
+  // if (loading) {
+  //   return (
+  //     <div className="flex flex-col gap-8 p-8">
+  //       <div className="w-1/2 rounded-lg border bg-white p-6 shadow-sm">
+  //         <h2 className="mb-6 text-xl font-semibold">My Profile</h2>
+  //         <div className="text-center animate-pulse">Loading...</div>
+  //       </div>
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="flex flex-col gap-8 p-8">
@@ -35,10 +78,10 @@ export default function ProfilePage() {
           <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
             <div className="w-full max-w-[200px]">
               <AvatarUpload
-                initialImage={formData.avatar}
-                onImageChange={(image) =>
-                  setFormData({ ...formData, avatar: image || '' })
-                }
+                initialImage={user?.avatar}
+                // onImageChange={(image) =>
+                //   setFormData({ ...formData, avatar: image || '' })
+                // }
               />
             </div>
 
@@ -48,10 +91,11 @@ export default function ProfilePage() {
                   <Label htmlFor="firstName">First Name</Label>
                   <Input
                     id="firstName"
-                    value={formData.firstName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, firstName: e.target.value })
-                    }
+                    value={user?.first_name}
+                    disabled
+                    // onChange={(e) =>
+                    //   setFormData({ ...formData, first_name: e.target.value })
+                    // }
                     placeholder="Enter first name"
                     required
                   />
@@ -61,10 +105,11 @@ export default function ProfilePage() {
                   <Label htmlFor="lastName">Last Name</Label>
                   <Input
                     id="lastName"
-                    value={formData.lastName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, lastName: e.target.value })
-                    }
+                    value={user?.last_name}
+                    disabled
+                    // onChange={(e) =>
+                    //   setFormData({ ...formData, last_name: e.target.value })
+                    // }
                     placeholder="Enter last name"
                     required
                   />
@@ -79,7 +124,7 @@ export default function ProfilePage() {
                   <Input
                     id="email"
                     type="email"
-                    value={formData.email}
+                    value={user?.email}
                     disabled
                     className="bg-gray-100"
                   />
@@ -91,7 +136,7 @@ export default function ProfilePage() {
                   </Label>
                   <Input
                     id="role"
-                    value={formData.role}
+                    value={user?.role}
                     disabled
                     className="bg-gray-100"
                   />
@@ -99,7 +144,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <div>
+                {/* <div>
                   <Label htmlFor="password">Password</Label>
                   <Input
                     id="password"
@@ -110,7 +155,7 @@ export default function ProfilePage() {
                     }
                     placeholder="Enter new password"
                   />
-                </div>
+                </div> */}
 
                 <div>
                   <Label htmlFor="createdDate" className="text-gray-500">
@@ -118,7 +163,7 @@ export default function ProfilePage() {
                   </Label>
                   <Input
                     id="createdDate"
-                    value={formData.createdDate}
+                    value={new Date(user?.created_at || 0).toLocaleString()}
                     disabled
                     className="bg-gray-100"
                   />
@@ -132,12 +177,12 @@ export default function ProfilePage() {
                 <div className="mt-1 flex items-center">
                   <span
                     className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                      formData.status === 'active'
+                      user?.status === 'active'
                         ? 'bg-green-100 text-green-800'
                         : 'bg-red-100 text-red-800'
                     }`}
                   >
-                    {formData.status === 'active' ? 'Active' : 'Inactive'}
+                    {user?.status === 'active' ? 'Active' : 'Inactive'}
                   </span>
                   <span className="ml-2 text-sm text-gray-500">
                     (Only Admin/Manager can change your status)
@@ -147,14 +192,14 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="flex justify-end">
+          {/* <div className="flex justify-end">
             <Button
               type="submit"
               className="bg-orange-500 text-white hover:bg-orange-400"
             >
               Save Changes
             </Button>
-          </div>
+          </div> */}
         </form>
       </div>
     </div>

@@ -89,17 +89,11 @@ export default function ManagerRepairTypePage() {
                     <TableCell className="font-medium">{repair.id}</TableCell>
                     <TableCell>{repair.variation}</TableCell>
                     <TableCell>{repair.type}</TableCell>
-                    <TableCell>{repair.unitMeasure.type}</TableCell>
-                    <TableCell>{repair.unitMeasure.value}</TableCell>
-                    <TableCell>{repair.unitToCharge}</TableCell>
-                    <TableCell>{repair.createdBy}</TableCell>
-                    <TableCell>
-                      {new Date(repair.createdAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </TableCell>
+                    <TableCell>{repair.unit_measure.type}</TableCell>
+                    <TableCell>{repair.unit_measure.value}</TableCell>
+                    <TableCell>{repair.unit_to_charge}</TableCell>
+                    <TableCell>{repair.created_by_user_name}</TableCell>
+                    <TableCell>{repair.created_at}</TableCell>
                     <TableCell>
                       <span
                         className={`inline-flex items-center capitalize rounded-full px-2.5 py-0.5 text-xs font-medium ${
@@ -152,17 +146,11 @@ export default function ManagerRepairTypePage() {
                     <TableCell className="font-medium">{repair.id}</TableCell>
                     <TableCell>{repair.variation}</TableCell>
                     <TableCell>{repair.type}</TableCell>
-                    <TableCell>{repair.unitMeasure.type}</TableCell>
-                    <TableCell>{repair.unitMeasure.value}</TableCell>
-                    <TableCell>{repair.unitToCharge}</TableCell>
-                    <TableCell>{repair.createdBy}</TableCell>
-                    <TableCell>
-                      {new Date(repair.createdAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </TableCell>
+                    <TableCell>{repair.unit_measure.type}</TableCell>
+                    <TableCell>{repair.unit_measure.value}</TableCell>
+                    <TableCell>{repair.unit_to_charge}</TableCell>
+                    <TableCell>{repair.created_by_user_name}</TableCell>
+                    <TableCell>{repair.created_at}</TableCell>
                     <TableCell>
                       <span
                         className={`inline-flex items-center capitalize rounded-full px-2.5 py-0.5 text-xs font-medium ${

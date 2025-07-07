@@ -1,12 +1,12 @@
+// src/components/pages/manager/projects-page.tsx
+
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRepairTypeStore } from '@/stores/repair-type-store'
-import { useProjectsListStore } from '@/stores/projects-list-store'
-// import { useToast } from '@/hooks/use-toast'
-// import { ToastAction } from '@/components/ui/toast'
+import { useCurrentUser } from '@/stores/user-store'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
-
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -23,7 +23,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-
 import {
   FolderPlus,
   Edit,
@@ -40,16 +39,21 @@ import {
   ProjectData,
   ProjectRepairType,
   TechnicianAssignment,
-  // RepairStatusType,
-  // REPAIR_STATUS_OPTIONS,
 } from '@/types/project-types'
 import { Separator } from '@/components/ui/separator'
 import { UserType } from '@/types/user-types'
-
 import { Label } from '@/components/ui/label'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { ProjectsFilter } from '@/components/projects-filter'
-//import Link from 'next/link'
+import {
+  ProjectsFilter,
+  ProjectFilterOptions,
+} from '@/components/projects-filter'
+import {
+  createProjectViaAPI,
+  deleteProjectViaAPI,
+  updateProjectViaAPI,
+} from '@/lib/api/projects'
+import { useProjectsList } from '@/hooks/use-projects-list'
 
 const clientList = [
   { id: 1, name: 'ABC Corporation' },
@@ -100,14 +104,205 @@ export default function ManagerProjectsPage() {
     null
   )
   const [messageAdvice, setMessageAdvice] = useState<'delete' | null>(null)
+  const [filters, setFilters] = useState<ProjectFilterOptions>({
+    status: 'all',
+    client: 'all',
+    searchTerm: '',
+    sortBy: 'date',
+    sortOrder: 'desc',
+  })
+
   // Zustand stores
-  const { projectsList, deleteProject } = useProjectsListStore()
+  const { accessToken } = useCurrentUser()
+
+  // Usar el hook simplificado
+  const {
+    projects: projectsList,
+    pagination,
+    isLoading,
+    error,
+    refetch,
+    setPage,
+    currentPage,
+    totalPages,
+  } = useProjectsList(20)
+
+  // Obtener clientes únicos de los proyectos
+  // const uniqueClients = useMemo(
+  //   () => [...new Set(projectsList.map((p) => p.client_name))],
+  //   [projectsList]
+  // )
+
+  // Filtrar y ordenar los proyectos
+  const filteredAndSortedProjects = useMemo(() => {
+    let filtered = [...projectsList]
+
+    // Aplicar filtro de búsqueda
+    if (filters.searchTerm) {
+      const searchLower = filters.searchTerm.toLowerCase()
+      filtered = filtered.filter((project) => {
+        const projectName = project.name.toLowerCase()
+        const clientName = project.client_name.toLowerCase()
+        const createdBy = project.created_by_user_name?.toLowerCase() || ''
+        const repairTypes =
+          project.repair_types
+            ?.map((rt) => rt.repair_type.toLowerCase())
+            .join(' ') || ''
+
+        return (
+          projectName.includes(searchLower) ||
+          clientName.includes(searchLower) ||
+          createdBy.includes(searchLower) ||
+          repairTypes.includes(searchLower) ||
+          project.id.toString().includes(searchLower)
+        )
+      })
+    }
+
+    // Aplicar filtro de estado
+    if (filters.status && filters.status !== 'all') {
+      filtered = filtered.filter((project) => project.status === filters.status)
+    }
+
+    // Aplicar filtro de cliente
+    if (filters.client && filters.client !== 'all') {
+      filtered = filtered.filter(
+        (project) => project.client_name === filters.client
+      )
+    }
+
+    // Ordenar los resultados
+    if (filters.sortBy) {
+      filtered.sort((a, b) => {
+        let comparison = 0
+
+        switch (filters.sortBy) {
+          case 'date':
+            comparison =
+              new Date(a.created_at).getTime() -
+              new Date(b.created_at).getTime()
+            break
+          case 'id':
+            comparison = a.id - b.id
+            break
+          case 'name':
+            comparison = a.name.localeCompare(b.name)
+            break
+          case 'client':
+            comparison = a.client_name.localeCompare(b.client_name)
+            break
+          case 'status':
+            const statusOrder = {
+              [PROJECT_STATUS.pending]: 1,
+              [PROJECT_STATUS['in-progress']]: 2,
+              [PROJECT_STATUS.completed]: 3,
+            }
+            comparison = statusOrder[a.status] - statusOrder[b.status]
+            break
+          default:
+            comparison = 0
+        }
+
+        return filters.sortOrder === 'asc' ? comparison : -comparison
+      })
+    }
+
+    return filtered
+  }, [projectsList, filters])
+
+  const handleFilter = (newFilters: ProjectFilterOptions) => {
+    setFilters(newFilters)
+  }
+
+  const handleSort = ({
+    sortBy,
+    sortOrder,
+  }: {
+    sortBy: ProjectFilterOptions['sortBy']
+    sortOrder: ProjectFilterOptions['sortOrder']
+  }) => {
+    setFilters((prev) => ({
+      ...prev,
+      sortBy,
+      sortOrder,
+    }))
+  }
+
+  const handleDeleteProject = async (projectId: number) => {
+    if (!accessToken) {
+      toast.error('Authentication Error', {
+        description: 'You must be logged in to delete projects',
+        duration: 5000,
+        position: 'bottom-right',
+      })
+      return
+    }
+
+    try {
+      const result = await deleteProjectViaAPI(projectId, accessToken)
+
+      if (result.success) {
+        toast.success('Project deleted', {
+          description: 'Project has been deleted successfully',
+          duration: 3000,
+          position: 'bottom-right',
+          style: {
+            background: '#10B981',
+            color: '#fff',
+            fontWeight: 'bold',
+            fontSize: '16px',
+          },
+        })
+        await refetch()
+      } else {
+        toast.error('Delete failed', {
+          description: result.error || 'Failed to delete project',
+          duration: 5000,
+          position: 'bottom-right',
+          style: {
+            background: '#EF4444',
+            color: '#fff',
+            fontWeight: 'bold',
+            fontSize: '16px',
+          },
+        })
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error)
+      toast.error('Unexpected error', {
+        description: 'Error' + error,
+        duration: 5000,
+        position: 'bottom-right',
+        style: {
+          background: '#EF4444',
+          color: '#fff',
+          fontWeight: 'bold',
+          fontSize: '16px',
+        },
+      })
+    } finally {
+      setMessageAdvice(null)
+      setSelectedProject(null)
+    }
+  }
+
+  const handleProjectChange = async () => {
+    await refetch()
+  }
 
   return (
-    <div className=" relative flex flex-col gap-8">
+    <div className="relative flex flex-col gap-8">
       <div className="rounded-lg border bg-white p-6 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Projects</h2>
+          <h2 className="text-xl font-semibold">
+            Projects
+            {filteredAndSortedProjects.length !== projectsList.length && (
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
+                (Showing {filteredAndSortedProjects.length} of{' '}
+                {projectsList.length})
+              </span>
+            )}
+          </h2>
           <Button
             className="bg-green-600 text-white hover:bg-green-500"
             onClick={() => {
@@ -120,129 +315,196 @@ export default function ManagerProjectsPage() {
           </Button>
         </div>
 
-        <ProjectsFilter onFilter={() => {}} onSort={() => {}} />
+        <ProjectsFilter
+          onFilter={handleFilter}
+          onSort={handleSort}
+          // clients={uniqueClients}
+        />
 
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Project Name</TableHead>
-                <TableHead>Created by</TableHead>
-                <TableHead>Client</TableHead>
-                {/* <TableHead>Total Drops</TableHead>
-                <TableHead>Elevations</TableHead> */}
-                <TableHead>Repairs</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Created at</TableHead>
-                <TableHead>Updated at</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {projectsList.map((project) => (
-                <TableRow key={project?.id}>
-                  <TableCell className="font-medium">{project?.id}</TableCell>
-                  <TableCell className="font-medium">{project?.name}</TableCell>
-                  <TableCell>{project?.createdByUserName}</TableCell>
-                  {/* Client name */}
-                  <TableCell>{project?.clientName}</TableCell>
-                  {/* Total drops amount */}
-                  {/* <TableCell>
-                    {project?.elevations
-                      ?.map((elevation) => elevation.drops)
-                      ?.reduce((a, b) => a + b, 0)}
-                  </TableCell> */}
-                  {/* Elevations amount */}
-                  {/* <TableCell>{project?.elevations?.length}</TableCell> */}
-                  {/* Repairs type */}
-                  <TableCell>
-                    {project?.repairTypes?.map((repair) => (
-                      <span
-                        key={`${project.id}-${repair.repairType}`}
-                        className="mx-1 px-2 py-0.5 bg-neutral-500 text-white rounded-md"
+        {/* Loading state */}
+        {isLoading && (
+          <div className="flex justify-center items-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+            <span className="ml-2 text-gray-600">Loading projects...</span>
+          </div>
+        )}
+
+        {/* Error state */}
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <p className="font-medium">Error loading projects:</p>
+            <p>{error}</p>
+            <Button
+              onClick={refetch}
+              className="mt-2 bg-red-600 text-white hover:bg-red-700"
+              size="sm"
+            >
+              Retry
+            </Button>
+          </div>
+        )}
+
+        {/* Projects table */}
+        {!isLoading && !error && (
+          <>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Project Name</TableHead>
+                    <TableHead>Created by</TableHead>
+                    <TableHead>Client</TableHead>
+                    <TableHead>Repairs</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Created at</TableHead>
+                    <TableHead>Updated at</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredAndSortedProjects.length === 0 ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={9}
+                        className="text-center py-8 text-gray-500"
                       >
-                        {repair.repairType}
-                      </span>
-                    ))}
-                  </TableCell>
-                  {/* Status */}
-                  <TableCell>
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        project.status === PROJECT_STATUS['completed']
-                          ? 'bg-green-100 text-green-800'
-                          : project.status === PROJECT_STATUS['in-progress']
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}
+                        {projectsList.length === 0
+                          ? 'No projects found. Create your first project!'
+                          : 'No projects found matching the current filters'}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredAndSortedProjects.map((project) => (
+                      <TableRow key={project?.id}>
+                        <TableCell className="font-medium">
+                          {project?.id}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {project?.name}
+                        </TableCell>
+                        <TableCell>{project?.created_by_user_name}</TableCell>
+                        <TableCell>{project?.client_name}</TableCell>
+                        <TableCell>
+                          {project?.repair_types?.map((repair) => (
+                            <span
+                              key={`${project.id}-${repair.repair_type}`}
+                              className="mx-1 px-2 py-0.5 bg-neutral-500 text-white rounded-md"
+                            >
+                              {repair.repair_type}
+                            </span>
+                          ))}
+                        </TableCell>
+                        <TableCell>
+                          <span
+                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                              project.status === PROJECT_STATUS['completed']
+                                ? 'bg-green-100 text-green-800'
+                                : project.status ===
+                                  PROJECT_STATUS['in-progress']
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-yellow-100 text-yellow-800'
+                            }`}
+                          >
+                            {project.status}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          {project?.created_at.split('T')[0]}
+                        </TableCell>
+                        <TableCell>
+                          {project?.updated_at.split('T')[0]}
+                        </TableCell>
+                        <TableCell className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-green-600 hover:bg-green-100 hover:text-green-700"
+                            onClick={() => {
+                              setSelectedProject(project)
+                              setActionSelected('view')
+                            }}
+                          >
+                            <Eye className="mr-2 h-4 w-4" />
+                            View
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-blue-500 hover:bg-blue-100 hover:text-blue-600"
+                            onClick={() => {
+                              setSelectedProject(project)
+                              setActionSelected('edit')
+                            }}
+                            disabled={
+                              project.status === PROJECT_STATUS['completed']
+                            }
+                          >
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-red-500 hover:bg-red-100 hover:text-red-600"
+                            onClick={() => {
+                              setMessageAdvice('delete')
+                              setSelectedProject(project)
+                            }}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Pagination - Solo mostrar para todos los proyectos, no los filtrados */}
+            {pagination &&
+              pagination.totalPages > 1 &&
+              filteredAndSortedProjects.length === projectsList.length && (
+                <div className="flex items-center justify-between mt-4">
+                  <div className="text-sm text-gray-700">
+                    Showing {(currentPage - 1) * (pagination.limit || 20) + 1}{' '}
+                    to{' '}
+                    {Math.min(
+                      currentPage * (pagination.limit || 20),
+                      pagination.total
+                    )}{' '}
+                    of {pagination.total} projects
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage(currentPage - 1)}
+                      disabled={currentPage <= 1}
                     >
-                      {project.status}
+                      Previous
+                    </Button>
+                    <span className="text-sm">
+                      Page {currentPage} of {totalPages}
                     </span>
-                  </TableCell>
-                  {/* Created At */}
-                  <TableCell>
-                    {new Date(project?.createdAt).toLocaleString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </TableCell>
-                  {/* Updated At */}
-                  <TableCell>
-                    {new Date(project?.updatedAt).toLocaleString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </TableCell>
-                  {/* Actions (View - Edit - Delete)*/}
-                  <TableCell className="flex gap-2">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-green-600 hover:bg-green-100 hover:text-green-700"
-                      onClick={() => {
-                        setSelectedProject(project)
-                        setActionSelected('view')
-                      }}
+                      onClick={() => setPage(currentPage + 1)}
+                      disabled={currentPage >= totalPages}
                     >
-                      <Eye className="mr-2 h-4 w-4" />
-                      View
+                      Next
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-blue-500 hover:bg-blue-100 hover:text-blue-600"
-                      onClick={() => {
-                        setSelectedProject(project)
-                        setActionSelected('edit')
-                      }}
-                      disabled={project.status === PROJECT_STATUS['completed']}
-                    >
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-red-500 hover:bg-red-100 hover:text-red-600"
-                      onClick={() => {
-                        setMessageAdvice('delete')
-                        setSelectedProject(project)
-                      }}
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+                  </div>
+                </div>
+              )}
+          </>
+        )}
       </div>
 
+      {/* Modal de confirmación de eliminación */}
       <div
         className={`${
           messageAdvice !== null
@@ -258,47 +520,66 @@ export default function ManagerProjectsPage() {
             </p>
             <p className="text-sm text-gray-500">
               This action cannot be undone. If you delete this project, all
-              associated data will also be deleted.
+              associated data will also be deleted permanently.
             </p>
-            <div>
-              <p className="text-sm font-medium text-gray-500">
+            <div className="bg-red-50 border border-red-200 rounded-md p-3">
+              <p className="text-sm font-medium text-gray-700">
                 Project ID:{' '}
-                <span className="font-bold">{selectedProject?.id}</span>
+                <span className="font-bold text-red-600">
+                  {selectedProject?.id}
+                </span>
               </p>
-              <p className="text-sm font-medium text-gray-500">
+              <p className="text-sm font-medium text-gray-700">
                 Project Name:{' '}
-                <span className="font-bold">{selectedProject?.name}</span>
+                <span className="font-bold text-red-600">
+                  {selectedProject?.name}
+                </span>
+              </p>
+              <p className="text-sm font-medium text-gray-700">
+                Client:{' '}
+                <span className="font-bold text-red-600">
+                  {selectedProject?.client_name}
+                </span>
               </p>
             </div>
-            <Button onClick={() => setMessageAdvice(null)} variant="outline">
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              className="bg-red-500 text-white hover:bg-red-400"
-              onClick={() => {
-                deleteProject(selectedProject?.id || 0)
-                setMessageAdvice(null)
-              }}
-            >
-              Confirm
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                onClick={() => setMessageAdvice(null)}
+                variant="outline"
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                className="flex-1 bg-red-500 text-white hover:bg-red-600"
+                onClick={() => handleDeleteProject(selectedProject?.id || 0)}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Project
+              </Button>
+            </div>
           </div>
         )}
       </div>
 
+      {/* Modales de crear/editar y ver */}
       <div
         className={`${
           actionSelected === 'new' || actionSelected === 'edit'
-            ? ' translate-y-0 scale-100 '
-            : ' translate-y-[200%] scale-50 '
-        } fixed top-0 left-0 z-50 w-screen h-screen bg-black/50 flex items-center justify-center transition-all duration-300 ease-in-out`}
+            ? ' translate-y-0 scale-100 bg-black/50 '
+            : ' translate-y-[200%] scale-50 bg-black/0 '
+        } fixed top-0 left-0 z-50 w-screen h-screen  flex items-center justify-center transition-all duration-300 ease-in-out`}
       >
         <ProjectForm
           projectData={selectedProject || undefined}
-          onClose={() => setActionSelected('close')}
+          onClose={() => {
+            setActionSelected('close')
+            handleProjectChange()
+          }}
         />
       </div>
+
       <div
         className={`${
           actionSelected === 'view'
@@ -322,16 +603,17 @@ const ProjectForm = ({
   projectData?: ProjectData
   onClose: () => void
 }) => {
+  const { userId, accessToken, fullName } = useCurrentUser()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   // Project Data
   const [projectName, setProjectName] = useState<ProjectData['name']>('')
-  const [clientName, setClientName] = useState<ProjectData['clientName']>('')
+  const [client_name, setclient_name] = useState<ProjectData['client_name']>('')
   const [elevations, setElevations] = useState<Elevation[]>([])
-  const [repairTypes, setRepairTypes] = useState<ProjectData['repairTypes']>([])
+  const [repairTypes, setRepairTypes] = useState<ProjectData['repair_types']>(
+    []
+  )
   const [technicians, setTechnicians] = useState<ProjectData['technicians']>([])
-  // const [googleDriveUrl, setGoogleDriveUrl] =
-  //   useState<ProjectData['googleDriveUrl']>('')
   const [status, setStatus] = useState<ProjectData['status']>('pending')
-
   const [newElevation, setNewElevation] = useState<Elevation>({
     name: '',
     drops: 0,
@@ -347,13 +629,13 @@ const ProjectForm = ({
   const [newRepairType, setNewRepairType] = useState<
     Partial<ProjectRepairType>
   >({
-    repairTypeId: 0,
-    repairType: '',
+    repair_type_id: 0,
+    repair_type: '',
     phases: 3,
     price: 0,
-    minimumChargePerRepair: 0,
-    minimumChargePerDrop: 0,
-    unitToCharge: '',
+    minimum_charge_per_repair: 0,
+    minimum_charge_per_drop: 0,
+    unit_to_charge: '',
     status: 'active',
   })
   const [editingIndex, setEditingIndex] = useState<number | null>(null) // Índice del repairType que se está editando
@@ -362,10 +644,10 @@ const ProjectForm = ({
   const [newTechnician, setNewTechnician] = useState<
     Partial<TechnicianAssignment>
   >({
-    technicianId: 0,
-    technicianFirstName: '',
-    technicianLastName: '',
-    technicianAvatar: '',
+    technician_id: 0,
+    technician_first_name: '',
+    technician_last_name: '',
+    technician_avatar: '',
   })
 
   const [editingTechnicianIndex, setEditingTechnicianIndex] = useState<
@@ -373,14 +655,23 @@ const ProjectForm = ({
   >(null)
 
   // Zustand stores
-  const { projectsList, addProject, updateProject } = useProjectsListStore()
+  // const { updateProject } = useProjectsListStore()
   const { repairTypeList } = useRepairTypeStore()
   //const { technicians: technicianList } = useTechniciansStore()
 
   // Manejador para agregar una elevation
   const handleAddElevation = () => {
     if (elevations.length > 20) {
-      alert('Maximum 20 elevations allowed')
+      toast.error('Maximum 20 elevations allowed', {
+        duration: 3000,
+        position: 'bottom-right',
+        style: {
+          background: 'red',
+          color: '#fff',
+          fontWeight: 'bold',
+          fontSize: '16px',
+        },
+      })
       return
     }
     if (
@@ -388,7 +679,16 @@ const ProjectForm = ({
       newElevation.drops! <= 0 ||
       (newElevation.levels! <= 0 && !sameLevelsForAll)
     ) {
-      alert('Please fill in all elevation fields with valid values')
+      toast.error('Please fill in all elevation fields with valid values', {
+        duration: 3000,
+        position: 'bottom-right',
+        style: {
+          background: 'red',
+          color: '#fff',
+          fontWeight: 'bold',
+          fontSize: '16px',
+        },
+      })
       return
     }
 
@@ -443,9 +743,9 @@ const ProjectForm = ({
     if (selectedRepairType) {
       setNewRepairType({
         ...newRepairType,
-        repairTypeId: selectedRepairType.id,
-        repairType: selectedRepairType.type,
-        unitToCharge: selectedRepairType.unitToCharge,
+        repair_type_id: selectedRepairType.id,
+        repair_type: selectedRepairType.type,
+        unit_to_charge: selectedRepairType.unit_to_charge,
       })
     }
   }
@@ -453,23 +753,32 @@ const ProjectForm = ({
   // Manejador para agregar o actualizar un tipo de reparación
   const handleAddOrUpdateRepairType = () => {
     if (
-      !newRepairType.repairTypeId ||
+      !newRepairType.repair_type_id ||
       newRepairType.phases! < 3 ||
       newRepairType.phases! > 10 ||
       newRepairType.price! <= 0
     ) {
-      alert('Please fill in all repair type fields with valid values')
+      toast.error('Please fill in all repair type fields with valid values', {
+        duration: 3000,
+        position: 'bottom-right',
+        style: {
+          background: 'red',
+          color: '#fff',
+          fontWeight: 'bold',
+          fontSize: '16px',
+        },
+      })
       return
     }
 
     const repairTypeToAdd: ProjectRepairType = {
-      repairTypeId: newRepairType.repairTypeId!,
-      repairType: newRepairType.repairType!,
+      repair_type_id: newRepairType.repair_type_id!,
+      repair_type: newRepairType.repair_type!,
       phases: newRepairType.phases!,
       price: newRepairType.price!,
-      unitToCharge: newRepairType.unitToCharge!,
-      minimumChargePerRepair: newRepairType.minimumChargePerRepair!,
-      minimumChargePerDrop: newRepairType.minimumChargePerDrop!,
+      unit_to_charge: newRepairType.unit_to_charge!,
+      minimum_charge_per_repair: newRepairType.minimum_charge_per_repair!,
+      minimum_charge_per_drop: newRepairType.minimum_charge_per_drop!,
       status: newRepairType.status!,
     }
 
@@ -486,13 +795,13 @@ const ProjectForm = ({
 
     // Reseteamos el formulario
     setNewRepairType({
-      repairTypeId: 0,
-      repairType: '',
+      repair_type_id: 0,
+      repair_type: '',
       phases: 3,
       price: 0,
-      minimumChargePerRepair: 0,
-      minimumChargePerDrop: 0,
-      unitToCharge: '',
+      minimum_charge_per_repair: 0,
+      minimum_charge_per_drop: 0,
+      unit_to_charge: '',
       status: 'active',
     })
   }
@@ -512,13 +821,13 @@ const ProjectForm = ({
   const handleCancelEditRepairType = () => {
     setEditingIndex(null)
     setNewRepairType({
-      repairTypeId: 0,
-      repairType: '',
+      repair_type_id: 0,
+      repair_type: '',
       phases: 3,
       price: 0,
-      minimumChargePerRepair: 0,
-      minimumChargePerDrop: 0,
-      unitToCharge: '',
+      minimum_charge_per_repair: 0,
+      minimum_charge_per_drop: 0,
+      unit_to_charge: '',
       status: 'active',
     })
   }
@@ -532,10 +841,10 @@ const ProjectForm = ({
 
     if (selectedTechnician) {
       setNewTechnician({
-        technicianId: selectedId,
-        technicianFirstName: selectedTechnician.first_name,
-        technicianLastName: selectedTechnician.last_name,
-        technicianAvatar: selectedTechnician.avatar,
+        technician_id: selectedId,
+        technician_first_name: selectedTechnician.first_name,
+        technician_last_name: selectedTechnician.last_name,
+        technician_avatar: selectedTechnician.avatar,
       })
     }
   }
@@ -545,16 +854,25 @@ const ProjectForm = ({
 
   // Manejador para agregar o actualizar un técnico
   const handleAddOrUpdateTechnician = () => {
-    if (!newTechnician.technicianId) {
-      alert('Please select a technician')
+    if (!newTechnician.technician_id) {
+      toast.error('Please select a technician', {
+        duration: 5000,
+        position: 'bottom-right',
+        style: {
+          background: 'red',
+          color: '#fff',
+          fontWeight: 'bold',
+          fontSize: '16px',
+        },
+      })
       return
     }
 
     const technicianToAdd: TechnicianAssignment = {
-      technicianId: newTechnician.technicianId!,
-      technicianFirstName: newTechnician.technicianFirstName!,
-      technicianLastName: newTechnician.technicianLastName!,
-      technicianAvatar: newTechnician.technicianAvatar!,
+      technician_id: newTechnician.technician_id!,
+      technician_first_name: newTechnician.technician_first_name!,
+      technician_last_name: newTechnician.technician_last_name!,
+      technician_avatar: newTechnician.technician_avatar!,
     }
 
     if (editingTechnicianIndex !== null) {
@@ -567,10 +885,10 @@ const ProjectForm = ({
     }
 
     setNewTechnician({
-      technicianId: 0,
-      technicianFirstName: '',
-      technicianLastName: '',
-      technicianAvatar: '',
+      technician_id: 0,
+      technician_first_name: '',
+      technician_last_name: '',
+      technician_avatar: '',
     })
   }
 
@@ -589,102 +907,247 @@ const ProjectForm = ({
   const handleCancelEditTechnician = () => {
     setEditingTechnicianIndex(null)
     setNewTechnician({
-      technicianId: 0,
-      technicianFirstName: '',
-      technicianLastName: '',
-      technicianAvatar: '',
+      technician_id: 0,
+      technician_first_name: '',
+      technician_last_name: '',
+      technician_avatar: '',
     })
   }
 
   // Manejador para enviar el formulario
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setIsSubmitting(true)
+
+    if (!accessToken) {
+      toast.error('You`re not logged in', {
+        description: 'You must be logged in to create a project',
+        duration: 5000,
+        position: 'bottom-right',
+        style: {
+          background: 'red',
+          color: '#fff',
+          fontWeight: 'bold',
+          fontSize: '16px',
+        },
+      })
+      setIsSubmitting(false)
+      return
+    }
+    if (client_name === '') {
+      toast.error('Client is required', {
+        description: 'Please select a client',
+        duration: 5000,
+        position: 'bottom-right',
+        style: {
+          background: 'red',
+          color: '#fff',
+          fontWeight: 'bold',
+          fontSize: '16px',
+        },
+      })
+      setIsSubmitting(false)
+      return
+    }
 
     if (elevations.length < 1) {
-      alert('At least 1 elevation is required')
+      toast.error('Elevations are required', {
+        description: 'At least 1 elevation is required',
+        duration: 5000,
+        position: 'bottom-right',
+        style: {
+          background: 'red',
+          color: '#fff',
+          fontWeight: 'bold',
+          fontSize: '16px',
+        },
+      })
+      setIsSubmitting(false)
       return
     }
 
     if (sameLevelsForAll && commonLevels <= 0) {
-      alert('Please enter a valid number of levels for all elevations')
+      toast.error('Invalid number of levels', {
+        description: 'Please enter a valid number of levels for all elevations',
+        duration: 5000,
+        position: 'bottom-right',
+        style: {
+          background: 'red',
+          color: '#fff',
+          fontWeight: 'bold',
+          fontSize: '16px',
+        },
+      })
+      setIsSubmitting(false)
       return
     }
 
-    if (projectData) {
-      const updatedProject: ProjectData = {
-        id: projectData.id,
-        name: projectName,
-        clientName,
-        clientId: clientList.find((client) => client.name === clientName)!.id,
-        elevations,
-        repairTypes,
-        technicians,
-        //googleDriveUrl,
-        status,
-        createdByUserName: projectData.createdByUserName,
-        createdByUserId: projectData.createdByUserId,
-        createdAt: projectData.createdAt,
-        updatedAt: Date.now(),
-      }
-      updateProject(updatedProject)
-    } else {
-      const newProject: ProjectData = {
-        id: Number(projectsList.length + 1),
-        name: projectName,
-        clientName,
-        clientId: clientList.find((client) => client.name === clientName)!.id,
-        elevations,
-        repairTypes,
-        technicians,
-        //googleDriveUrl,
-        status,
-        createdByUserName: 'John Doe',
-        createdByUserId: 123,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      }
+    try {
+      if (projectData) {
+        // // Modo edicion - Usando Zustand por ahora
+        // const updatedProject: ProjectData = {
+        //   id: projectData.id,
+        //   name: projectName,
+        //   client_name,
+        //   client_id: clientList.find((client) => client.name === client_name)!
+        //     .id,
+        //   elevations: elevations || [],
+        //   repair_types: repairTypes,
+        //   technicians,
+        //   //googleDriveUrl,
+        //   status,
+        //   created_by_user_name: projectData.created_by_user_name,
+        //   created_by_user_id: projectData.created_by_user_id,
+        //   created_at: projectData.created_at,
+        //   updated_at: Date.now().toLocaleString('en-NZ'),
+        // }
+        // updateProject(updatedProject) // usando Zustand actualmente
+        // 🔧 MODO EDICIÓN - Usar API en lugar de Zustand
+        console.log('Updating project via API:', projectData.id)
 
-      addProject(newProject)
+        const result = await updateProjectViaAPI(
+          projectData.id,
+          {
+            name: projectName,
+            client_name: client_name,
+            client_id: clientList.find((client) => client.name === client_name)!
+              .id,
+            status,
+            elevations: elevations || [],
+            repair_types: repairTypes || [],
+            technicians: technicians || [],
+          },
+          accessToken
+        )
+
+        if (!result.success) {
+          toast.error(result.error || 'Failed to update project', {
+            duration: 5000,
+            position: 'bottom-right',
+            style: {
+              background: 'red',
+              color: '#fff',
+              fontWeight: 'bold',
+              fontSize: '16px',
+            },
+          })
+          setIsSubmitting(false)
+          return
+        }
+
+        toast.success('Project updated successfully', {
+          description: `"${projectName}" has been updated`,
+          duration: 3000,
+          position: 'bottom-right',
+          style: {
+            background: 'green',
+            color: '#fff',
+            fontWeight: 'bold',
+            fontSize: '16px',
+          },
+        })
+      } else {
+        // Modo creación - usar el nuevo endpoint
+        const result = await createProjectViaAPI(
+          {
+            name: projectName,
+            client_name: client_name,
+            client_id: clientList.find((client) => client.name === client_name)!
+              .id,
+            status,
+            elevations,
+            repair_types: repairTypes,
+            technicians,
+            created_by_user_id: userId || 0,
+            created_by_user_name: fullName || 'Unknown User',
+          },
+          accessToken
+        ) // Usar token del usuario actual
+
+        if (!result.success) {
+          toast.error(result.error || 'Failed to create project', {
+            duration: 5000,
+            position: 'bottom-right',
+            style: {
+              background: 'red',
+              color: '#fff',
+              fontWeight: 'bold',
+              fontSize: '16px',
+            },
+          })
+          setIsSubmitting(false)
+          return
+        }
+
+        toast.success('Project created successfully', {
+          duration: 5000,
+          position: 'bottom-right',
+          style: {
+            background: 'green',
+            color: '#fff',
+            fontWeight: 'bold',
+            fontSize: '16px',
+          },
+        })
+      }
+    } catch (error) {
+      console.error('Error submitting project:', error)
+      toast.error('Failed to submit project', {
+        description: `Error: ${error}`,
+        duration: 5000,
+        position: 'bottom-right',
+        style: {
+          background: 'red',
+          color: '#fff',
+          fontWeight: 'bold',
+          fontSize: '16px',
+        },
+      })
+    } finally {
+      resetFormData()
+      setIsSubmitting(false)
+      setTimeout(() => {
+        onClose()
+      }, 200)
     }
+  }
 
-    setTimeout(() => {
-      onClose()
-    }, 200)
+  const resetFormData = () => {
+    setProjectName('')
+    setclient_name('')
+    setStatus(PROJECT_STATUS['in-progress'])
+    setElevations([])
+    setRepairTypes([])
+    setTechnicians([])
+    setSameLevelsForAll(false)
+    setCommonLevels(0)
+    setEditingTechnicianIndex(null)
+    setNewTechnician({
+      technician_id: 0,
+      technician_first_name: '',
+      technician_last_name: '',
+      technician_avatar: '',
+    })
+    setEditingTechnicianIndex(null)
   }
 
   useEffect(() => {
     if (projectData) {
       setProjectName(projectData.name)
-      setClientName(projectData.clientName)
+      setclient_name(projectData.client_name)
       setStatus(projectData.status)
       setElevations(projectData.elevations)
-      setRepairTypes(projectData.repairTypes)
+      setRepairTypes(projectData.repair_types)
       setTechnicians(projectData.technicians)
       // setGoogleDriveUrl(projectData.googleDriveUrl)
     } else {
-      setProjectName('')
-      setClientName('')
-      setStatus(PROJECT_STATUS['in-progress'])
-      setElevations([])
-      setRepairTypes([])
-      setTechnicians([])
-      //setGoogleDriveUrl('')
-      setSameLevelsForAll(false)
-      setCommonLevels(0)
-      setEditingTechnicianIndex(null)
-      setNewTechnician({
-        technicianId: 0,
-        technicianFirstName: '',
-        technicianLastName: '',
-        technicianAvatar: '',
-      })
-      setEditingTechnicianIndex(null)
+      resetFormData()
     }
   }, [projectData])
 
   return (
     <div
-      className={`relative w-2/5 h-[95%] mx-auto overflow-y-scroll rounded-lg border bg-white p-6 shadow-sm`}
+      className={`relative w-[95%] max-w-screen-lg h-[95%] mx-auto overflow-y-scroll rounded-lg border bg-white p-6 shadow-sm`}
     >
       <Button
         type="button"
@@ -694,8 +1157,9 @@ const ProjectForm = ({
         <XIcon className="h-6 w-6 stroke-3" />
       </Button>
       <h2 className="mb-4 text-center text-xl font-semibold">
-        Create a new Project
+        {projectData ? 'Edit Project' : 'Create a new Project'}
       </h2>
+
       <form className="grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit}>
         <h3 className=" col-span-2 mb-0 text-lg font-semibold">Project Data</h3>
         <div>
@@ -711,9 +1175,9 @@ const ProjectForm = ({
           <Label htmlFor="client">Client</Label>
           <Select
             name="client"
-            value={clientName}
+            value={client_name}
             onValueChange={(e) => {
-              setClientName(e as string)
+              setclient_name(e as string)
             }}
           >
             <SelectTrigger>
@@ -908,85 +1372,87 @@ const ProjectForm = ({
 
           {/* Lista de repairTypes existentes */}
           <div className="space-y-2">
-            {repairTypes.map((rt, index) => (
-              <div
-                key={index}
-                className=" p-2 flex items-center justify-between border rounded-lg"
-              >
-                <div className=" flex items-center gap-2">
+            {repairTypes &&
+              repairTypes.map((rt, index) => (
+                <div
+                  key={index}
+                  className=" p-2 flex items-center justify-between border rounded-lg"
+                >
                   <div className=" flex items-center gap-2">
-                    <span className="  bg-neutral-700 text-white font-semibold px-2 py-1 border rounded-md">
-                      {rt.repairType}
-                    </span>
-                    <span>
-                      {
-                        repairTypeList.find((r) => r.id === rt.repairTypeId)
-                          ?.variation
-                      }{' '}
-                      {repairTypeList.find((r) => r.id === rt.repairTypeId)
-                        ?.unitMeasure?.defaultValues?.depth ? (
-                        <span>
-                          (
-                          {
-                            repairTypeList.find((r) => r.id === rt.repairTypeId)
-                              ?.unitMeasure?.defaultValues?.depth
-                          }{' '}
-                          mm)
-                        </span>
-                      ) : null}
-                    </span>
-                  </div>
-                  <Separator
-                    orientation="vertical"
-                    className="w-0.5 h-6 bg-neutral-300"
-                  />
-
-                  <div className=" flex items-center gap-2">
-                    <span>{rt.phases} phases</span>
+                    <div className=" flex items-center gap-2">
+                      <span className="  bg-neutral-700 text-white font-semibold px-2 py-1 border rounded-md">
+                        {rt.repair_type}
+                      </span>
+                      <span>
+                        {
+                          repairTypeList.find((r) => r.id === rt.repair_type_id)
+                            ?.variation
+                        }{' '}
+                        {repairTypeList.find((r) => r.id === rt.repair_type_id)
+                          ?.unit_measure?.default_values?.depth ? (
+                          <span>
+                            (
+                            {
+                              repairTypeList.find(
+                                (r) => r.id === rt.repair_type_id
+                              )?.unit_measure?.default_values?.depth
+                            }{' '}
+                            mm)
+                          </span>
+                        ) : null}
+                      </span>
+                    </div>
                     <Separator
                       orientation="vertical"
                       className="w-0.5 h-6 bg-neutral-300"
                     />
-                    <span>
-                      ${rt.price} ({rt.unitToCharge})
+
+                    <div className=" flex items-center gap-2">
+                      <span>{rt.phases} phases</span>
+                      <Separator
+                        orientation="vertical"
+                        className="w-0.5 h-6 bg-neutral-300"
+                      />
+                      <span>
+                        ${rt.price} ({rt.unit_to_charge})
+                      </span>
+                    </div>
+                    <Separator
+                      orientation="vertical"
+                      className="w-0.5 h-6 bg-neutral-300"
+                    />
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        rt.status === PROJECT_STATUS['completed']
+                          ? 'bg-green-100 text-green-800'
+                          : rt.status === PROJECT_STATUS['in-progress']
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}
+                    >
+                      {rt.status}
                     </span>
                   </div>
-                  <Separator
-                    orientation="vertical"
-                    className="w-0.5 h-6 bg-neutral-300"
-                  />
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                      rt.status === PROJECT_STATUS['completed']
-                        ? 'bg-green-100 text-green-800'
-                        : rt.status === PROJECT_STATUS['in-progress']
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}
-                  >
-                    {rt.status}
-                  </span>
-                </div>
 
-                <div className=" flex items-center gap-2">
-                  <Button
-                    type="button"
-                    onClick={() => handleEditRepairType(index)}
-                    className="flex items-center gap-1 bg-blue-500 text-white hover:bg-blue-600 text-xs rounded"
-                  >
-                    <Pencil className="h-3 w-3" />
-                    Edit
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() => handleRemoveRepairType(index)}
-                    className="flex items-center gap-2 bg-red-500 text-white hover:bg-red-600 rounded"
-                  >
-                    <Trash2Icon className="h-4 w-4" />
-                  </Button>
+                  <div className=" flex items-center gap-2">
+                    <Button
+                      type="button"
+                      onClick={() => handleEditRepairType(index)}
+                      className="flex items-center gap-1 bg-blue-500 text-white hover:bg-blue-600 text-xs rounded"
+                    >
+                      <Pencil className="h-3 w-3" />
+                      Edit
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() => handleRemoveRepairType(index)}
+                      className="flex items-center gap-2 bg-red-500 text-white hover:bg-red-600 rounded"
+                    >
+                      <Trash2Icon className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
 
           {/* Formulario para agregar un nuevo repairType */}
@@ -996,7 +1462,7 @@ const ProjectForm = ({
                 <Label htmlFor="repairType">Repair Type</Label>
                 <Select
                   name="repairType"
-                  value={`${newRepairType.repairTypeId}`}
+                  value={`${newRepairType.repair_type_id}`}
                   onValueChange={(e) => handleRepairTypeChange(e)}
                 >
                   <SelectTrigger>
@@ -1010,7 +1476,7 @@ const ProjectForm = ({
                           key={repair.id}
                           value={`${repair.id}`}
                           disabled={repairTypes
-                            .map((rt) => rt.repairTypeId)
+                            .map((rt) => rt.repair_type_id)
                             .includes(repair.id)}
                         >
                           {repair.variation} ({repair.type})
@@ -1081,8 +1547,8 @@ const ProjectForm = ({
                     placeholder="Price"
                     min="0"
                   />
-                  {newRepairType.unitToCharge && (
-                    <span>/{newRepairType.unitToCharge}</span>
+                  {newRepairType.unit_to_charge && (
+                    <span>/{newRepairType.unit_to_charge}</span>
                   )}
                 </div>
               </div>
@@ -1097,18 +1563,18 @@ const ProjectForm = ({
                   <Input
                     id="minChargePerRepair"
                     type="number"
-                    value={newRepairType.minimumChargePerRepair || ''}
+                    value={newRepairType.minimum_charge_per_repair || ''}
                     onChange={(e) =>
                       setNewRepairType({
                         ...newRepairType,
-                        minimumChargePerRepair: Number(e.target.value),
+                        minimum_charge_per_repair: Number(e.target.value),
                       })
                     }
                     placeholder="MC/R"
                     min="1"
                   />
-                  {newRepairType.unitToCharge && (
-                    <span>/{newRepairType.unitToCharge}</span>
+                  {newRepairType.unit_to_charge && (
+                    <span>/{newRepairType.unit_to_charge}</span>
                   )}
                 </div>
               </div>
@@ -1119,18 +1585,18 @@ const ProjectForm = ({
                   <Input
                     id="minChargePerDrop"
                     type="number"
-                    value={newRepairType.minimumChargePerDrop || ''}
+                    value={newRepairType.minimum_charge_per_drop || ''}
                     onChange={(e) =>
                       setNewRepairType({
                         ...newRepairType,
-                        minimumChargePerDrop: Number(e.target.value),
+                        minimum_charge_per_drop: Number(e.target.value),
                       })
                     }
                     placeholder="MC/D"
                     min="1"
                   />
-                  {newRepairType.unitToCharge && (
-                    <span>/{newRepairType.unitToCharge}</span>
+                  {newRepairType.unit_to_charge && (
+                    <span>/{newRepairType.unit_to_charge}</span>
                   )}
                 </div>
               </div>
@@ -1165,43 +1631,44 @@ const ProjectForm = ({
 
           {/* Lista de technicians existentes */}
           <div className="space-y-2">
-            {technicians.map((tech, index) => (
-              <div
-                key={index}
-                className="flex space-x-2 items-center justify-between p-2 border rounded-lg"
-              >
-                <div className=" flex items-center gap-2">
-                  <Avatar>
-                    <AvatarImage src={tech.technicianAvatar} />
-                    <AvatarFallback className="bg-orange-100 text-orange-800">
-                      {tech.technicianFirstName.charAt(0)}
-                      {tech.technicianLastName.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className=" ">
-                    {tech.technicianFirstName} {tech.technicianLastName} (ID:{' '}
-                    {tech.technicianId})
-                  </span>
+            {technicians &&
+              technicians.map((tech, index) => (
+                <div
+                  key={index}
+                  className="flex space-x-2 items-center justify-between p-2 border rounded-lg"
+                >
+                  <div className=" flex items-center gap-2">
+                    <Avatar>
+                      <AvatarImage src={tech.technician_avatar} />
+                      <AvatarFallback className="bg-orange-100 text-orange-800">
+                        {tech.technician_first_name.charAt(0)}
+                        {tech.technician_last_name.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className=" ">
+                      {tech.technician_first_name} {tech.technician_last_name}{' '}
+                      (ID: {tech.technician_id})
+                    </span>
+                  </div>
+                  <div className=" flex items-center gap-2">
+                    <Button
+                      type="button"
+                      onClick={() => handleEditTechnician(index)}
+                      className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-xs text-white rounded"
+                    >
+                      <Pencil className="h-3 w-3" />
+                      Edit
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() => handleRemoveTechnician(index)}
+                      className="bg-red-500 hover:bg-red-600 text-white rounded"
+                    >
+                      <Trash2Icon className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-                <div className=" flex items-center gap-2">
-                  <Button
-                    type="button"
-                    onClick={() => handleEditTechnician(index)}
-                    className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-xs text-white rounded"
-                  >
-                    <Pencil className="h-3 w-3" />
-                    Edit
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() => handleRemoveTechnician(index)}
-                    className="bg-red-500 hover:bg-red-600 text-white rounded"
-                  >
-                    <Trash2Icon className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
+              ))}
           </div>
 
           {/* Formulario para agregar/editar un técnico */}
@@ -1211,8 +1678,8 @@ const ProjectForm = ({
               <Select
                 name="technician"
                 value={
-                  newTechnician.technicianId !== 0
-                    ? `${newTechnician.technicianId}`
+                  newTechnician.technician_id !== 0
+                    ? `${newTechnician.technician_id}`
                     : ''
                 }
                 onValueChange={(e) => handleTechnicianChange(e)}
@@ -1226,7 +1693,7 @@ const ProjectForm = ({
                       key={tech.id}
                       value={`${tech.id}`}
                       disabled={technicians
-                        .map((tech) => tech.technicianId)
+                        .map((tech) => tech.technician_id)
                         .includes(tech.id)}
                     >
                       {tech.first_name} {tech.last_name} (ID: {tech.id})
@@ -1255,31 +1722,29 @@ const ProjectForm = ({
         </div>
 
         <Separator className=" w-full col-span-2 mt-4" />
-
-        {/* Google Drive URL */}
-        {/* <div>
-          <label className="block text-sm font-medium">Google Drive URL</label>
-          <input
-            type="text"
-            value={googleDriveUrl}
-            onChange={(e) => setGoogleDriveUrl(e.target.value)}
-            placeholder="https://drive.google.com/folder/xyz"
-            required
-            className="border rounded p-2 w-full"
-          />
-        </div> */}
-
         <div className="space-x-2 sm:col-span-2">
           <Button
             className="mt-4 bg-green-600 text-white hover:bg-green-500"
             type="submit"
+            disabled={isSubmitting}
           >
-            {projectData ? 'Update Project' : 'Create Project'}
+            {isSubmitting ? (
+              <>
+                <span className="mr-2">Creating...</span>
+                {/* Puedes agregar un spinner aquí */}
+                <span className=" w-14 h-14 border-2 border-black border-t-transparent rounded-full animate-spin"></span>
+              </>
+            ) : projectData ? (
+              'Update Project'
+            ) : (
+              'Create Project'
+            )}
           </Button>
           <Button
             type="button"
             className="mt-4 bg-neutral-900 text-white hover:bg-neutral-700"
             onClick={onClose}
+            disabled={isSubmitting}
           >
             Close
           </Button>
@@ -1334,7 +1799,7 @@ const ProjectDataModal = ({
           {/* Client Project */}
           <div>
             <Label>Client</Label>
-            <p className="text-lg font-semibold">{projectData?.clientName}</p>
+            <p className="text-lg font-semibold">{projectData?.client_name}</p>
           </div>
         </div>
 
@@ -1343,14 +1808,14 @@ const ProjectDataModal = ({
           <div>
             <Label>Created By</Label>
             <p>
-              {projectData?.createdByUserName} (ID:{' '}
-              {projectData?.createdByUserId})
+              {projectData?.created_by_user_name} (ID:{' '}
+              {projectData?.created_by_user_id})
             </p>
           </div>
           <div>
             <Label>Created At</Label>
             <p>
-              {new Date(projectData?.createdAt || '').toLocaleDateString(
+              {new Date(projectData?.created_at || '').toLocaleDateString(
                 'en-US',
                 {
                   day: 'numeric',
@@ -1362,19 +1827,7 @@ const ProjectDataModal = ({
           </div>
           <div>
             <Label>Last Updated</Label>
-            <p>
-              {new Date(projectData?.updatedAt || '').toLocaleDateString(
-                'en-US',
-                {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                  hour: 'numeric',
-                  minute: 'numeric',
-                  hour12: true,
-                }
-              )}
-            </p>
+            <p>{projectData?.updated_at.split('T')[0] || 'Date Unknown'}</p>
           </div>
         </div>
 
@@ -1385,30 +1838,34 @@ const ProjectDataModal = ({
           <h3 className="text-lg font-medium">Elevations (1 min - 6 max)</h3>
 
           {/* Elevations list */}
-          <div className="flex flex-wrap gap-4 ">
-            {projectData?.elevations.map((elevation, index) => (
-              <div key={index} className="flex space-x-2 items-center">
-                <div className="flex items-center gap-6 border p-2 rounded">
-                  <span className=" font-bold">{elevation.name}</span>
-                  <span>{elevation.drops} drops</span>
-                  <span>{elevation.levels} levels</span>
-                </div>
+          {projectData && projectData?.elevations && (
+            <>
+              <div className="flex flex-wrap gap-4 ">
+                {projectData?.elevations.map((elevation, index) => (
+                  <div key={index} className="flex space-x-2 items-center">
+                    <div className="flex items-center gap-6 border p-2 rounded">
+                      <span className=" font-bold">{elevation.name}</span>
+                      <span>{elevation.drops} drops</span>
+                      <span>{elevation.levels} levels</span>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          <div className=" w-full mt-6 mb-0 flex items-center gap-10">
-            <p className=" text-sm text-muted-foreground">
-              Elevations: {projectData?.elevations?.length}
-            </p>
-            <p className=" text-sm text-muted-foreground">
-              Total Drops:{' '}
-              {projectData?.elevations?.reduce(
-                (total, e) => total + e.drops,
-                0
-              )}
-            </p>
-          </div>
+              <div className=" w-full mt-6 mb-0 flex items-center gap-10">
+                <p className=" text-sm text-muted-foreground">
+                  Elevations: {projectData?.elevations?.length}
+                </p>
+                <p className=" text-sm text-muted-foreground">
+                  Total Drops:{' '}
+                  {projectData?.elevations?.reduce(
+                    (total, e) => total + e.drops,
+                    0
+                  )}
+                </p>
+              </div>
+            </>
+          )}
         </div>
 
         <Separator className=" w-full col-span-2 mt-4" />
@@ -1421,9 +1878,9 @@ const ProjectDataModal = ({
 
           {/* Lista de repairTypes existentes */}
           <div className="space-y-2">
-            {projectData?.repairTypes &&
-              projectData?.repairTypes?.length > 0 &&
-              projectData?.repairTypes?.map((rt, index) => (
+            {projectData?.repair_types &&
+              projectData?.repair_types?.length > 0 &&
+              projectData?.repair_types?.map((rt, index) => (
                 <div
                   key={index}
                   className=" p-2 flex items-center gap-4 border rounded-lg"
@@ -1435,20 +1892,21 @@ const ProjectDataModal = ({
                   ></span>
                   <div className=" flex items-center gap-2">
                     <span className="  bg-neutral-700 text-white font-semibold px-2 py-1 border rounded-md">
-                      {rt.repairType}
+                      {rt.repair_type}
                     </span>
                     <span>
                       {
-                        repairTypeList.find((r) => r.id === rt.repairTypeId)
+                        repairTypeList.find((r) => r.id === rt.repair_type_id)
                           ?.variation
                       }{' '}
-                      {repairTypeList.find((r) => r.id === rt.repairTypeId)
-                        ?.unitMeasure?.defaultValues?.depth ? (
+                      {repairTypeList.find((r) => r.id === rt.repair_type_id)
+                        ?.unit_measure?.default_values?.depth ? (
                         <span>
                           (
                           {
-                            repairTypeList.find((r) => r.id === rt.repairTypeId)
-                              ?.unitMeasure?.defaultValues?.depth
+                            repairTypeList.find(
+                              (r) => r.id === rt.repair_type_id
+                            )?.unit_measure?.default_values?.depth
                           }{' '}
                           mm)
                         </span>
@@ -1466,18 +1924,18 @@ const ProjectDataModal = ({
                       className="w-0.5 h-6 bg-neutral-300"
                     />
                     <span>
-                      ${rt.price} ({rt.unitToCharge})
+                      ${rt.price} ({rt.unit_to_charge})
                     </span>
                     <Separator
                       orientation="vertical"
                       className="w-0.5 h-6 bg-neutral-300"
                     />
-                    <span>MC/R: {rt.minimumChargePerRepair}</span>
+                    <span>MC/R: {rt.minimum_charge_per_repair}</span>
                     <Separator
                       orientation="vertical"
                       className="w-0.5 h-6 bg-neutral-300"
                     />
-                    <span>MC/D: {rt.minimumChargePerDrop}</span>
+                    <span>MC/D: {rt.minimum_charge_per_drop}</span>
                   </div>
 
                   {/* <Separator
@@ -1517,15 +1975,15 @@ const ProjectDataModal = ({
                 >
                   <div className=" flex items-center gap-2">
                     <Avatar>
-                      <AvatarImage src={tech.technicianAvatar} />
+                      <AvatarImage src={tech.technician_avatar} />
                       <AvatarFallback className="bg-orange-100 text-orange-800">
-                        {tech.technicianFirstName.charAt(0)}
-                        {tech.technicianLastName.charAt(0)}
+                        {tech.technician_first_name.charAt(0)}
+                        {tech.technician_last_name.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                     <span className=" ">
-                      {tech.technicianFirstName} {tech.technicianLastName} (ID:{' '}
-                      {tech.technicianId})
+                      {tech.technician_first_name} {tech.technician_last_name}{' '}
+                      (ID: {tech.technician_id})
                     </span>
                   </div>
                 </div>
@@ -1534,17 +1992,6 @@ const ProjectDataModal = ({
         </div>
 
         <Separator className=" w-full col-span-2 mt-4" />
-
-        {/* Google Drive URL */}
-        {/* <div>
-          <label className="block text-sm font-medium">Google Drive URL</label>
-          <Link
-            href={projectData?.googleDriveUrl || ''}
-            className=" text-sky-600 hover:underline hover:text-sky-500"
-          >
-            {projectData?.googleDriveUrl || 'No URL provided'}
-          </Link>
-        </div> */}
 
         <div className="space-x-2 sm:col-span-2">
           <Button

@@ -1,11 +1,13 @@
+// src/app/auth/login/page.tsx
 'use client'
 import type React from 'react'
 import { useState } from 'react'
+import { useUserStore } from '@/stores/user-store'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { PageWrapper } from '@/components/page-wrapper'
-
 import { createClient } from '@/lib/supabase/client'
+
+import { PageWrapper } from '@/components/page-wrapper'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -21,6 +23,7 @@ import { Eye, EyeOff, LogIn, Loader2 } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
+  const { initializeUser } = useUserStore()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -36,14 +39,30 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      // 1. Autentizar con Supabase
+      const { error: authError } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
       })
-      if (error) throw error
+      if (authError) throw authError
+
+      // 2. Inicializar el store con los datos del usuario
+      await initializeUser()
+
+      // 3. Pequeña espera para asegurar que el store se actualice
       // Update this route to redirect to an authenticated route. The user already has an active session.
-      await new Promise((resolve) => setTimeout(resolve, 100)) // Espera mínima
-      router.push('/dashboard')
+      await new Promise((resolve) => setTimeout(resolve, 100))
+
+      // 4. Obtener el rol del usuario desde el store
+      const currentUser = useUserStore.getState().currentUser
+
+      if (!currentUser || !currentUser.role) {
+        throw new Error('Failed to load user data')
+      }
+
+      // 5. Redirigir según el rol
+      router.push(`/dashboard/${currentUser.role}`)
+
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {

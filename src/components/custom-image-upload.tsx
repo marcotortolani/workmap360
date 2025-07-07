@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/custom-image-upload.tsx
 'use client'
@@ -34,21 +35,23 @@ interface ExtendedNavigator extends Navigator {
 
 interface CustomImageUploadProps {
   onUploadSuccess: (image: {
-    id: string
-    public_id: string
     url: string
+    publicId: string
+    fileName: string
+    phase: string
   }) => void
-  fieldName: 'surveyImage' | 'progressImage' | 'finishImage'
+  fieldName: 'survey_image' | 'progress_image' | 'finish_image'
   fileNameData: {
     drop: number
     level: number
-    repairType: string
-    repairIndex: number
+    repair_type: string
+    repair_index: number
     measures: string
     phase: string
   }
   folderName: string
   userName: string
+  disabled?: boolean
 }
 
 export default function CustomImageUpload({
@@ -57,6 +60,7 @@ export default function CustomImageUpload({
   fileNameData,
   folderName,
   userName,
+  disabled = false,
 }: CustomImageUploadProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [file, setFile] = useState<File | null>(null)
@@ -208,11 +212,11 @@ export default function CustomImageUpload({
 
   const handleFileName = () => {
     if (!fileNameData) return null
-    const { drop, level, repairType, repairIndex, measures, phase } =
+    const { drop, level, repair_type, repair_index, measures, phase } =
       fileNameData
 
-    if (!drop || !level || !repairType || !repairIndex) return
-    const name = `D${drop}.L${level}.${repairType}.${repairIndex}.${measures}.${phase}`
+    if (!drop || !level || !repair_type || !repair_index) return
+    const name = `D${drop}.L${level}.${repair_type}.${repair_index}.${measures}.${phase}`
     console.log('filename: ', name)
 
     return name
@@ -478,7 +482,7 @@ export default function CustomImageUpload({
       const textX = backgroundX + padding
       let textY = backgroundY + padding
 
-      // Orden modificado: 
+      // Orden modificado:
       // fecha/hora primero
       ctx.font = `${fontSize}px Arial`
       ctx.fillText(dateTimeText, textX, textY)
@@ -584,9 +588,10 @@ export default function CustomImageUpload({
       const uploadResult = await uploadResponse.json()
 
       onUploadSuccess({
-        id: uploadResult.public_id,
-        public_id: uploadResult.public_id,
+        publicId: uploadResult.public_id,
         url: uploadResult.secure_url,
+        fileName: uploadResult.original_filename,
+        phase: uploadResult.asset_folder,
       })
 
       resetComponent()
@@ -624,7 +629,7 @@ export default function CustomImageUpload({
   }
 
   const isFormValid =
-    fileNameData?.repairType.length > 0 && fileNameData?.repairIndex
+    fileNameData?.repair_type.length > 0 && fileNameData?.repair_index
 
   // const formatFileSize = (bytes: number) => {
   //   return (bytes / 1024 / 1024).toFixed(2) + ' MB'
@@ -641,7 +646,7 @@ export default function CustomImageUpload({
           <>
             <div
               className={`${loading && 'animate-pulse'} ${
-                !isFormValid && ' opacity-70 '
+                (!isFormValid || disabled) && ' opacity-70 '
               } flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pb-6 pt-5`}
             >
               <div className="space-y-1 text-center">
@@ -649,14 +654,16 @@ export default function CustomImageUpload({
                 <div className="flex text-sm text-gray-600">
                   <label
                     className={` ${
-                      !isFormValid ? ' cursor-default ' : ' cursor-pointer '
+                      !isFormValid || disabled
+                        ? ' cursor-default '
+                        : ' cursor-pointer '
                     } relative rounded-md bg-white font-medium text-orange-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-orange-500 focus-within:ring-offset-2 hover:text-orange-400`}
                   >
                     <span>Subir archivo</span>
                     <Input
                       ref={fileInputRef}
                       type="file"
-                      disabled={!isFormValid || loading}
+                      disabled={!isFormValid || loading || disabled}
                       className="sr-only"
                       accept="image/*"
                       onChange={handleFileChange}
@@ -681,7 +688,7 @@ export default function CustomImageUpload({
                 <Button
                   type="button"
                   variant="outline"
-                  disabled={!isFormValid || loading}
+                  disabled={!isFormValid || loading || disabled}
                   className="flex items-center justify-center flex-1"
                   onClick={startCamera}
                 >
@@ -693,7 +700,7 @@ export default function CustomImageUpload({
               <Button
                 type="button"
                 variant="outline"
-                disabled={!isFormValid || loading}
+                disabled={!isFormValid || loading || disabled}
                 className="flex items-center justify-center flex-1"
                 onClick={triggerCameraInput}
               >

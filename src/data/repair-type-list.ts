@@ -9,13 +9,13 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     variation: 'Concrete Repair 1',
     type: 'CR1',
     description: '',
-    unitMeasure: {
+    unit_measure: {
       type: 'volume',
       value: 'mm x mm x mm',
-      defaultValues: { depth: 10 },
+      default_values: { depth: 10 },
       dimensions: ['width', 'height', 'depth'],
     },
-    unitToCharge: 'Lt',
+    unit_to_charge: 'Lt',
     conversion: {
       from: {
         type: 'volume',
@@ -23,12 +23,12 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
         dimensions: ['width', 'height', 'depth'],
       },
       to: 'Lt',
-      conversionFactor: ({ width, height, depth }) =>
+      conversion_factor: ({ width, height, depth }) =>
         width * height * (depth || 10) * MM3_TO_LITERS,
     },
-    createdBy: 'admin',
-    createdByUser: 1,
-    createdAt: Date.now(),
+    created_by_user_name: 'admin',
+    created_by_user_id: 1,
+    created_at: Date.now().toLocaleString('en-NZ'),
     status: 'active',
   },
   {
@@ -36,12 +36,12 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     variation: 'Render Repair',
     type: 'RR',
     description: '',
-    unitMeasure: {
+    unit_measure: {
       type: 'volume',
       value: 'mm x mm x mm',
       dimensions: ['width', 'height', 'depth'],
     },
-    unitToCharge: 'm2',
+    unit_to_charge: 'm2',
     conversion: {
       from: {
         type: 'volume',
@@ -49,11 +49,11 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
         dimensions: ['width', 'height', 'depth'],
       },
       to: 'm2',
-      conversionFactor: ({ width, height }) => (width * height) / 1_000_000,
+      conversion_factor: ({ width, height }) => (width * height) / 1_000_000,
     },
-    createdBy: 'admin',
-    createdByUser: 1,
-    createdAt: Date.now(),
+    created_by_user_name: 'admin',
+    created_by_user_id: 1,
+    created_at: Date.now().toLocaleString('en-NZ'),
     status: 'active',
   },
   {
@@ -61,20 +61,20 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     variation: 'Narrow Render Repair',
     type: 'NR',
     description: '',
-    unitMeasure: {
+    unit_measure: {
       type: 'length',
       value: 'mm',
       dimensions: ['length'],
     },
-    unitToCharge: 'm',
+    unit_to_charge: 'm',
     conversion: {
       from: { type: 'length', value: 'mm', dimensions: ['length'] },
       to: 'm',
-      conversionFactor: ({ length }) => length / 1_000,
+      conversion_factor: ({ length }) => length / 1_000,
     },
-    createdBy: 'admin',
-    createdByUser: 1,
-    createdAt: Date.now(),
+    created_by_user_name: 'admin',
+    created_by_user_id: 1,
+    created_at: Date.now().toLocaleString('en-NZ'),
     status: 'active',
   },
   {
@@ -82,20 +82,20 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     variation: 'Joint Replacement',
     type: 'JR',
     description: '',
-    unitMeasure: {
+    unit_measure: {
       type: 'length',
       value: 'mm',
       dimensions: ['length'],
     },
-    unitToCharge: 'm',
+    unit_to_charge: 'm',
     conversion: {
       from: { type: 'length', value: 'mm', dimensions: ['length'] },
       to: 'm',
-      conversionFactor: ({ length }) => length / 1_000,
+      conversion_factor: ({ length }) => length / 1_000,
     },
-    createdBy: 'admin',
-    createdByUser: 1,
-    createdAt: Date.now(),
+    created_by_user_name: 'admin',
+    created_by_user_id: 1,
+    created_at: Date.now().toLocaleString('en-NZ'),
     status: 'active',
   },
   {
@@ -103,20 +103,20 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     variation: 'Joint application',
     type: 'JA',
     description: '',
-    unitMeasure: {
+    unit_measure: {
       type: 'length',
       value: 'mm',
       dimensions: ['length'],
     },
-    unitToCharge: 'm',
+    unit_to_charge: 'm',
     conversion: {
       from: { type: 'length', value: 'mm', dimensions: ['length'] },
       to: 'm',
-      conversionFactor: ({ length }) => length / 1_000,
+      conversion_factor: ({ length }) => length / 1_000,
     },
-    createdBy: 'admin',
-    createdByUser: 1,
-    createdAt: Date.now(),
+    created_by_user_name: 'admin',
+    created_by_user_id: 1,
+    created_at: Date.now().toLocaleString('en-NZ'),
     status: 'active',
   },
   {
@@ -124,15 +124,15 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     variation: 'Plug Removal',
     type: 'PR',
     description: '',
-    unitMeasure: {
+    unit_measure: {
       type: 'unit',
       value: 'Unit',
       dimensions: ['count'],
     },
-    unitToCharge: 'Unit',
-    createdBy: 'admin',
-    createdByUser: 1,
-    createdAt: Date.now(),
+    unit_to_charge: 'Unit',
+    created_by_user_name: 'admin',
+    created_by_user_id: 1,
+    created_at: Date.now().toLocaleString('en-NZ'),
     status: 'active',
   },
   {
@@ -140,15 +140,15 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     variation: 'Tie Wires',
     type: 'TW',
     description: '',
-    unitMeasure: {
+    unit_measure: {
       type: 'unit',
       value: 'Unit',
       dimensions: ['count'],
     },
-    unitToCharge: 'Unit',
-    createdBy: 'admin',
-    createdByUser: 1,
-    createdAt: Date.now(),
+    unit_to_charge: 'Unit',
+    created_by_user_name: 'admin',
+    created_by_user_id: 1,
+    created_at: Date.now().toLocaleString('en-NZ'),
     status: 'active',
   },
   {
@@ -156,15 +156,15 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     variation: 'Rusty Spots',
     type: 'RS',
     description: '',
-    unitMeasure: {
+    unit_measure: {
       type: 'unit',
       value: 'Unit',
       dimensions: ['count'],
     },
-    unitToCharge: 'Unit',
-    createdBy: 'admin',
-    createdByUser: 1,
-    createdAt: Date.now(),
+    unit_to_charge: 'Unit',
+    created_by_user_name: 'admin',
+    created_by_user_id: 1,
+    created_at: Date.now().toLocaleString('en-NZ'),
     status: 'active',
   },
   {
@@ -172,15 +172,15 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     variation: 'Replacing bricks',
     type: 'B',
     description: '',
-    unitMeasure: {
+    unit_measure: {
       type: 'unit',
       value: 'Unit',
       dimensions: ['count'],
     },
-    unitToCharge: 'Unit',
-    createdBy: 'admin',
-    createdByUser: 1,
-    createdAt: Date.now(),
+    unit_to_charge: 'Unit',
+    created_by_user_name: 'admin',
+    created_by_user_id: 1,
+    created_at: Date.now().toLocaleString('en-NZ'),
     status: 'active',
   },
   {
@@ -188,15 +188,15 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     variation: 'HeliBar',
     type: 'HB',
     description: '',
-    unitMeasure: {
+    unit_measure: {
       type: 'unit',
       value: 'unit',
       dimensions: ['count'],
     },
-    unitToCharge: 'unit',
-    createdBy: 'admin',
-    createdByUser: 1,
-    createdAt: Date.now(),
+    unit_to_charge: 'unit',
+    created_by_user_name: 'admin',
+    created_by_user_id: 1,
+    created_at: Date.now().toLocaleString('en-NZ'),
     status: 'active',
   },
   {
@@ -204,15 +204,15 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     variation: 'Pity Pocket',
     type: 'PP',
     description: '',
-    unitMeasure: {
+    unit_measure: {
       type: 'unit',
       value: 'unit',
       dimensions: ['count'],
     },
-    unitToCharge: 'unit',
-    createdBy: 'admin',
-    createdByUser: 1,
-    createdAt: Date.now(),
+    unit_to_charge: 'unit',
+    created_by_user_name: 'admin',
+    created_by_user_id: 1,
+    created_at: Date.now().toLocaleString('en-NZ'),
     status: 'active',
   },
   {
@@ -220,20 +220,20 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     variation: 'Crack Repair',
     type: 'KRG',
     description: '',
-    unitMeasure: {
+    unit_measure: {
       type: 'length',
       value: 'mm',
       dimensions: ['length'],
     },
-    unitToCharge: 'm',
+    unit_to_charge: 'm',
     conversion: {
       from: { type: 'length', value: 'mm', dimensions: ['length'] },
       to: 'm',
-      conversionFactor: ({ length }) => length / 1_000,
+      conversion_factor: ({ length }) => length / 1_000,
     },
-    createdBy: 'admin',
-    createdByUser: 1,
-    createdAt: Date.now(),
+    created_by_user_name: 'admin',
+    created_by_user_id: 1,
+    created_at: Date.now().toLocaleString('en-NZ'),
     status: 'active',
   },
   {
@@ -241,15 +241,15 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     variation: 'Holes',
     type: 'H',
     description: '',
-    unitMeasure: {
+    unit_measure: {
       type: 'unit',
       value: 'Unit',
       dimensions: ['count'],
     },
-    unitToCharge: 'Unit',
-    createdBy: 'admin',
-    createdByUser: 1,
-    createdAt: Date.now(),
+    unit_to_charge: 'Unit',
+    created_by_user_name: 'admin',
+    created_by_user_id: 1,
+    created_at: Date.now().toLocaleString('en-NZ'),
     status: 'active',
   },
   {
@@ -257,20 +257,20 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     variation: 'Flashing',
     type: 'FL',
     description: '',
-    unitMeasure: {
+    unit_measure: {
       type: 'length',
       value: 'mm',
       dimensions: ['length'],
     },
-    unitToCharge: 'm',
+    unit_to_charge: 'm',
     conversion: {
       from: { type: 'length', value: 'mm', dimensions: ['length'] },
       to: 'm',
-      conversionFactor: ({ length }) => length / 1_000,
+      conversion_factor: ({ length }) => length / 1_000,
     },
-    createdBy: 'admin',
-    createdByUser: 1,
-    createdAt: Date.now(),
+    created_by_user_name: 'admin',
+    created_by_user_id: 1,
+    created_at: Date.now().toLocaleString('en-NZ'),
     status: 'active',
   },
   {
@@ -278,20 +278,20 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     variation: 'Mortar Repair',
     type: 'MR',
     description: '',
-    unitMeasure: {
+    unit_measure: {
       type: 'area',
       value: 'mm x mm',
       dimensions: ['width', 'height'],
     },
-    unitToCharge: 'm2',
+    unit_to_charge: 'm2',
     conversion: {
       from: { type: 'area', value: 'mm x mm', dimensions: ['width', 'height'] },
       to: 'm2',
-      conversionFactor: ({ width, height }) => (width * height) / 1_000_000,
+      conversion_factor: ({ width, height }) => (width * height) / 1_000_000,
     },
-    createdBy: 'admin',
-    createdByUser: 1,
-    createdAt: Date.now(),
+    created_by_user_name: 'admin',
+    created_by_user_id: 1,
+    created_at: Date.now().toLocaleString('en-NZ'),
     status: 'active',
   },
   {
@@ -299,15 +299,15 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     variation: 'Steel Holes',
     type: 'SH',
     description: '',
-    unitMeasure: {
+    unit_measure: {
       type: 'unit',
       value: 'Unit',
       dimensions: ['count'],
     },
-    unitToCharge: 'Unit',
-    createdBy: 'admin',
-    createdByUser: 1,
-    createdAt: Date.now(),
+    unit_to_charge: 'Unit',
+    created_by_user_name: 'admin',
+    created_by_user_id: 1,
+    created_at: Date.now().toLocaleString('en-NZ'),
     status: 'active',
   },
   {
@@ -315,13 +315,13 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     variation: 'Concrete Repair 2',
     type: 'CR2',
     description: '',
-    unitMeasure: {
+    unit_measure: {
       type: 'volume',
       value: 'mm x mm x mm',
-      defaultValues: { depth: 20 },
+      default_values: { depth: 20 },
       dimensions: ['width', 'height', 'depth'],
     },
-    unitToCharge: 'Lt',
+    unit_to_charge: 'Lt',
     conversion: {
       from: {
         type: 'volume',
@@ -329,12 +329,12 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
         dimensions: ['width', 'height', 'depth'],
       },
       to: 'Lt',
-      conversionFactor: ({ width, height, depth }) =>
+      conversion_factor: ({ width, height, depth }) =>
         width * height * (depth || 20) * MM3_TO_LITERS,
     },
-    createdBy: 'admin',
-    createdByUser: 1,
-    createdAt: Date.now(),
+    created_by_user_name: 'admin',
+    created_by_user_id: 1,
+    created_at: Date.now().toLocaleString('en-NZ'),
     status: 'active',
   },
   {
@@ -342,13 +342,13 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     variation: 'Concrete Repair 1',
     type: 'CR1',
     description: '',
-    unitMeasure: {
+    unit_measure: {
       type: 'volume',
       value: 'mm x mm x mm',
-      defaultValues: { depth: 1 },
+      default_values: { depth: 1 },
       dimensions: ['width', 'height', 'depth'],
     },
-    unitToCharge: 'Lt',
+    unit_to_charge: 'Lt',
     conversion: {
       from: {
         type: 'volume',
@@ -356,12 +356,12 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
         dimensions: ['width', 'height', 'depth'],
       },
       to: 'Lt',
-      conversionFactor: ({ width, height, depth }) =>
+      conversion_factor: ({ width, height, depth }) =>
         width * height * (depth || 10) * MM3_TO_LITERS,
     },
-    createdBy: 'admin',
-    createdByUser: 1,
-    createdAt: Date.now(),
+    created_by_user_name: 'admin',
+    created_by_user_id: 1,
+    created_at: Date.now().toLocaleString('en-NZ'),
     status: 'inactive',
   },
   {
@@ -369,13 +369,13 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     variation: 'Concrete Repair 1',
     type: 'CR2',
     description: '',
-    unitMeasure: {
+    unit_measure: {
       type: 'volume',
       value: 'mm x mm x mm',
-      defaultValues: { depth: 2 },
+      default_values: { depth: 2 },
       dimensions: ['width', 'height', 'depth'],
     },
-    unitToCharge: 'Lt',
+    unit_to_charge: 'Lt',
     conversion: {
       from: {
         type: 'volume',
@@ -383,12 +383,12 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
         dimensions: ['width', 'height', 'depth'],
       },
       to: 'Lt',
-      conversionFactor: ({ width, height, depth }) =>
+      conversion_factor: ({ width, height, depth }) =>
         width * height * (depth || 10) * MM3_TO_LITERS,
     },
-    createdBy: 'admin',
-    createdByUser: 1,
-    createdAt: Date.now(),
+    created_by_user_name: 'admin',
+    created_by_user_id: 1,
+    created_at: Date.now().toLocaleString('en-NZ'),
     status: 'inactive',
   },
 ]
