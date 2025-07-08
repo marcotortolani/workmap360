@@ -23,7 +23,9 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Label } from '@/components/ui/label'
 import { useProjectsList } from '@/hooks/use-projects-list'
-import { useRepairsDataStore } from '@/stores/repairs-data-store'
+import { useRepairsList } from '@/hooks/use-repairs-list'
+
+// import { useRepairsDataStore } from '@/stores/repairs-data-store'
 import { useCurrentUser } from '@/stores/user-store'
 import CustomImageUpload from '@/components/custom-image-upload'
 import { getRepairStatus } from '@/lib/utils'
@@ -56,7 +58,8 @@ interface MeasurementField {
 
 export default function TechnicianNewRepairPage() {
   const { projects, isLoading: projectsLoading } = useProjectsList()
-  const { repairsDataList, addRepair, updateRepair } = useRepairsDataStore()
+  // const { repairsDataList, addRepair, updateRepair } = useRepairsDataStore()
+  const { repairs, isLoading: repairsLoading } = useRepairsList()
   const { userId, fullName, accessToken } = useCurrentUser()
 
   // Referencias para validación
@@ -188,7 +191,7 @@ export default function TechnicianNewRepairPage() {
   }, [selectedRepairType])
 
   // Filtrar reparaciones existentes
-  const matchingRepairs = repairsDataList.filter(
+  const matchingRepairs = repairs.filter(
     (repair) =>
       repair.project_id === project_id &&
       repair.elevation_name === elevation &&
@@ -196,6 +199,10 @@ export default function TechnicianNewRepairPage() {
       repair.level === level &&
       repair.phases.survey?.repair_type === repair_type
   )
+
+  console.log('repairsDataList', repairs)
+
+  console.log('matchingRepairs', matchingRepairs)
 
   // Calcular el próximo repairIndex
   const nextRepairIndex =
@@ -391,23 +398,25 @@ export default function TechnicianNewRepairPage() {
           { phases: updatedPhases },
           accessToken
         )
+        console.log("Update Repair Result:", result);
+        
 
-        if (result.success && result.repair) {
-          // Actualizar en el store local
-          await updateRepair(result.repair)
+        // Actualizar en el store local
+        // if (result.success && result.repair) {
+        //   await updateRepair(result.repair)
 
-          toast.success('Repair updated successfully', {
-            duration: 5000,
-            position: 'bottom-right',
-            style: {
-              background: '#4CAF50',
-              color: '#FFFFFF',
-              fontWeight: 'bold',
-            },
-          })
-        } else {
-          throw new Error(result.error || 'Failed to update repair')
-        }
+        //   toast.success('Repair updated successfully', {
+        //     duration: 5000,
+        //     position: 'bottom-right',
+        //     style: {
+        //       background: '#4CAF50',
+        //       color: '#FFFFFF',
+        //       fontWeight: 'bold',
+        //     },
+        //   })
+        // } else {
+        //   throw new Error(result.error || 'Failed to update repair')
+        // }
       } else {
         // Crear nueva reparación
         const newRepairData = {
@@ -433,40 +442,41 @@ export default function TechnicianNewRepairPage() {
 
         // Llamar al API para crear la reparación
         const result = await createRepairViaAPI(newRepairData, accessToken)
+        console.log("Create Repair Result:", result);
 
-        if (result.success && result.repairId) {
-          // Crear el objeto completo para el store local
-          const newRepair: RepairData = {
-            id: result.repairId,
-            project_id: project_id,
-            project_name: selectedProject?.name || '',
-            elevation_name: elevation,
-            drop: drop,
-            level: level,
-            repair_index: nextRepairIndex,
-            status: 'pending',
-            phases: newRepairData.phases,
-            created_by_user_name: fullName,
-            created_by_user_id: userId,
-            created_at: timestamp,
-            updated_at: timestamp,
-          }
+        // Crear el objeto completo para el store local
+        // if (result.success && result.repairId) {
+        //   const newRepair: RepairData = {
+        //     id: result.repairId,
+        //     project_id: project_id,
+        //     project_name: selectedProject?.name || '',
+        //     elevation_name: elevation,
+        //     drop: drop,
+        //     level: level,
+        //     repair_index: nextRepairIndex,
+        //     status: 'pending',
+        //     phases: newRepairData.phases,
+        //     created_by_user_name: fullName,
+        //     created_by_user_id: userId,
+        //     created_at: timestamp,
+        //     updated_at: timestamp,
+        //   }
 
-          // Actualizar en el store local
-          await addRepair(newRepair)
+        //   // Actualizar en el store local
+        //   await addRepair(newRepair)
 
-          toast.success('New repair created successfully', {
-            duration: 5000,
-            position: 'bottom-right',
-            style: {
-              background: '#4CAF50',
-              color: '#FFFFFF',
-              fontWeight: 'bold',
-            },
-          })
-        } else {
-          throw new Error(result.error || 'Failed to create repair')
-        }
+        //   toast.success('New repair created successfully', {
+        //     duration: 5000,
+        //     position: 'bottom-right',
+        //     style: {
+        //       background: '#4CAF50',
+        //       color: '#FFFFFF',
+        //       fontWeight: 'bold',
+        //     },
+        //   })
+        // } else {
+        //   throw new Error(result.error || 'Failed to create repair')
+        // }
       }
 
       // Resetear formulario
@@ -606,7 +616,7 @@ export default function TechnicianNewRepairPage() {
     }
   }
 
-  if (projectsLoading) {
+  if (projectsLoading || repairsLoading) {
     return (
       <div className="w-full flex justify-center items-center min-h-[400px]">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -794,7 +804,7 @@ export default function TechnicianNewRepairPage() {
                         value={repair.repair_index.toString()}
                       >
                         <div className="flex items-center gap-2">
-                          <span>Repair #{repair.repair_index}</span>
+                          <span>Index #{repair.repair_index}</span>
                           <Badge
                             variant={
                               repair.status === 'approved'

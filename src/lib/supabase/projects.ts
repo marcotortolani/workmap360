@@ -72,13 +72,13 @@ export async function createProjectInSupabase(projectData: {
     if (projectData.repairTypes.length > 0) {
       const repairTypesToInsert = projectData.repairTypes.map((repairType) => ({
         project_id: projectId,
-        repair_type_id: repairType.repairTypeId,
-        repair_type: repairType.repairType,
+        repair_type_id: repairType.repair_type_id,
+        repair_type: repairType.repair_type,
         phases: repairType.phases,
         price: repairType.price,
-        unit_to_charge: repairType.unitToCharge,
-        minimum_charge_per_repair: repairType.minimumChargePerRepair,
-        minimum_charge_per_drop: repairType.minimumChargePerDrop,
+        unit_to_charge: repairType.unit_to_charge,
+        minimum_charge_per_repair: repairType.minimum_charge_per_repair,
+        minimum_charge_per_drop: repairType.minimum_charge_per_drop,
         status: repairType.status,
         created_at: new Date().toISOString(),
       }))
@@ -97,10 +97,10 @@ export async function createProjectInSupabase(projectData: {
     if (projectData.technicians.length > 0) {
       const techniciansToInsert = projectData.technicians.map((technician) => ({
         project_id: projectId,
-        technician_id: technician.technicianId,
-        technician_first_name: technician.technicianFirstName,
-        technician_last_name: technician.technicianLastName,
-        technician_avatar: technician.technicianAvatar,
+        technician_id: technician.technician_id,
+        technician_first_name: technician.technician_first_name,
+        technician_last_name: technician.technician_last_name,
+        technician_avatar: technician.technician_avatar,
         created_at: new Date().toISOString(),
       }))
 
