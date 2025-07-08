@@ -5,7 +5,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import {  z } from 'zod'
 import { toast } from 'sonner'
 import { createFormSchema } from '@/lib/schemas/new-repair-form-schema'
 //import { Button } from '@/components/ui/button'
@@ -199,10 +199,6 @@ export default function TechnicianNewRepairPage() {
       repair.level === level &&
       repair.phases.survey?.repair_type === repair_type
   )
-
-  console.log('repairsDataList', repairs)
-
-  console.log('matchingRepairs', matchingRepairs)
 
   // Calcular el próximo repairIndex
   const nextRepairIndex =
@@ -398,8 +394,7 @@ export default function TechnicianNewRepairPage() {
           { phases: updatedPhases },
           accessToken
         )
-        console.log("Update Repair Result:", result);
-        
+        console.log('Update Repair Result:', result)
 
         // Actualizar en el store local
         // if (result.success && result.repair) {
@@ -442,7 +437,7 @@ export default function TechnicianNewRepairPage() {
 
         // Llamar al API para crear la reparación
         const result = await createRepairViaAPI(newRepairData, accessToken)
-        console.log("Create Repair Result:", result);
+        console.log('Create Repair Result:', result)
 
         // Crear el objeto completo para el store local
         // if (result.success && result.repairId) {
@@ -750,7 +745,11 @@ export default function TechnicianNewRepairPage() {
                 <Label>Repair Type</Label>
                 <Select
                   value={repair_type}
-                  onValueChange={(value) => setValue('repair_type', value)}
+                  onValueChange={(value) => {
+                    setValue('repair_type', value)
+                    setCurrentPhase(null)
+                    setSelectedRepair(null)
+                  }}
                   disabled={
                     !project_id ||
                     !elevation ||

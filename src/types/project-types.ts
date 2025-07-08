@@ -1,3 +1,5 @@
+// src/types/project-types.ts
+
 import { UserType } from './user-types'
 
 export type ProjectStatusType = 'pending' | 'in-progress' | 'completed'
