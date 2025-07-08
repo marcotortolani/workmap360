@@ -1,26 +1,12 @@
-// app/api/projects/[id]/route.ts - CORREGIDO
+// app/api/projects/update/route.ts - CORREGIDO
 import { NextResponse, NextRequest } from 'next/server'
 import { getSupabaseAuthWithRole } from '@/lib/getSupabaseAuthWithRole'
 import { getServiceSupabase } from '@/lib/supabaseAuth'
 
-// Función auxiliar simplificada usando uid
-async function getUserDataFromAuthId(
-  authId: string,
-  serviceClient: ReturnType<typeof getServiceSupabase>
-): Promise<{ id: number; role: string } | null> {
-  const { data: user } = await serviceClient
-    .from('users')
-    .select('id, role')
-    .eq('uid', authId)
-    .single()
-
-  return user || null
-}
-
 export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  req: NextRequest
 ) {
+  const { id, updateData } = await req.json()
   try {
     const { user, role, error } = await getSupabaseAuthWithRole(req)
 
@@ -39,7 +25,7 @@ export async function PUT(
       )
     }
 
-    const projectId = parseInt(params.id)
+    const projectId = parseInt(id)
     if (!projectId || isNaN(projectId)) {
       return NextResponse.json({ error: 'Invalid project ID' }, { status: 400 })
     }
@@ -52,7 +38,7 @@ export async function PUT(
       elevations,
       repair_types,
       technicians,
-    } = await req.json()
+    } = updateData
 
     // Validaciones básicas
     if (!name || !client_name || !client_id) {
@@ -121,276 +107,276 @@ export async function PUT(
 
 // 2. CORREGIDO: app/api/projects/list/route.ts - Simplificado sin JOINs
 
-export async function GET(req: NextRequest) {
-  try {
-    const { user, role, error } = await getSupabaseAuthWithRole(req)
+// export async function GET(req: NextRequest) {
+//   try {
+//     const { user, role, error } = await getSupabaseAuthWithRole(req)
 
-    if (error || !user || !role) {
-      return NextResponse.json(
-        { error: error || 'Unauthorized' },
-        { status: 401 }
-      )
-    }
+//     if (error || !user || !role) {
+//       return NextResponse.json(
+//         { error: error || 'Unauthorized' },
+//         { status: 401 }
+//       )
+//     }
 
-    const { searchParams } = new URL(req.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '20')
-    const offset = (page - 1) * limit
+//     const { searchParams } = new URL(req.url)
+//     const page = parseInt(searchParams.get('page') || '1')
+//     const limit = parseInt(searchParams.get('limit') || '20')
+//     const offset = (page - 1) * limit
 
-    const serviceClient = getServiceSupabase()
+//     const serviceClient = getServiceSupabase()
 
-    // 🔧 CONSULTA SIMPLIFICADA - Solo tabla projects
-    let query = serviceClient.from('projects').select('*', { count: 'exact' })
+//     // 🔧 CONSULTA SIMPLIFICADA - Solo tabla projects
+//     let query = serviceClient.from('projects').select('*', { count: 'exact' })
 
-    // Filtrar según el rol (si es necesario)
-    if (role === 'client') {
-      const userIdInUsersTable = await getUserDataFromAuthId(
-        user.id,
-        serviceClient
-      )
-      if (!userIdInUsersTable) {
-        return NextResponse.json({
-          projects: [],
-          pagination: { total: 0, page, limit, totalPages: 0 },
-        })
-      }
-      query = query.eq('client_id', userIdInUsersTable)
-    } else if (role === 'technician') {
-      // Para técnicos, necesitarías filtrar por technicians JSON
-      // Esta lógica podría ser más compleja si necesitas buscar dentro del JSON
-      const userIdInUsersTable = await getUserDataFromAuthId(
-        user.id,
-        serviceClient
-      )
-      if (!userIdInUsersTable) {
-        return NextResponse.json({
-          projects: [],
-          pagination: { total: 0, page, limit, totalPages: 0 },
-        })
-      }
-      // Filtrar proyectos donde el técnico esté asignado (búsqueda en JSON)
-      query = query.contains('technicians', [
-        { technician_id: userIdInUsersTable },
-      ])
-    }
-    // Admin y Manager ven todos los proyectos
+//     // Filtrar según el rol (si es necesario)
+//     if (role === 'client') {
+//       const userIdInUsersTable = await getUserDataFromAuthId(
+//         user.id,
+//         serviceClient
+//       )
+//       if (!userIdInUsersTable) {
+//         return NextResponse.json({
+//           projects: [],
+//           pagination: { total: 0, page, limit, totalPages: 0 },
+//         })
+//       }
+//       query = query.eq('client_id', userIdInUsersTable)
+//     } else if (role === 'technician') {
+//       // Para técnicos, necesitarías filtrar por technicians JSON
+//       // Esta lógica podría ser más compleja si necesitas buscar dentro del JSON
+//       const userIdInUsersTable = await getUserDataFromAuthId(
+//         user.id,
+//         serviceClient
+//       )
+//       if (!userIdInUsersTable) {
+//         return NextResponse.json({
+//           projects: [],
+//           pagination: { total: 0, page, limit, totalPages: 0 },
+//         })
+//       }
+//       // Filtrar proyectos donde el técnico esté asignado (búsqueda en JSON)
+//       query = query.contains('technicians', [
+//         { technician_id: userIdInUsersTable },
+//       ])
+//     }
+//     // Admin y Manager ven todos los proyectos
 
-    const {
-      data: projects,
-      error: queryError,
-      count,
-    } = await query
-      .range(offset, offset + limit - 1)
-      .order('created_at', { ascending: false })
+//     const {
+//       data: projects,
+//       error: queryError,
+//       count,
+//     } = await query
+//       .range(offset, offset + limit - 1)
+//       .order('created_at', { ascending: false })
 
-    if (queryError) {
-      console.error('Error fetching projects:', queryError)
-      return NextResponse.json(
-        { error: 'Failed to fetch projects' },
-        { status: 500 }
-      )
-    }
+//     if (queryError) {
+//       console.error('Error fetching projects:', queryError)
+//       return NextResponse.json(
+//         { error: 'Failed to fetch projects' },
+//         { status: 500 }
+//       )
+//     }
 
-    // 🔧 NO NECESITA TRANSFORMACIÓN - Los datos ya vienen en el formato correcto
-    return NextResponse.json({
-      projects: projects || [],
-      pagination: {
-        total: count || 0,
-        page,
-        limit,
-        totalPages: Math.ceil((count || 0) / limit),
-      },
-    })
-  } catch (error) {
-    console.error('Unexpected error fetching projects:', error)
-    return NextResponse.json(
-      { error: 'Unexpected error occurred' },
-      { status: 500 }
-    )
-  }
-}
+//     // 🔧 NO NECESITA TRANSFORMACIÓN - Los datos ya vienen en el formato correcto
+//     return NextResponse.json({
+//       projects: projects || [],
+//       pagination: {
+//         total: count || 0,
+//         page,
+//         limit,
+//         totalPages: Math.ceil((count || 0) / limit),
+//       },
+//     })
+//   } catch (error) {
+//     console.error('Unexpected error fetching projects:', error)
+//     return NextResponse.json(
+//       { error: 'Unexpected error occurred' },
+//       { status: 500 }
+//     )
+//   }
+// }
 
 // 3. CORREGIDO: app/api/projects/create/route.ts - Simplificado para una tabla
 
-export async function POST(req: NextRequest) {
-  try {
-    const { user, role, error } = await getSupabaseAuthWithRole(req)
+// export async function POST(req: NextRequest) {
+//   try {
+//     const { user, role, error } = await getSupabaseAuthWithRole(req)
 
-    if (error || !user || !role) {
-      return NextResponse.json(
-        { error: error || 'Unauthorized' },
-        { status: 401 }
-      )
-    }
+//     if (error || !user || !role) {
+//       return NextResponse.json(
+//         { error: error || 'Unauthorized' },
+//         { status: 401 }
+//       )
+//     }
 
-    // Solo Admin y Manager pueden crear proyectos
-    if (!['admin', 'manager'].includes(role)) {
-      return NextResponse.json(
-        { error: 'You dont have permission to create projects' },
-        { status: 403 }
-      )
-    }
+//     // Solo Admin y Manager pueden crear proyectos
+//     if (!['admin', 'manager'].includes(role)) {
+//       return NextResponse.json(
+//         { error: 'You dont have permission to create projects' },
+//         { status: 403 }
+//       )
+//     }
 
-    const {
-      name,
-      client_name,
-      client_id,
-      status,
-      elevations,
-      repair_types,
-      technicians,
-    } = await req.json()
+//     const {
+//       name,
+//       client_name,
+//       client_id,
+//       status,
+//       elevations,
+//       repair_types,
+//       technicians,
+//     } = await req.json()
 
-    if (
-      !name ||
-      !client_name ||
-      !client_id ||
-      !elevations ||
-      elevations.length === 0
-    ) {
-      return NextResponse.json(
-        { error: 'Required fields are missing' },
-        { status: 400 }
-      )
-    }
+//     if (
+//       !name ||
+//       !client_name ||
+//       !client_id ||
+//       !elevations ||
+//       elevations.length === 0
+//     ) {
+//       return NextResponse.json(
+//         { error: 'Required fields are missing' },
+//         { status: 400 }
+//       )
+//     }
 
-    const serviceClient = getServiceSupabase()
+//     const serviceClient = getServiceSupabase()
 
-    // Obtener datos del usuario
-    const userData = await getUserDataFromAuthId(user.id, serviceClient)
-    if (!userData) {
-      return NextResponse.json(
-        { error: 'User data not found' },
-        { status: 400 }
-      )
-    }
+//     // Obtener datos del usuario
+//     const userData = await getUserDataFromAuthId(user.id, serviceClient)
+//     if (!userData) {
+//       return NextResponse.json(
+//         { error: 'User data not found' },
+//         { status: 400 }
+//       )
+//     }
 
-    // 🔧 INSERTAR PROYECTO COMPLETO EN UNA SOLA OPERACIÓN
-    const { data: project, error: projectError } = await serviceClient
-      .from('projects')
-      .insert({
-        name,
-        client_name,
-        client_id,
-        status: status || 'pending',
-        // 🔧 Campos JSON directamente
-        elevations: elevations || [],
-        repair_types: repair_types || [],
-        technicians: technicians || [],
-        created_by_user_name:
-          `${user.user_metadata.first_name} ${user.user_metadata.last_name}`.trim(),
-        created_by_user_id: userData.id,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .select('id')
-      .single()
+//     // 🔧 INSERTAR PROYECTO COMPLETO EN UNA SOLA OPERACIÓN
+//     const { data: project, error: projectError } = await serviceClient
+//       .from('projects')
+//       .insert({
+//         name,
+//         client_name,
+//         client_id,
+//         status: status || 'pending',
+//         // 🔧 Campos JSON directamente
+//         elevations: elevations || [],
+//         repair_types: repair_types || [],
+//         technicians: technicians || [],
+//         created_by_user_name:
+//           `${user.user_metadata.first_name} ${user.user_metadata.last_name}`.trim(),
+//         created_by_user_id: userData.id,
+//         created_at: new Date().toISOString(),
+//         updated_at: new Date().toISOString(),
+//       })
+//       .select('id')
+//       .single()
 
-    if (projectError || !project) {
-      console.error('Error creating project:', projectError)
-      return NextResponse.json(
-        { error: 'Failed to create project' },
-        { status: 500 }
-      )
-    }
+//     if (projectError || !project) {
+//       console.error('Error creating project:', projectError)
+//       return NextResponse.json(
+//         { error: 'Failed to create project' },
+//         { status: 500 }
+//       )
+//     }
 
-    return NextResponse.json(
-      {
-        success: true,
-        projectId: project.id,
-        message: 'Project created successfully',
-      },
-      { status: 201 }
-    )
-  } catch (error) {
-    console.error('Unexpected error creating project:', error)
-    return NextResponse.json(
-      { error: 'Unexpected error occurred' },
-      { status: 500 }
-    )
-  }
-}
+//     return NextResponse.json(
+//       {
+//         success: true,
+//         projectId: project.id,
+//         message: 'Project created successfully',
+//       },
+//       { status: 201 }
+//     )
+//   } catch (error) {
+//     console.error('Unexpected error creating project:', error)
+//     return NextResponse.json(
+//       { error: 'Unexpected error occurred' },
+//       { status: 500 }
+//     )
+//   }
+// }
 
 // 4. CORREGIDO: app/api/projects/[id]/route.ts - DELETE simplificado
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const { user, role, error } = await getSupabaseAuthWithRole(req)
+// export async function DELETE(
+//   req: NextRequest,
+//   { params }: { params: { id: string } }
+// ) {
+//   try {
+//     const { user, role, error } = await getSupabaseAuthWithRole(req)
 
-    if (error || !user || !role) {
-      return NextResponse.json(
-        { error: error || 'Unauthorized' },
-        { status: 401 }
-      )
-    }
+//     if (error || !user || !role) {
+//       return NextResponse.json(
+//         { error: error || 'Unauthorized' },
+//         { status: 401 }
+//       )
+//     }
 
-    // Solo Admin y Manager pueden eliminar proyectos
-    if (!['admin', 'manager'].includes(role)) {
-      return NextResponse.json(
-        { error: 'You dont have permission to delete projects' },
-        { status: 403 }
-      )
-    }
+//     // Solo Admin y Manager pueden eliminar proyectos
+//     if (!['admin', 'manager'].includes(role)) {
+//       return NextResponse.json(
+//         { error: 'You dont have permission to delete projects' },
+//         { status: 403 }
+//       )
+//     }
 
-    const projectId = parseInt(params.id)
-    if (!projectId || isNaN(projectId)) {
-      return NextResponse.json({ error: 'Invalid project ID' }, { status: 400 })
-    }
+//     const projectId = parseInt(params.id)
+//     if (!projectId || isNaN(projectId)) {
+//       return NextResponse.json({ error: 'Invalid project ID' }, { status: 400 })
+//     }
 
-    const serviceClient = getServiceSupabase()
+//     const serviceClient = getServiceSupabase()
 
-    // Verificar que el proyecto existe
-    const { data: projectExists, error: checkError } = await serviceClient
-      .from('projects')
-      .select('id, name, client_name')
-      .eq('id', projectId)
-      .single()
+//     // Verificar que el proyecto existe
+//     const { data: projectExists, error: checkError } = await serviceClient
+//       .from('projects')
+//       .select('id, name, client_name')
+//       .eq('id', projectId)
+//       .single()
 
-    if (checkError || !projectExists) {
-      return NextResponse.json({ error: 'Project not found' }, { status: 404 })
-    }
+//     if (checkError || !projectExists) {
+//       return NextResponse.json({ error: 'Project not found' }, { status: 404 })
+//     }
 
-    // 🔧 ELIMINAR PROYECTO (solo una operación)
-    const { error: deleteError } = await serviceClient
-      .from('projects')
-      .delete()
-      .eq('id', projectId)
+//     // 🔧 ELIMINAR PROYECTO (solo una operación)
+//     const { error: deleteError } = await serviceClient
+//       .from('projects')
+//       .delete()
+//       .eq('id', projectId)
 
-    if (deleteError) {
-      console.error('Error deleting project:', deleteError)
-      return NextResponse.json(
-        {
-          error: 'Failed to delete project',
-          details: deleteError.message,
-        },
-        { status: 500 }
-      )
-    }
+//     if (deleteError) {
+//       console.error('Error deleting project:', deleteError)
+//       return NextResponse.json(
+//         {
+//           error: 'Failed to delete project',
+//           details: deleteError.message,
+//         },
+//         { status: 500 }
+//       )
+//     }
 
-    console.log(
-      `✅ Project deleted successfully: ID ${projectId} - "${projectExists.name}"`
-    )
+//     console.log(
+//       `✅ Project deleted successfully: ID ${projectId} - "${projectExists.name}"`
+//     )
 
-    return NextResponse.json({
-      success: true,
-      message: `Project "${projectExists.name}" deleted successfully`,
-      deletedProject: {
-        id: projectId,
-        name: projectExists.name,
-        client: projectExists.client_name,
-      },
-    })
-  } catch (error) {
-    console.error('Unexpected error deleting project:', error)
-    return NextResponse.json(
-      { error: 'Unexpected error occurred' },
-      { status: 500 }
-    )
-  }
-}
+//     return NextResponse.json({
+//       success: true,
+//       message: `Project "${projectExists.name}" deleted successfully`,
+//       deletedProject: {
+//         id: projectId,
+//         name: projectExists.name,
+//         client: projectExists.client_name,
+//       },
+//     })
+//   } catch (error) {
+//     console.error('Unexpected error deleting project:', error)
+//     return NextResponse.json(
+//       { error: 'Unexpected error occurred' },
+//       { status: 500 }
+//     )
+//   }
+// }
 
 // export async function GET(
 //   req: NextRequest,

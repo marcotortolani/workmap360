@@ -153,10 +153,12 @@ export async function getProjectViaAPI(
   accessToken: string
 ): Promise<{ success: boolean; project?: ProjectData; error?: string }> {
   try {
-    const response = await fetch(`/api/projects/${projectId}`, {
+    const response = await fetch(`/api/projects/read-by-id`, {
+      method: 'GET',
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
+      body: JSON.stringify({ id: projectId }),
     })
 
     const result = await response.json()
@@ -182,13 +184,13 @@ export async function updateProjectViaAPI(
   accessToken: string
 ): Promise<{ success: boolean; project?: ProjectData; error?: string }> {
   try {
-    const response = await fetch(`/api/projects/${projectId}`, {
+    const response = await fetch(`/api/projects/update`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify(updateData),
+      body: JSON.stringify({ id: projectId, updateData }),
     })
 
     const result = await response.json()
@@ -213,11 +215,12 @@ export async function deleteProjectViaAPI(
   accessToken: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await fetch(`/api/projects/${projectId}`, {
+    const response = await fetch(`/api/projects/delete`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
+      body: JSON.stringify({ id: projectId }),
     })
 
     const result = await response.json()

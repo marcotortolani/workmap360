@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // src/hooks/use-users-list.ts
 import { useState, useEffect } from 'react'
 import { useCurrentUser } from '@/stores/user-store'

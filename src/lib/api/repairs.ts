@@ -68,10 +68,11 @@ export async function getRepairViaAPI(
   accessToken: string
 ): Promise<{ success: boolean; repair?: RepairData; error?: string }> {
   try {
-    const response = await fetch(`/api/repairs/${repairId}`, {
+    const response = await fetch(`/api/repairs/read-by-id`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
+      body: JSON.stringify({ id: repairId }),
     })
 
     const result = await response.json()
@@ -139,13 +140,13 @@ export async function updateRepairViaAPI(
   accessToken: string
 ): Promise<{ success: boolean; repair?: RepairData; error?: string }> {
   try {
-    const response = await fetch(`/api/repairs/${repairId}`, {
+    const response = await fetch(`/api/repairs/update`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify(updateData),
+      body: JSON.stringify({ id: repairId, repairData: updateData }),
     })
 
     const result = await response.json()
@@ -171,13 +172,13 @@ export async function updateRepairStatusViaAPI(
   accessToken: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await fetch(`/api/repairs/${repairId}/status`, {
+    const response = await fetch(`/api/repairs/update-status`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify({ id: repairId, status }),
     })
 
     const result = await response.json()
@@ -202,11 +203,12 @@ export async function deleteRepairViaAPI(
   accessToken: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await fetch(`/api/repairs/${repairId}`, {
+    const response = await fetch(`/api/repairs/delete`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
+      body: JSON.stringify({ id: repairId }),
     })
 
     const result = await response.json()
