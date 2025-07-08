@@ -119,7 +119,7 @@ export default function TechnicianNewRepairPage() {
       repair.elevation_name === elevation &&
       repair.drop === drop &&
       repair.level === level &&
-      repair.phases.survey.repair_type === repair_type
+      repair.phases.survey?.repair_type === repair_type
   )
 
   // Calcular el próximo repair_index

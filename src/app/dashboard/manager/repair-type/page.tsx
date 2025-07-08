@@ -89,12 +89,12 @@ export default function ManagerRepairsPage() {
                     <TableCell className="font-medium">{repair.id}</TableCell>
                     <TableCell>{repair.variation}</TableCell>
                     <TableCell>{repair.type}</TableCell>
-                    <TableCell>{repair.unitMeasure.type}</TableCell>
-                    <TableCell>{repair.unitMeasure.value}</TableCell>
-                    <TableCell>{repair.unitToCharge}</TableCell>
-                    <TableCell>{repair.createdBy}</TableCell>
+                    <TableCell>{repair.unit_measure.type}</TableCell>
+                    <TableCell>{repair.unit_measure.value}</TableCell>
+                    <TableCell>{repair.unit_to_charge}</TableCell>
+                    <TableCell>{repair.created_by_user_name}</TableCell>
                     <TableCell>
-                      {new Date(repair.createdAt).toLocaleDateString('en-US', {
+                      {new Date(repair.created_at).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
@@ -152,12 +152,12 @@ export default function ManagerRepairsPage() {
                     <TableCell className="font-medium">{repair.id}</TableCell>
                     <TableCell>{repair.variation}</TableCell>
                     <TableCell>{repair.type}</TableCell>
-                    <TableCell>{repair.unitMeasure.type}</TableCell>
-                    <TableCell>{repair.unitMeasure.value}</TableCell>
-                    <TableCell>{repair.unitToCharge}</TableCell>
-                    <TableCell>{repair.createdBy}</TableCell>
+                    <TableCell>{repair.unit_measure.type}</TableCell>
+                    <TableCell>{repair.unit_measure.value}</TableCell>
+                    <TableCell>{repair.unit_to_charge}</TableCell>
+                    <TableCell>{repair.created_by_user_name}</TableCell>
                     <TableCell>
-                      {new Date(repair.createdAt).toLocaleDateString('en-US', {
+                      {new Date(repair.created_at).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',

@@ -35,10 +35,7 @@ import {
   ProjectData,
   ProjectRepairType,
 } from '@/types/project-types'
-import { 
-  createRepairViaAPI, 
-  updateRepairViaAPI 
-} from '@/lib/api/repairs'
+import { createRepairViaAPI, updateRepairViaAPI } from '@/lib/api/repairs'
 
 type FormData = z.infer<ReturnType<typeof createFormSchema>>
 
@@ -398,7 +395,7 @@ export default function TechnicianNewRepairPage() {
         if (result.success && result.repair) {
           // Actualizar en el store local
           await updateRepair(result.repair)
-          
+
           toast.success('Repair updated successfully', {
             duration: 5000,
             position: 'bottom-right',
@@ -457,7 +454,7 @@ export default function TechnicianNewRepairPage() {
 
           // Actualizar en el store local
           await addRepair(newRepair)
-          
+
           toast.success('New repair created successfully', {
             duration: 5000,
             position: 'bottom-right',
@@ -744,7 +741,14 @@ export default function TechnicianNewRepairPage() {
                 <Select
                   value={repair_type}
                   onValueChange={(value) => setValue('repair_type', value)}
-                  disabled={!project_id || !elevation || !drop || !level}
+                  disabled={
+                    !project_id ||
+                    !elevation ||
+                    !drop ||
+                    !level ||
+                    !!errors?.drop ||
+                    !!errors?.level
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select repair type" />
@@ -978,8 +982,9 @@ export default function TechnicianNewRepairPage() {
                 <div className="flex items-center gap-2 text-blue-700">
                   <CheckCircle2 className="h-5 w-5" />
                   <p className="text-sm">
-                    <strong>Auto-submit enabled:</strong> Your repair will be automatically 
-                    saved when you successfully upload the {getCurrentPhaseName()} image.
+                    <strong>Auto-submit enabled:</strong> Your repair will be
+                    automatically saved when you successfully upload the{' '}
+                    {getCurrentPhaseName()} image.
                   </p>
                 </div>
               </div>
