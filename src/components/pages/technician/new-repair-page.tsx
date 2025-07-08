@@ -5,7 +5,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import {  z } from 'zod'
+import { z } from 'zod'
 import { toast } from 'sonner'
 import { createFormSchema } from '@/lib/schemas/new-repair-form-schema'
 //import { Button } from '@/components/ui/button'
@@ -741,45 +741,59 @@ export default function TechnicianNewRepairPage() {
 
             {/* Repair Type Selection */}
             <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <Label>Repair Type</Label>
-                <Select
-                  value={repair_type}
-                  onValueChange={(value) => {
-                    setValue('repair_type', value)
-                    setCurrentPhase(null)
-                    setSelectedRepair(null)
-                  }}
-                  disabled={
-                    !project_id ||
-                    !elevation ||
-                    !drop ||
-                    !level ||
-                    !!errors?.drop ||
-                    !!errors?.level
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select repair type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {selectedProject?.repair_types.map(
-                      (rt: ProjectRepairType) => (
-                        <SelectItem
-                          key={rt.repair_type_id}
-                          value={rt.repair_type}
-                        >
-                          {rt.repair_type}
-                        </SelectItem>
-                      )
-                    )}
-                  </SelectContent>
-                </Select>
-                {errors.repair_type && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {errors.repair_type.message}
-                  </p>
-                )}
+              <div className=" grid gap-4 md:grid-cols-3 ">
+                <div className="md:col-span-2">
+                  <Label>Repair Type</Label>
+                  <Select
+                    value={repair_type}
+                    onValueChange={(value) => {
+                      setValue('repair_type', value)
+                      setCurrentPhase(null)
+                      setSelectedRepair(null)
+                    }}
+                    disabled={
+                      !project_id ||
+                      !elevation ||
+                      !drop ||
+                      !level ||
+                      !!errors?.drop ||
+                      !!errors?.level
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select repair type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {selectedProject?.repair_types.map(
+                        (rt: ProjectRepairType) => (
+                          <SelectItem
+                            key={rt.repair_type_id}
+                            value={rt.repair_type}
+                          >
+                            {rt.repair_type}
+                          </SelectItem>
+                        )
+                      )}
+                    </SelectContent>
+                  </Select>
+                  {errors.repair_type && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.repair_type.message}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <Label>Total Phases</Label>
+                  <Input                  
+                    type="number"
+                    disabled={true}
+                    value={
+                      selectedProject?.repair_types.find(
+                        (rt) => rt.repair_type === repair_type
+                      )?.phases
+                    }               
+                  />
+                </div>
               </div>
 
               <div>
