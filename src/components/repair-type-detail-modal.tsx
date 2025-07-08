@@ -75,32 +75,32 @@ export function RepairTypeDetailModal({
               <Label className="text-sm font-medium text-gray-500">
                 Measure Type
               </Label>
-              <p className="font-medium">{repair.unitMeasure.type}</p>
+              <p className="font-medium">{repair.unit_measure.type}</p>
             </div>
             <div>
               <Label className="text-sm font-medium text-gray-500">
                 Units To Measure
               </Label>
-              <p className="font-medium">{repair.unitMeasure.value}</p>
+              <p className="font-medium">{repair.unit_measure.value}</p>
             </div>
             <div>
               <Label className="text-sm font-medium text-gray-500">
                 Unit to Charge
               </Label>
-              <p className="font-medium">{repair.unitToCharge}</p>
+              <p className="font-medium">{repair.unit_to_charge}</p>
             </div>
             <div>
               <Label className="text-sm font-medium text-gray-500">
                 Created By
               </Label>
-              <p className="font-medium">{repair.createdBy}</p>
+              <p className="font-medium">{repair.created_by_user_name}</p>
             </div>
             <div>
               <Label className="text-sm font-medium text-gray-500">
                 Created At
               </Label>
               <p className="font-medium">
-                {new Date(repair.createdAt).toLocaleDateString('en-US', {
+                {new Date(repair.created_at).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric',
