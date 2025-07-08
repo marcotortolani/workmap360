@@ -1,4 +1,5 @@
 // src/app/dashboard/client/layout.tsx
+'use client'
 import type React from 'react'
 import { useCurrentUser } from '@/stores/user-store'
 import { Sidebar } from '@/components/sidebar'
