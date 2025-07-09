@@ -279,6 +279,17 @@ export default function CustomImageUpload({
       setError(
         'La cámara no está disponible. Por favor, usa la opción de subir archivo.'
       )
+      toast.error('La cámara no está disponible.', {
+        position: 'top-center',
+        style: {
+          background: '#333',
+          color: '#fff',
+          borderRadius: '8px',
+          padding: '8px 12px',
+          fontSize: '14px',
+        },
+      })
+
       return
     }
 
@@ -386,8 +397,8 @@ export default function CustomImageUpload({
       hour12: false,
     }
 
-    const date = now.toLocaleDateString('en-US', dateOptions)
-    const time = now.toLocaleTimeString('en-US', timeOptions)
+    const date = now.toLocaleDateString('en-NZ', dateOptions)
+    const time = now.toLocaleTimeString('en-NZ', timeOptions)
 
     return `${date} ${time}`
   }
@@ -567,7 +578,7 @@ export default function CustomImageUpload({
     fileNameData?.repair_type.length > 0 && fileNameData?.repair_index
 
   // Verificar si se puede agregar más fotos
-  const canAddMorePhotos = allowMultiple && currentCount < maxPhotos
+  const canAddMorePhotos = currentCount < maxPhotos
 
   return (
     <div className="space-y-4">
