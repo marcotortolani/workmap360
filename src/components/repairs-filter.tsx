@@ -109,7 +109,7 @@ export function RepairsFilter({
 
   return (
     <div className="mb-6 space-y-4">
-      <div className="flex flex-wrap gap-4">
+      <div className="h-full flex flex-wrap wrap-anywhere gap-2">
         {/* Search Bar */}
         <div className="relative flex-1 min-w-[200px] max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -126,7 +126,7 @@ export function RepairsFilter({
           value={filters.status}
           onValueChange={(value) => handleFilterChange('status', value)}
         >
-          <SelectTrigger className="w-[150px]">
+          <SelectTrigger className="w-[120px]">
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
           <SelectContent>
@@ -218,7 +218,7 @@ export function RepairsFilter({
         </Popover>
 
         {/* Sort Options */}
-        <div className="flex gap-2">
+        <div className=" flex gap-2">
           <Button
             variant="outline"
             size="sm"
