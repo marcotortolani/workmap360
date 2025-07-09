@@ -1147,12 +1147,12 @@ const ProjectForm = ({
 
   return (
     <div
-      className={`relative w-[95%] max-w-screen-lg h-[95%] mx-auto overflow-y-scroll rounded-lg border bg-white p-6 shadow-sm`}
+      className={`relative w-[95%] max-w-screen-lg h-[90%] mx-auto overflow-y-scroll rounded-lg border bg-white p-6 shadow-sm`}
     >
       <Button
         type="button"
         onClick={onClose}
-        className="absolute top-6 right-6 w-fit bg-neutral-900 text-white hover:bg-neutral-600 rounded-md"
+        className="absolute top-6 right-6 w-8 h-8 bg-neutral-900 text-white hover:bg-neutral-600 rounded-md"
       >
         <XIcon className="h-6 w-6 stroke-3" />
       </Button>
@@ -1160,7 +1160,7 @@ const ProjectForm = ({
         {projectData ? 'Edit Project' : 'Create a new Project'}
       </h2>
 
-      <form className="grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit}>
+      <form className=" grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit}>
         <h3 className=" col-span-2 mb-0 text-lg font-semibold">Project Data</h3>
         <div>
           <Label>Project Name</Label>
@@ -1767,141 +1767,189 @@ const ProjectDataModal = ({
 
   return (
     <div
-      className={`relative w-2/5 h-[95%] mx-auto overflow-y-scroll rounded-lg border bg-white p-6 shadow-sm`}
+      className={`relative w-full max-w-sm sm:max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-6xl 
+        h-[90vh] sm:h-[95vh] mx-auto overflow-y-auto rounded-lg border bg-white 
+        p-3 sm:p-4 md:p-6 shadow-lg`}
     >
       <Button
         type="button"
         onClick={onClose}
-        className="absolute top-6 right-6 w-fit bg-neutral-900 text-white hover:bg-neutral-600 rounded-md"
+        className="absolute top-2 right-2 sm:top-4 sm:right-4 md:top-6 md:right-6 
+          w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 bg-neutral-900 text-white 
+          hover:bg-neutral-600 rounded-md p-0 z-10"
       >
-        <XIcon className="h-6 w-6 stroke-3" />
+        <XIcon className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 stroke-2" />
       </Button>
-      <h2 className="mb-4 text-center text-xl font-semibold">Project Data</h2>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="col-span-2 flex items-center justify-between">
+
+      <h2 className="mb-4 sm:mb-6 text-center text-lg sm:text-xl md:text-2xl font-semibold pr-8">
+        Project Data
+      </h2>
+
+      <div className="space-y-4 sm:space-y-6">
+        {/* Project Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           {/* Project Name */}
-          <div>
-            <Label>Project Name</Label>
-            <h3 className="text-lg font-semibold">{projectData?.name}</h3>
+          <div className="flex-1">
+            <Label className="text-xs sm:text-sm">Project Name</Label>
+            <h3 className="text-base sm:text-lg md:text-xl font-semibold break-words">
+              {projectData?.name}
+            </h3>
             <span
-              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                projectData?.status === PROJECT_STATUS['completed']
-                  ? 'bg-green-100 text-green-800'
-                  : projectData?.status === PROJECT_STATUS['in-progress']
-                  ? 'bg-blue-100 text-blue-800'
-                  : 'bg-yellow-100 text-yellow-800'
-              }`}
+              className={`inline-flex items-center rounded-full px-2 py-0.5 sm:px-2.5 sm:py-1 
+                text-xs font-medium mt-1 ${
+                  projectData?.status === PROJECT_STATUS['completed']
+                    ? 'bg-green-100 text-green-800'
+                    : projectData?.status === PROJECT_STATUS['in-progress']
+                    ? 'bg-blue-100 text-blue-800'
+                    : 'bg-yellow-100 text-yellow-800'
+                }`}
             >
               {projectData?.status}
             </span>
           </div>
 
           {/* Client Project */}
-          <div>
-            <Label>Client</Label>
-            <p className="text-lg font-semibold">{projectData?.client_name}</p>
+          <div className="flex-1 sm:text-right">
+            <Label className="text-xs sm:text-sm">Client</Label>
+            <p className="text-base sm:text-lg md:text-xl font-semibold break-words">
+              {projectData?.client_name}
+            </p>
           </div>
         </div>
 
-        {/* Created & Updated */}
-        <div className="col-span-2 flex items-start justify-between">
+        {/* Created & Updated Information */}
+        <div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 
+          p-3 sm:p-4 bg-gray-50 rounded-lg"
+        >
           <div>
-            <Label>Created By</Label>
-            <p>
-              {projectData?.created_by_user_name} (ID:{' '}
-              {projectData?.created_by_user_id})
+            <Label className="text-xs sm:text-sm font-medium">Created By</Label>
+            <p className="text-sm sm:text-base break-words">
+              {projectData?.created_by_user_name}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              ID: {projectData?.created_by_user_id}
             </p>
           </div>
+
           <div>
-            <Label>Created At</Label>
-            <p>
+            <Label className="text-xs sm:text-sm font-medium">Created At</Label>
+            <p className="text-sm sm:text-base">
               {new Date(projectData?.created_at || '').toLocaleDateString(
                 'en-US',
                 {
                   day: 'numeric',
-                  month: 'long',
+                  month: 'short',
                   year: 'numeric',
                 }
               )}
             </p>
           </div>
-          <div>
-            <Label>Last Updated</Label>
-            <p>{projectData?.updated_at.split('T')[0] || 'Date Unknown'}</p>
+
+          <div className="sm:col-span-2 lg:col-span-1">
+            <Label className="text-xs sm:text-sm font-medium">
+              Last Updated
+            </Label>
+            <p className="text-sm sm:text-base">
+              {projectData?.updated_at.split('T')[0] || 'Date Unknown'}
+            </p>
           </div>
         </div>
 
-        <Separator className=" w-full col-span-2 mt-4" />
+        <Separator className="w-full" />
 
         {/* Elevations */}
-        <div className=" col-span-2">
-          <h3 className="text-lg font-medium">Elevations (1 min - 6 max)</h3>
+        <div>
+          <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-4">
+            Elevations
+            <span className="text-xs sm:text-sm text-muted-foreground ml-2">
+              (1 min - 6 max)
+            </span>
+          </h3>
 
-          {/* Elevations list */}
           {projectData && projectData?.elevations && (
             <>
-              <div className="flex flex-wrap gap-4 ">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
                 {projectData?.elevations.map((elevation, index) => (
-                  <div key={index} className="flex space-x-2 items-center">
-                    <div className="flex items-center gap-6 border p-2 rounded">
-                      <span className=" font-bold">{elevation.name}</span>
-                      <span>{elevation.drops} drops</span>
-                      <span>{elevation.levels} levels</span>
+                  <div
+                    key={index}
+                    className="border rounded-lg p-3 sm:p-4 bg-white hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="space-y-1 sm:space-y-2">
+                      <h4 className="font-bold text-sm sm:text-base break-words">
+                        {elevation.name}
+                      </h4>
+                      <div className="flex flex-col xs:flex-row xs:gap-4 gap-1 text-xs sm:text-sm text-muted-foreground">
+                        <span>{elevation.drops} drops</span>
+                        <span>{elevation.levels} levels</span>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className=" w-full mt-6 mb-0 flex items-center gap-10">
-                <p className=" text-sm text-muted-foreground">
-                  Elevations: {projectData?.elevations?.length}
-                </p>
-                <p className=" text-sm text-muted-foreground">
-                  Total Drops:{' '}
-                  {projectData?.elevations?.reduce(
-                    (total, e) => total + e.drops,
-                    0
-                  )}
-                </p>
+              <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-blue-50 rounded-lg">
+                <div className="flex flex-col xs:flex-row xs:gap-6 gap-2 text-xs sm:text-sm text-blue-700">
+                  <span className="font-medium">
+                    Elevations: {projectData?.elevations?.length}
+                  </span>
+                  <span className="font-medium">
+                    Total Drops:{' '}
+                    {projectData?.elevations?.reduce(
+                      (total, e) => total + e.drops,
+                      0
+                    )}
+                  </span>
+                </div>
               </div>
             </>
           )}
         </div>
 
-        <Separator className=" w-full col-span-2 mt-4" />
+        <Separator className="w-full" />
 
-        {/* Reparations list */}
-        <div className=" col-span-2">
-          <h3 className=" col-span-2 mb-1 text-lg font-semibold">
-            Reparation Types
+        {/* Repair Types */}
+        <div>
+          <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-4">
+            Repair Types
           </h3>
 
-          {/* Lista de repairTypes existentes */}
-          <div className="space-y-2">
+          <div className="space-y-3 sm:space-y-4">
             {projectData?.repair_types &&
               projectData?.repair_types?.length > 0 &&
               projectData?.repair_types?.map((rt, index) => (
                 <div
                   key={index}
-                  className=" p-2 flex items-center gap-4 border rounded-lg"
+                  className="border rounded-lg p-3 sm:p-4 bg-white hover:bg-gray-50 transition-colors"
                 >
-                  <span
-                    className={`inline-flex items-center rounded-full size-3 -mr-2 ${
-                      rt.status === 'active' ? 'bg-green-400' : 'bg-yellow-400'
-                    }`}
-                  ></span>
-                  <div className=" flex items-center gap-2">
-                    <span className="  bg-neutral-700 text-white font-semibold px-2 py-1 border rounded-md">
-                      {rt.repair_type}
-                    </span>
-                    <span>
-                      {
-                        repairTypeList.find((r) => r.id === rt.repair_type_id)
-                          ?.variation
-                      }{' '}
+                  {/* Header with type and status */}
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 mb-3">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`rounded-full w-2 h-2 sm:w-3 sm:h-3 ${
+                          rt.status === 'active'
+                            ? 'bg-green-400'
+                            : 'bg-yellow-400'
+                        }`}
+                      ></span>
+                      <span
+                        className="bg-neutral-700 text-white font-semibold px-2 py-1 
+                        rounded-md text-xs sm:text-sm"
+                      >
+                        {rt.repair_type}
+                      </span>
+                    </div>
+
+                    <div className="text-xs sm:text-sm text-muted-foreground">
+                      <span className="font-medium">
+                        {
+                          repairTypeList.find((r) => r.id === rt.repair_type_id)
+                            ?.variation
+                        }
+                      </span>
                       {repairTypeList.find((r) => r.id === rt.repair_type_id)
-                        ?.unit_measure?.default_values?.depth ? (
-                        <span>
+                        ?.unit_measure?.default_values?.depth && (
+                        <span className="ml-1">
                           (
                           {
                             repairTypeList.find(
@@ -1910,93 +1958,95 @@ const ProjectDataModal = ({
                           }{' '}
                           mm)
                         </span>
-                      ) : null}
-                    </span>
-                  </div>
-                  <Separator
-                    orientation="vertical"
-                    className="w-0.5 h-6 bg-neutral-300"
-                  />
-                  <div className=" flex items-center gap-2">
-                    <span>{rt.phases} phases</span>
-                    <Separator
-                      orientation="vertical"
-                      className="w-0.5 h-6 bg-neutral-300"
-                    />
-                    <span>
-                      ${rt.price} ({rt.unit_to_charge})
-                    </span>
-                    <Separator
-                      orientation="vertical"
-                      className="w-0.5 h-6 bg-neutral-300"
-                    />
-                    <span>MC/R: {rt.minimum_charge_per_repair}</span>
-                    <Separator
-                      orientation="vertical"
-                      className="w-0.5 h-6 bg-neutral-300"
-                    />
-                    <span>MC/D: {rt.minimum_charge_per_drop}</span>
+                      )}
+                    </div>
                   </div>
 
-                  {/* <Separator
-                    orientation="vertical"
-                    className="w-0.5 h-6 bg-neutral-300"
-                  />
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                      rt.status === 'active'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}
+                  {/* Details grid */}
+                  <div
+                    className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 
+                    text-xs sm:text-sm"
                   >
-                    {rt.status}
-                  </span> */}
+                    <div className="flex flex-col">
+                      <span className="text-muted-foreground">Phases</span>
+                      <span className="font-medium">{rt.phases}</span>
+                    </div>
+
+                    <div className="flex flex-col">
+                      <span className="text-muted-foreground">Price</span>
+                      <span className="font-medium">${rt.price}</span>
+                    </div>
+
+                    <div className="flex flex-col">
+                      <span className="text-muted-foreground">Unit</span>
+                      <span className="font-medium">{rt.unit_to_charge}</span>
+                    </div>
+
+                    <div className="flex flex-col">
+                      <span className="text-muted-foreground">MC/R</span>
+                      <span className="font-medium">
+                        {rt.minimum_charge_per_repair}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-col">
+                      <span className="text-muted-foreground">MC/D</span>
+                      <span className="font-medium">
+                        {rt.minimum_charge_per_drop}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               ))}
           </div>
         </div>
 
-        <Separator className=" w-full col-span-2 mt-4" />
+        <Separator className="w-full" />
 
         {/* Technicians */}
-        <div className=" col-span-2">
-          <h3 className=" col-span-2 mb-1 text-lg font-semibold">
+        <div>
+          <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-4">
             Technicians
           </h3>
 
-          {/* Lista de technicians existentes */}
-          <div className="space-y-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {projectData?.technicians &&
               projectData?.technicians?.length > 0 &&
               projectData?.technicians?.map((tech, index) => (
                 <div
                   key={index}
-                  className="flex space-x-2 items-center justify-between p-2 border rounded-lg"
+                  className="flex items-center gap-3 p-3 sm:p-4 border rounded-lg 
+                    bg-white hover:bg-gray-50 transition-colors"
                 >
-                  <div className=" flex items-center gap-2">
-                    <Avatar>
-                      <AvatarImage src={tech.technician_avatar} />
-                      <AvatarFallback className="bg-orange-100 text-orange-800">
-                        {tech.technician_first_name.charAt(0)}
-                        {tech.technician_last_name.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className=" ">
-                      {tech.technician_first_name} {tech.technician_last_name}{' '}
-                      (ID: {tech.technician_id})
-                    </span>
+                  <Avatar className="w-8 h-8 sm:w-10 sm:h-10">
+                    <AvatarImage src={tech.technician_avatar} />
+                    <AvatarFallback className="bg-orange-100 text-orange-800 text-xs sm:text-sm">
+                      {tech.technician_first_name.charAt(0)}
+                      {tech.technician_last_name.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm sm:text-base truncate">
+                      {tech.technician_first_name} {tech.technician_last_name}
+                    </p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">
+                      ID: {tech.technician_id}
+                    </p>
                   </div>
                 </div>
               ))}
           </div>
         </div>
 
-        <Separator className=" w-full col-span-2 mt-4" />
+        <Separator className="w-full" />
 
-        <div className="space-x-2 sm:col-span-2">
+        {/* Close Button */}
+        <div className="flex justify-center sm:justify-end pt-2">
           <Button
             type="button"
-            className="mt-4 bg-neutral-900 text-white hover:bg-neutral-700"
+            className="w-full sm:w-auto bg-neutral-900 text-white hover:bg-neutral-700 
+              px-6 py-2 sm:px-8 sm:py-3"
             onClick={onClose}
           >
             Close
@@ -2006,3 +2056,265 @@ const ProjectDataModal = ({
     </div>
   )
 }
+
+
+{/* Old ProjectDataModal component without responsive */}
+// const ProjectDataModal = ({
+//   projectData,
+//   onClose,
+// }: {
+//   projectData?: ProjectData | null
+//   onClose: () => void
+// }) => {
+//   const { repairTypeList } = useRepairTypeStore()
+
+//   if (!projectData) return null
+
+//   return (
+//     <div
+//       className={`relative w-full max-w-screen-lg h-[95%] mx-auto overflow-y-scroll rounded-lg border bg-white p-6 shadow-sm`}
+//     >
+//       <Button
+//         type="button"
+//         onClick={onClose}
+//         className="absolute top-6 right-6 w-8 h-8 bg-neutral-900 text-white hover:bg-neutral-600 rounded-md"
+//       >
+//         <XIcon className="h-6 w-6 stroke-3" />
+//       </Button>
+//       <h2 className="mb-4 text-center text-xl font-semibold">Project Data</h2>
+//       <div className="grid gap-4 grid-cols-2">
+//         <div className="col-span-2 flex items-center justify-between">
+//           {/* Project Name */}
+//           <div>
+//             <Label>Project Name</Label>
+//             <h3 className="text-lg font-semibold">{projectData?.name}</h3>
+//             <span
+//               className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+//                 projectData?.status === PROJECT_STATUS['completed']
+//                   ? 'bg-green-100 text-green-800'
+//                   : projectData?.status === PROJECT_STATUS['in-progress']
+//                   ? 'bg-blue-100 text-blue-800'
+//                   : 'bg-yellow-100 text-yellow-800'
+//               }`}
+//             >
+//               {projectData?.status}
+//             </span>
+//           </div>
+
+//           {/* Client Project */}
+//           <div>
+//             <Label>Client</Label>
+//             <p className="text-lg font-semibold">{projectData?.client_name}</p>
+//           </div>
+//         </div>
+
+//         {/* Created & Updated */}
+//         <div className="col-span-2 grid grid-cols-2">
+//           <div>
+//             <Label>Created By</Label>
+//             <p>
+//               {projectData?.created_by_user_name} (ID:{' '}
+//               {projectData?.created_by_user_id})
+//             </p>
+//           </div>
+
+//           <div>
+//             <Label>Created At</Label>
+//             <p>
+//               {new Date(projectData?.created_at || '').toLocaleDateString(
+//                 'en-US',
+//                 {
+//                   day: 'numeric',
+//                   month: 'long',
+//                   year: 'numeric',
+//                 }
+//               )}
+//             </p>
+//           </div>
+
+//           <div className=" mt-4 sm:mt-0">
+//             <Label>Last Updated</Label>
+//             <p>{projectData?.updated_at.split('T')[0] || 'Date Unknown'}</p>
+//           </div>
+//         </div>
+
+//         <Separator className=" w-full col-span-2 mt-4" />
+
+//         {/* Elevations */}
+//         <div className=" col-span-2">
+//           <h3 className="text-lg font-medium">Elevations (1 min - 6 max)</h3>
+
+//           {/* Elevations list */}
+//           {projectData && projectData?.elevations && (
+//             <>
+//               <div className="flex flex-wrap gap-4 ">
+//                 {projectData?.elevations.map((elevation, index) => (
+//                   <div key={index} className="flex space-x-2 items-center">
+//                     <div className="flex items-center gap-6 border p-2 rounded">
+//                       <span className=" font-bold">{elevation.name}</span>
+//                       <span>{elevation.drops} drops</span>
+//                       <span>{elevation.levels} levels</span>
+//                     </div>
+//                   </div>
+//                 ))}
+//               </div>
+
+//               <div className=" w-full mt-6 mb-0 flex items-center gap-10">
+//                 <p className=" text-sm text-muted-foreground">
+//                   Elevations: {projectData?.elevations?.length}
+//                 </p>
+//                 <p className=" text-sm text-muted-foreground">
+//                   Total Drops:{' '}
+//                   {projectData?.elevations?.reduce(
+//                     (total, e) => total + e.drops,
+//                     0
+//                   )}
+//                 </p>
+//               </div>
+//             </>
+//           )}
+//         </div>
+
+//         <Separator className=" w-full col-span-2 mt-4" />
+
+//         {/* Reparations list */}
+//         <div className=" col-span-2">
+//           <h3 className=" col-span-2 mb-1 text-lg font-semibold">
+//             Reparation Types
+//           </h3>
+
+//           {/* Lista de repairTypes existentes */}
+//           <div className="space-y-2">
+//             {projectData?.repair_types &&
+//               projectData?.repair_types?.length > 0 &&
+//               projectData?.repair_types?.map((rt, index) => (
+//                 <div
+//                   key={index}
+//                   className=" p-2 grid grid-cols-2 gap-4 border rounded-lg"
+//                 >
+//                   <div className=" grid grid-cols-2 gap-2">
+//                     <div className="col-span-1 flex gap-2 items-center">
+//                       <span
+//                         className={`  rounded-full size-3 -mr-2 ${
+//                           rt.status === 'active'
+//                             ? 'bg-green-400'
+//                             : 'bg-yellow-400'
+//                         }`}
+//                       ></span>
+//                       <span className="  bg-neutral-700 text-white font-semibold px-2 py-1 border rounded-md">
+//                         {rt.repair_type}
+//                       </span>
+//                     </div>
+
+//                     <span>
+//                       {
+//                         repairTypeList.find((r) => r.id === rt.repair_type_id)
+//                           ?.variation
+//                       }{' '}
+//                       {repairTypeList.find((r) => r.id === rt.repair_type_id)
+//                         ?.unit_measure?.default_values?.depth ? (
+//                         <span>
+//                           (
+//                           {
+//                             repairTypeList.find(
+//                               (r) => r.id === rt.repair_type_id
+//                             )?.unit_measure?.default_values?.depth
+//                           }{' '}
+//                           mm)
+//                         </span>
+//                       ) : null}
+//                     </span>
+//                   </div>
+//                   <Separator
+//                     orientation="vertical"
+//                     className="w-0.5 h-6 bg-neutral-300"
+//                   />
+//                   <div className=" flex items-center gap-2">
+//                     <span>{rt.phases} phases</span>
+//                     <Separator
+//                       orientation="vertical"
+//                       className="w-0.5 h-6 bg-neutral-300"
+//                     />
+//                     <span>
+//                       ${rt.price} ({rt.unit_to_charge})
+//                     </span>
+//                     <Separator
+//                       orientation="vertical"
+//                       className="w-0.5 h-6 bg-neutral-300"
+//                     />
+//                     <span>MC/R: {rt.minimum_charge_per_repair}</span>
+//                     <Separator
+//                       orientation="vertical"
+//                       className="w-0.5 h-6 bg-neutral-300"
+//                     />
+//                     <span>MC/D: {rt.minimum_charge_per_drop}</span>
+//                   </div>
+
+//                   {/* <Separator
+//                     orientation="vertical"
+//                     className="w-0.5 h-6 bg-neutral-300"
+//                   />
+//                   <span
+//                     className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+//                       rt.status === 'active'
+//                         ? 'bg-green-100 text-green-800'
+//                         : 'bg-yellow-100 text-yellow-800'
+//                     }`}
+//                   >
+//                     {rt.status}
+//                   </span> */}
+//                 </div>
+//               ))}
+//           </div>
+//         </div>
+
+//         <Separator className=" w-full col-span-2 mt-4" />
+
+//         {/* Technicians */}
+//         <div className=" col-span-2">
+//           <h3 className=" col-span-2 mb-1 text-lg font-semibold">
+//             Technicians
+//           </h3>
+
+//           {/* Lista de technicians existentes */}
+//           <div className="space-y-2">
+//             {projectData?.technicians &&
+//               projectData?.technicians?.length > 0 &&
+//               projectData?.technicians?.map((tech, index) => (
+//                 <div
+//                   key={index}
+//                   className="flex space-x-2 items-center justify-between p-2 border rounded-lg"
+//                 >
+//                   <div className=" flex items-center gap-2">
+//                     <Avatar>
+//                       <AvatarImage src={tech.technician_avatar} />
+//                       <AvatarFallback className="bg-orange-100 text-orange-800">
+//                         {tech.technician_first_name.charAt(0)}
+//                         {tech.technician_last_name.charAt(0)}
+//                       </AvatarFallback>
+//                     </Avatar>
+//                     <span className=" ">
+//                       {tech.technician_first_name} {tech.technician_last_name}{' '}
+//                       (ID: {tech.technician_id})
+//                     </span>
+//                   </div>
+//                 </div>
+//               ))}
+//           </div>
+//         </div>
+
+//         <Separator className=" w-full col-span-2 mt-4" />
+
+//         <div className="space-x-2 sm:col-span-2">
+//           <Button
+//             type="button"
+//             className="mt-4 bg-neutral-900 text-white hover:bg-neutral-700"
+//             onClick={onClose}
+//           >
+//             Close
+//           </Button>
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
