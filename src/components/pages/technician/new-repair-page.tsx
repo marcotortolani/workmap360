@@ -206,10 +206,39 @@ export default function TechnicianNewRepairPage() {
       }, 0)
     : undefined
 
-  const maxLevels = selectedProject
-    ? selectedProject?.elevations.reduce((acc: number, elev: Elevation) => {
-        return Math.max(acc, elev.levels)
-      }, 0)
+  // Calcular el elevationName en base al drop elegido segun dentro del rango de que elevation se encuentra
+  const getElevationNameByDrop = (
+    dropNumber: number,
+    elevations: Elevation[]
+  ) => {
+    let accumulated = 0
+
+    for (const elevation of elevations) {
+      const min = accumulated + 1
+      const max = accumulated + elevation.drops
+
+      if (dropNumber >= min && dropNumber <= max) {
+        return elevation.name
+      }
+
+      accumulated += elevation.drops
+    }
+
+    return 'no-data' // Drop fuera de rango
+  }
+
+  // const maxLevels = selectedProject
+  //   ? selectedProject?.elevations.reduce((acc: number, elev: Elevation) => {
+  //       return Math.max(acc, elev.levels)
+  //     }, 0)
+  //   : undefined
+
+  const maxLevels = selectedProject?.elevations
+    ? selectedProject?.elevations.find(
+        (elev: Elevation) =>
+          elev.name ===
+          getElevationNameByDrop(drop, selectedProject?.elevations)
+      )?.levels
     : undefined
 
   const phases = projectRepairType?.phases || 3
@@ -293,27 +322,6 @@ export default function TechnicianNewRepairPage() {
       repair.level === level &&
       repair.phases.survey?.repair_type === repair_type
   )
-
-  // Calcular el elevationName en base al drop elegido segun dentro del rango de que elevation se encuentra
-  const getElevationNameByDrop = (
-    dropNumber: number,
-    elevations: Elevation[]
-  ) => {
-    let accumulated = 0
-
-    for (const elevation of elevations) {
-      const min = accumulated + 1
-      const max = accumulated + elevation.drops
-
-      if (dropNumber >= min && dropNumber <= max) {
-        return elevation.name
-      }
-
-      accumulated += elevation.drops
-    }
-
-    return 'no-data' // Drop fuera de rango
-  }
 
   // Calcular el próximo repairIndex
   const nextRepairIndex =
