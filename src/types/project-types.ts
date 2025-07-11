@@ -39,8 +39,9 @@ export interface TechnicianAssignment {
 export interface ProjectData {
   id: number // ID único del proyecto, ej. 1
   name: string // Nombre del proyecto (dirección), ej. "957 George Av"
-  client_name: string // Nombre del cliente, ej. "Walter Perez"
   client_id: number // ID del cliente, ej. 100
+  client_name: string // Nombre del cliente, ej. "Walter Perez"
+  client_user?: UserType // Objeto de usuario del cliente
   elevations: Elevation[] // Array de caras del edificio (mín: 1, máx: 20)
   repair_types: ProjectRepairType[] // Tipos de reparación permitidos en el proyecto
   technicians: TechnicianAssignment[] // Técnicos asignados al proyecto

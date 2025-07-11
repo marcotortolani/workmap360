@@ -1,4 +1,4 @@
-// /app/api/users/by-role/[role]/route.ts
+// /app/api/users/by-role/route.ts
 import { NextResponse } from 'next/server'
 import { getSupabaseAuthWithRole } from '@/lib/getSupabaseAuthWithRole'
 import { checkPermissionOrFail } from '@/lib/auth/permissions'
