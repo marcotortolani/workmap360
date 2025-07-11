@@ -208,7 +208,7 @@ export default function CustomImageUpload({
     if (allowMultiple && maxPhotos > 1) {
       const imageNumber =
         photoIndex !== undefined ? photoIndex : currentCount + 1
-      name += `_${imageNumber}`
+      name += `${imageNumber}`
     }
 
     return name

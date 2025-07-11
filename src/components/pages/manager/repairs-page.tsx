@@ -399,7 +399,7 @@ export default function ManagerRepairsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8 p-2 sm:p-4 lg:p-8 max-w-7xl mx-auto">
+    <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8 p-2 sm:p-4 lg:p-8 max-w-screen-2xl mx-auto">
       <Card className="w-full">
         <CardHeader className="pb-3 sm:pb-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
@@ -493,7 +493,7 @@ export default function ManagerRepairsPage() {
               </div>
 
               {/* Desktop Table View */}
-              <div className="hidden lg:block">
+              <div className="hidden lg:block ">
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>

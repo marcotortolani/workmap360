@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAuthWithRole } from '@/lib/getSupabaseAuthWithRole'
 import { getServiceSupabase } from '@/lib/supabaseAuth'
 import { getUserDataFromAuthId } from '@/lib/api/utils'
+
 import { TechnicianAssignment } from "@/types/project-types"
 
 export async function POST(req: NextRequest) {

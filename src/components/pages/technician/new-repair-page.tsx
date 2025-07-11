@@ -166,7 +166,7 @@ export default function TechnicianNewRepairPage() {
     resolver: zodResolver(createFormSchema({ maxDropsRef, maxLevelsRef })),
     defaultValues: {
       project_id: 0,
-      elevation: '',
+      // elevation: '',
       drop: 1,
       level: 1,
       repair_type: '',
@@ -179,7 +179,7 @@ export default function TechnicianNewRepairPage() {
   })
 
   const project_id = watch('project_id')
-  const elevation = watch('elevation')
+  // const elevation = watch('elevation')
   const drop = watch('drop')
   const level = watch('level')
   const repair_type = watch('repair_type')
@@ -199,16 +199,17 @@ export default function TechnicianNewRepairPage() {
   )
 
   // Calcular valores máximos
-  const maxDrops = elevation
-    ? selectedProject?.elevations.find(
-        (elev: Elevation) => elev.name === elevation
-      )?.drops
+  const maxDrops = selectedProject
+    ? selectedProject?.elevations.reduce((acc: number, elev: Elevation) => {
+        acc += elev.drops
+        return acc
+      }, 0)
     : undefined
 
-  const maxLevels = elevation
-    ? selectedProject?.elevations.find(
-        (elev: Elevation) => elev.name === elevation
-      )?.levels
+  const maxLevels = selectedProject
+    ? selectedProject?.elevations.reduce((acc: number, elev: Elevation) => {
+        return Math.max(acc, elev.levels)
+      }, 0)
     : undefined
 
   const phases = projectRepairType?.phases || 3
@@ -226,7 +227,7 @@ export default function TechnicianNewRepairPage() {
 
   // Reiniciar campos dependientes cuando cambia el proyecto
   useEffect(() => {
-    setValue('elevation', '')
+    // setValue('elevation', '')
     setValue('drop', 1)
     setValue('level', 1)
     setValue('repair_type', '')
@@ -239,16 +240,16 @@ export default function TechnicianNewRepairPage() {
   }, [project_id, setValue])
 
   // Reiniciar campos cuando cambia la elevación
-  useEffect(() => {
-    setValue('drop', 1)
-    setValue('level', 1)
-    setValue('repair_type', '')
-    setValue('repair_index', 1)
-    setValue('progress_image', [])
-    setMeasurements({})
-    setProcessedImages([])
-    setShowImageUpload(false)
-  }, [elevation, setValue])
+  // useEffect(() => {
+  //   setValue('drop', 1)
+  //   setValue('level', 1)
+  //   setValue('repair_type', '')
+  //   setValue('repair_index', 1)
+  //   setValue('progress_image', [])
+  //   setMeasurements({})
+  //   setProcessedImages([])
+  //   setShowImageUpload(false)
+  // }, [elevation, setValue])
 
   // Reiniciar mediciones cuando cambia el tipo de reparación
   useEffect(() => {
@@ -287,11 +288,32 @@ export default function TechnicianNewRepairPage() {
   const matchingRepairs = repairs.filter(
     (repair) =>
       repair.project_id === project_id &&
-      repair.elevation_name === elevation &&
+      // repair.elevation_name === elevation &&
       repair.drop === drop &&
       repair.level === level &&
       repair.phases.survey?.repair_type === repair_type
   )
+
+  // Calcular el elevationName en base al drop elegido segun dentro del rango de que elevation se encuentra
+  const getElevationNameByDrop = (
+    dropNumber: number,
+    elevations: Elevation[]
+  ) => {
+    let accumulated = 0
+
+    for (const elevation of elevations) {
+      const min = accumulated + 1
+      const max = accumulated + elevation.drops
+
+      if (dropNumber >= min && dropNumber <= max) {
+        return elevation.name
+      }
+
+      accumulated += elevation.drops
+    }
+
+    return 'no-data' // Drop fuera de rango
+  }
 
   // Calcular el próximo repairIndex
   const nextRepairIndex =
@@ -588,7 +610,10 @@ export default function TechnicianNewRepairPage() {
         const newRepairData = {
           project_id: project_id,
           project_name: selectedProject?.name || '',
-          elevation_name: elevation,
+          elevation_name: getElevationNameByDrop(
+            drop,
+            selectedProject?.elevations || []
+          ),
           drop: drop,
           level: level,
           repair_index: nextRepairIndex,
@@ -813,9 +838,10 @@ export default function TechnicianNewRepairPage() {
               </div>
             </div>
 
-            {/* Location Selection */}
+            {/* Location Selection - Drop & Level */}
             <div className="grid gap-4 md:grid-cols-4">
-              <div className="md:col-span-2">
+              {/* Elevation */}
+              {/* <div className="md:col-span-2">
                 <Label>Elevation</Label>
                 <Select
                   value={elevation}
@@ -840,8 +866,9 @@ export default function TechnicianNewRepairPage() {
                     {errors.elevation.message}
                   </p>
                 )}
-              </div>
+              </div> */}
 
+              {/* Drop */}
               <div>
                 <Label>
                   Drop{' '}
@@ -853,7 +880,7 @@ export default function TechnicianNewRepairPage() {
                 </Label>
                 <Input
                   type="number"
-                  disabled={!elevation}
+                  disabled={!project_id}
                   {...register('drop', { valueAsNumber: true })}
                   max={maxDrops}
                   min={1}
@@ -865,6 +892,7 @@ export default function TechnicianNewRepairPage() {
                 )}
               </div>
 
+              {/* Level */}
               <div>
                 <Label>
                   Level{' '}
@@ -876,7 +904,7 @@ export default function TechnicianNewRepairPage() {
                 </Label>
                 <Input
                   type="number"
-                  disabled={!elevation}
+                  disabled={!project_id}
                   {...register('level', { valueAsNumber: true })}
                   max={maxLevels}
                   min={1}
@@ -898,7 +926,6 @@ export default function TechnicianNewRepairPage() {
                   onValueChange={(value) => setValue('repair_type', value)}
                   disabled={
                     !project_id ||
-                    !elevation ||
                     !drop ||
                     !level ||
                     !!errors?.drop ||
