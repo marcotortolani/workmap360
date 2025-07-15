@@ -79,7 +79,6 @@ import {
 import { useProjectsList } from '@/hooks/use-projects-list'
 import { useUsersList } from '@/hooks/use-users-list'
 
-
 // Componente de paginación responsive
 interface PaginationProps {
   currentPage: number
@@ -1032,7 +1031,6 @@ const ProjectForm = ({
   })
   const [editingIndex, setEditingIndex] = useState<number | null>(null) // Índice del repairType que se está editando
 
-
   // Zustand stores
   const { repairTypeList } = useRepairTypeStore()
 
@@ -1051,6 +1049,22 @@ const ProjectForm = ({
       })
       return
     }
+
+    // Validación específica para "Same levels"
+    if (sameLevelsForAll && commonLevels <= 0) {
+      toast.error('Please set a valid number for common levels first.', {
+        duration: 4000,
+        position: 'bottom-right',
+        style: {
+          background: 'orange',
+          color: 'white',
+          fontWeight: 'bold',
+          fontSize: '16px',
+        },
+      })
+      return
+    }
+
     if (
       !newElevation.name ||
       newElevation.drops! <= 0 ||
@@ -1785,11 +1799,12 @@ const ProjectForm = ({
                 <Input
                   type="number"
                   value={commonLevels || ''}
-                  onChange={
-                    elevations.length === 0
-                      ? handleCommonLevelsChange
-                      : () => {}
-                  }
+                  // onChange={
+                  //   elevations.length === 0
+                  //     ? handleCommonLevelsChange
+                  //     : () => {}
+                  // }
+                  onChange={handleCommonLevelsChange}
                   placeholder="Levels"
                   min="1"
                   className="w-20"

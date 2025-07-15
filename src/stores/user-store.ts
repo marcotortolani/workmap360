@@ -271,6 +271,7 @@ export const useCurrentUser = () => {
     userId: currentUser?.id || null,
     userEmail: currentUser?.email || '',
     userRole: currentUser?.role || 'guest',
+    refreshCurrentUser: useUserStore.getState().refreshCurrentUser,
   }
 }
 

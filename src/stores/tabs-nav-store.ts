@@ -11,6 +11,7 @@ import {
   MapIcon,
   ListOrderedIcon,
   ChartBar,
+  LayoutDashboard,
 } from 'lucide-react'
 
 export interface NavProps {
@@ -23,6 +24,11 @@ const NAV_TABS: {
   [key: string]: NavProps[]
 } = {
   admin: [
+    {
+      title: 'Dashboard',
+      href: '/dashboard/admin/dashboard',
+      icon: LayoutDashboard,
+    },
     {
       title: 'Projects',
       href: '/dashboard/admin/projects',
@@ -80,6 +86,11 @@ const NAV_TABS: {
     // },
   ],
   manager: [
+    // {
+    //   title: 'Dashboard',
+    //   href: '/dashboard/admin/dashboard',
+    //   icon: LayoutDashboard,
+    // },
     {
       title: 'Projects',
       href: '/dashboard/manager/projects',
@@ -110,16 +121,16 @@ const NAV_TABS: {
       href: '/dashboard/manager/repair-type',
       icon: ListOrderedIcon,
     },
-    {
-      title: "Map's View",
-      href: '/dashboard/manager/maps-view',
-      icon: MapIcon,
-    },
-    {
-      title: 'Reports',
-      href: '/dashboard/manager/reports',
-      icon: ChartBar,
-    },
+    // {
+    //   title: "Map's View",
+    //   href: '/dashboard/manager/maps-view',
+    //   icon: MapIcon,
+    // },
+    // {
+    //   title: 'Reports',
+    //   href: '/dashboard/manager/reports',
+    //   icon: ChartBar,
+    // },
     {
       title: 'Profile',
       href: '/dashboard/manager/profile',

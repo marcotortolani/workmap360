@@ -1,8 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 
 import type React from 'react'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -16,8 +17,11 @@ import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 
 import { UserType } from '@/types/user-types'
-import { FallbackAvatar } from './fallback-avatar'
+
 import { LoaderPinwheelIcon } from 'lucide-react'
+import { getUserInitials } from '@/lib/api/users'
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import { generateRandomPeepsAvatar } from '@/lib/utils/avatar-peeps'
 
 interface UserFormProps {
   adminPermissions?: boolean
@@ -48,29 +52,25 @@ export function UserForm({
     onCancel?.()
   }
 
-  const handleRandomAvatar = () => {
-    const newRandomAvatar =
-      'https://avatar.iran.liara.run/public/' +
-      Math.floor(Math.random() * 49 + 1).toString()
-    setFormData({ ...formData, avatar: newRandomAvatar })
+  const handleRandomAvatar = async () => {
+    const newAvatar = await generateRandomPeepsAvatar()
+    setFormData({ ...formData, avatar: newAvatar })
   }
+
+  useEffect(() => {
+    handleRandomAvatar()
+  }, [])
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="flex flex-col items-center sm:flex-row sm:items-start sm:gap-8">
-        {/* <AvatarUpload
-          initialImage={formData.avatar || newRandomAvatar}
-          onImageChange={(image) => setFormData({ ...formData, avatar: image })}
-        /> */}
         <div>
-          <FallbackAvatar
-            src={formData.avatar || ''}
-            fallbackInitials={
-              formData.first_name[0] + formData.last_name[0] || 'U'
-            }
-            className="h-24 w-24"
-            alt="Avatar"
-          />
+          <Avatar className="w-24 h-24 lg:w-36 lg:h-36  overflow-hidden  rounded-full">
+            <AvatarImage src={formData?.avatar || ''} alt="Avatar" />
+            <AvatarFallback className="flex items-center justify-center lg:text-2xl bg-gradient-to-br font-bold text-sky-100 from-blue-500 to-purple-600">
+              {getUserInitials(formData as UserType)}
+            </AvatarFallback>
+          </Avatar>
           <Button
             type="button"
             onClick={handleRandomAvatar}

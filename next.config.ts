@@ -7,12 +7,13 @@ const nextConfig: NextConfig = {
     return config
   },
   images: {
-    // minimumCacheTTL: 60,
-    // formats: ['image/webp'],
+    // 🔧 CONFIGURAR TIMEOUTS Y CACHE
+    minimumCacheTTL: 60 * 60 * 24, // 24 horas de cache
+    formats: ['image/webp', 'image/avif'],
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'avatar.iran.liara.run',
+        hostname: 'api.dicebear.com',
         port: '',
         pathname: '/**',
       },

@@ -6,7 +6,7 @@ export type UserRole =
   | 'client'
   | 'guest'
   
-type UserStatus = 'active' | 'inactive'
+export type UserStatus = 'active' | 'inactive'
 
 export interface UserType {
   id: number

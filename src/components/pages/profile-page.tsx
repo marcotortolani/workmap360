@@ -1,101 +1,126 @@
+// src/components/pages/profile-page.tsx
+
 'use client'
 
 import type React from 'react'
-
-// import { useState, useEffect } from 'react'
-import { useCurrentUser } from '@/stores/user-store'
-//import { Button } from '@/components/ui/button'
+import { useState, useEffect } from 'react'
+import { useUserStore, useCurrentUser } from '@/stores/user-store'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { AvatarUpload } from '@/components/avatar-upload'
+import { toast } from 'sonner'
+import { Loader2 } from 'lucide-react'
+import { getUserInitials } from '@/lib/api/users'
+import { UserType } from '@/types/user-types'
+import { generateRandomPeepsAvatar } from '@/lib/utils/avatar-peeps'
+import { updateUserViaAPI } from '@/lib/api/users'
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 
 export default function ProfilePage() {
-  const { user } = useCurrentUser()
+  const { user, isLoading: userLoading } = useCurrentUser()
+  const { refreshCurrentUser, session } = useUserStore()
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // const [formData, setFormData] = useState<UserType>({
-  //   id: 0,
-  //   first_name: '',
-  //   last_name: '',
-  //   email: '',
-  //   role: 'guest',
-  //   created_at: '0',
-  //   status: 'active',
-  //   avatar: '',
-  //   // password: '',
-  // })
+  const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
+    avatar: '',
+  })
 
-  //const [loading, setLoading] = useState(false)
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        first_name: user.first_name,
+        last_name: user.last_name,
+        avatar: user.avatar,
+      })
+    }
+  }, [user])
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    //console.log('Profile updated:', formData)
-    // In a real app, you would update the profile in your backend
+  const handleFormChange = (field: string, value: string | null) => {
+    setFormData((prev) => ({ ...prev, [field]: value || '' }))
   }
 
-  // useEffect(() => {
-  //   const getDataUser = async () => {
-  //     try {
-  //       setLoading(true)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    //    const success = await updateUserProfile(formData)
+    const success = await updateUserViaAPI(
+      user!.id,
+      formData,
+      session!.access_token
+    )
 
-  //       setFormData({
-  //         id: dbUser.id || 0,
-  //         first_name: dbUser.first_name || '',
-  //         last_name: dbUser.last_name || '',
-  //         email: dbUser.email || '',
-  //         role: dbUser.role || 'guest',
-  //         created_at: dbUser.created_at || '0', // ✅ Corregido: created_at en lugar de created_date
-  //         status: dbUser.status || 'active',
-  //         avatar: dbUser.avatar || '', // ✅ Esto debería mostrar la URL del avatar
-  //       })
-  //     } catch (error) {
-  //       console.error('Error fetching user data:', error)
-  //     } finally {
-  //       setLoading(false)
-  //     }
-  //   }
+    if (success) {
+      toast.success('Profile updated successfully!')
+      await refreshCurrentUser() // Re-fetch user data to reflect changes everywhere
+    } else {
+      toast.error('Failed to update profile.', {
+        description: 'Please try again.',
+        style: {
+          backgroundColor: 'red',
+          color: 'white',
+          fontSize: '14px',
+        },
+      })
+    }
+    setIsSubmitting(false)
+  }
 
-  //   getDataUser()
-  // }, [])
+  const handleRandomAvatar = async () => {
+    const newAvatar = await generateRandomPeepsAvatar()
+    setFormData({ ...formData, avatar: newAvatar })
+  }
 
-  // Mostrar loading mientras se cargan los datos
-  // if (loading) {
-  //   return (
-  //     <div className="flex flex-col gap-8 p-8">
-  //       <div className="w-1/2 rounded-lg border bg-white p-6 shadow-sm">
-  //         <h2 className="mb-6 text-xl font-semibold">My Profile</h2>
-  //         <div className="text-center animate-pulse">Loading...</div>
-  //       </div>
-  //     </div>
-  //   )
-  // }
+  if (userLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  if (!user) {
+    return (
+      <div className="text-center text-muted-foreground">
+        Could not load user profile.
+      </div>
+    )
+  }
 
   return (
-    <div className="flex flex-col gap-8 p-8">
-      <div className="w-1/2 rounded-lg border bg-white p-6 shadow-sm">
+    <div className="flex flex-col gap-8 p-4 sm:p-8">
+      <div className="w-full lg:w-2/3 xl:w-1/2 mx-auto rounded-lg border bg-white p-6 shadow-sm">
         <h2 className="mb-6 text-xl font-semibold">My Profile</h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
             <div className="w-full max-w-[200px]">
-              <AvatarUpload
-                initialImage={user?.avatar}
-                // onImageChange={(image) =>
-                //   setFormData({ ...formData, avatar: image || '' })
-                // }
-              />
+              <Avatar className="w-24 h-24 lg:w-40 lg:h-40 overflow-hidden  rounded-full">
+                <AvatarImage src={formData.avatar} alt="Avatar" />
+                <AvatarFallback className="flex items-center justify-center text-4xl bg-gradient-to-br font-bold text-sky-100 from-blue-500 to-purple-600">
+                  {getUserInitials(formData as UserType)}
+                </AvatarFallback>
+              </Avatar>
+              <Button
+                type="button"
+                className="mt-4 w-full"
+                onClick={handleRandomAvatar}
+              >
+                Random Avatar
+              </Button>
             </div>
 
-            <div className="flex-1 space-y-4">
+            <div className="flex-1 space-y-4 w-full">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="firstName">First Name</Label>
                   <Input
                     id="firstName"
-                    value={user?.first_name}
-                    disabled
-                    // onChange={(e) =>
-                    //   setFormData({ ...formData, first_name: e.target.value })
-                    // }
+                    value={formData.first_name}
+                    onChange={(e) =>
+                      handleFormChange('first_name', e.target.value)
+                    }
                     placeholder="Enter first name"
                     required
                   />
@@ -105,11 +130,10 @@ export default function ProfilePage() {
                   <Label htmlFor="lastName">Last Name</Label>
                   <Input
                     id="lastName"
-                    value={user?.last_name}
-                    disabled
-                    // onChange={(e) =>
-                    //   setFormData({ ...formData, last_name: e.target.value })
-                    // }
+                    value={formData.last_name}
+                    onChange={(e) =>
+                      handleFormChange('last_name', e.target.value)
+                    }
                     placeholder="Enter last name"
                     required
                   />
@@ -124,7 +148,7 @@ export default function ProfilePage() {
                   <Input
                     id="email"
                     type="email"
-                    value={user?.email}
+                    value={user.email}
                     disabled
                     className="bg-gray-100"
                   />
@@ -136,70 +160,57 @@ export default function ProfilePage() {
                   </Label>
                   <Input
                     id="role"
-                    value={user?.role}
+                    value={user.role}
                     disabled
-                    className="bg-gray-100"
+                    className="bg-gray-100 capitalize"
                   />
                 </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                {/* <div>
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
-                    placeholder="Enter new password"
-                  />
-                </div> */}
-
                 <div>
                   <Label htmlFor="createdDate" className="text-gray-500">
-                    Created Date (Non-editable)
+                    Member Since (Non-editable)
                   </Label>
                   <Input
                     id="createdDate"
-                    value={new Date(user?.created_at || 0).toLocaleString()}
+                    value={new Date(user.created_at).toLocaleDateString()}
                     disabled
                     className="bg-gray-100"
                   />
                 </div>
-              </div>
-
-              <div>
-                <Label htmlFor="status" className="text-gray-500">
-                  Status (Non-editable)
-                </Label>
-                <div className="mt-1 flex items-center">
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                      user?.status === 'active'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}
-                  >
-                    {user?.status === 'active' ? 'Active' : 'Inactive'}
-                  </span>
-                  <span className="ml-2 text-sm text-gray-500">
-                    (Only Admin/Manager can change your status)
-                  </span>
+                <div>
+                  <Label htmlFor="status" className="text-gray-500">
+                    Status (Non-editable)
+                  </Label>
+                  <div className="mt-1 flex items-center h-10">
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        user.status === 'active'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}
+                    >
+                      {user.status === 'active' ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* <div className="flex justify-end">
+          <div className="flex justify-end pt-4 border-t">
             <Button
               type="submit"
               className="bg-orange-500 text-white hover:bg-orange-400"
+              disabled={isSubmitting}
             >
-              Save Changes
+              {isSubmitting ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : null}
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
             </Button>
-          </div> */}
+          </div>
         </form>
       </div>
     </div>

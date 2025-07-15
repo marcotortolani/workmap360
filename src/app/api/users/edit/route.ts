@@ -7,8 +7,8 @@ export async function PUT(req: NextRequest) {
   const body = await req.json()
   const {
     id: targetId,
-    firstName,
-    lastName,
+    first_name,
+    last_name,
     email,
     role: newRole,
     status,
@@ -32,7 +32,7 @@ export async function PUT(req: NextRequest) {
     if (deny) return deny
   }
 
-  if (!firstName && !lastName && !email && !newRole && !status && !avatar) {
+  if (!first_name && !last_name && !email && !newRole && !status && !avatar) {
     return NextResponse.json(
       { error: 'Al menos un campo debe ser proporcionado para actualizar' },
       { status: 400 }
@@ -40,8 +40,8 @@ export async function PUT(req: NextRequest) {
   }
 
   const updateData: Record<string, string> = {}
-  if (firstName) updateData.first_name = firstName
-  if (lastName) updateData.last_name = lastName
+  if (first_name) updateData.first_name = first_name
+  if (last_name) updateData.last_name = last_name
   if (email) updateData.email = email
   if (newRole) updateData.role = newRole
   if (status) updateData.status = status
