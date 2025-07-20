@@ -37,10 +37,10 @@ export default function AdminLayout({
   } 
 
   return (
-    <div className="flex flex-col md:flex-row w-full h-screen bg-red-500/0">
+    <div className="flex flex-col md:flex-row w-full h-screen">
       <Header role="admin" userData={user} />
       <Sidebar role="admin" userData={user} />
-      <main className="py-8 px-2 md:px-10 flex-1 space-y-6 overflow-auto bg-gray-50">
+      <main className="py-8 sm:px-2 md:px-10 flex-1 space-y-6 overflow-auto bg-gray-50">
         <div className=" hidden md:flex items-center justify-between ">
           <h2 className=" text-3xl font-bold text-orange-500">
             Admin Dashboard

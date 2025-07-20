@@ -1,5 +1,6 @@
 // lib/api/users.ts
 import { UserType, UserRole, UserStatus } from '@/types/user-types'
+import { generateRandomPeepsAvatar } from "../utils/avatar-peeps";
 
 // 🔧 FUNCIÓN PRINCIPAL: Lista de usuarios con paginación y filtros
 export async function fetchUsersListViaAPI(
@@ -117,11 +118,7 @@ export async function createUserViaAPI(
 }> {
   try {
     // Generar avatar aleatorio si no se proporciona
-    const defaultAvatar =
-      userData.avatar ||
-      `https://avatar.iran.liara.run/public/${Math.floor(
-        Math.random() * 49 + 1
-      )}`
+    const defaultAvatar = userData.avatar || generateRandomPeepsAvatar()
 
     const requestData = {
       firstName: userData.first_name,
@@ -130,7 +127,7 @@ export async function createUserViaAPI(
       role: userData.role,
       status: userData.status,
       avatar: defaultAvatar,
-      createdAt: userData.created_at || new Date().toLocaleString('en-NZ'),
+      createdAt: userData.created_at || new Date().toISOString(),
     }
 
     const response = await fetch('/api/users/create', {

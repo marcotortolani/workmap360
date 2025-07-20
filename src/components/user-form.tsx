@@ -1,9 +1,8 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 
 import type React from 'react'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -36,14 +35,14 @@ export function UserForm({
   onSubmit,
   onCancel,
 }: UserFormProps) {
-  const [formData, setFormData] = useState({
-    id: user?.id || null,
+  const [formData, setFormData] = useState<Partial<UserType>>({
+    id: user?.id || 0,
     first_name: user?.first_name || '',
     last_name: user?.last_name || '',
     email: user?.email || '',
-    role: user?.role || '',
+    role: user?.role || 'guest',
     status: user?.status || 'active',
-    avatar: user?.avatar || null,
+    avatar: user?.avatar || generateRandomPeepsAvatar(),
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -53,21 +52,22 @@ export function UserForm({
   }
 
   const handleRandomAvatar = async () => {
-    const newAvatar = await generateRandomPeepsAvatar()
-    setFormData({ ...formData, avatar: newAvatar })
+    const newAvatar = generateRandomPeepsAvatar()
+    setTimeout(() => {
+      setFormData({ ...formData, avatar: newAvatar })
+    }, 100)
   }
-
-  useEffect(() => {
-    handleRandomAvatar()
-  }, [])
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="flex flex-col items-center sm:flex-row sm:items-start sm:gap-8">
         <div>
           <Avatar className="w-24 h-24 lg:w-36 lg:h-36  overflow-hidden  rounded-full">
-            <AvatarImage src={formData?.avatar || ''} alt="Avatar" />
-            <AvatarFallback className="flex items-center justify-center lg:text-2xl bg-gradient-to-br font-bold text-sky-100 from-blue-500 to-purple-600">
+            <AvatarImage src={formData?.avatar} alt="Avatar" />
+            <AvatarFallback
+              className="flex items-center justify-center lg:text-2xl bg-gradient-to-br font-bold text-sky-100 from-blue-500 to-purple-600"
+              aria-disabled={formData?.avatar ? false : true}
+            >
               {getUserInitials(formData as UserType)}
             </AvatarFallback>
           </Avatar>
@@ -131,7 +131,7 @@ export function UserForm({
               <Select
                 value={formData.role}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, role: value })
+                  setFormData({ ...formData, role: value as UserType['role'] })
                 }
                 required
               >

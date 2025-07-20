@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 // src/components/pages/manager/projects-page.tsx
 
 'use client'
@@ -303,7 +302,7 @@ export default function ManagerProjectsPage() {
   })
 
   // Zustand stores
-  const { accessToken } = useCurrentUser()
+  const { accessToken, userRole } = useCurrentUser()
 
   // Usar el hook simplificado
   const {
@@ -505,16 +504,18 @@ export default function ManagerProjectsPage() {
                 </p>
               )}
             </div>
-            <Button
-              className="bg-green-600 text-white hover:bg-green-500 w-full sm:w-auto"
-              onClick={() => {
-                setSelectedProject(null)
-                setActionSelected('new')
-              }}
-            >
-              <FolderPlus className="mr-2 h-4 w-4" />
-              Create Project
-            </Button>
+            {(userRole === 'admin' || userRole === 'manager') && (
+              <Button
+                className="bg-green-600 text-white hover:bg-green-500 w-full sm:w-auto"
+                onClick={() => {
+                  setSelectedProject(null)
+                  setActionSelected('new')
+                }}
+              >
+                <FolderPlus className="mr-2 h-4 w-4" />
+                Create Project
+              </Button>
+            )}
           </div>
         </CardHeader>
 
@@ -698,7 +699,10 @@ export default function ManagerProjectsPage() {
                                   onClick={() => handleEditProject(project)}
                                   disabled={
                                     project.status ===
-                                    PROJECT_STATUS['completed']
+                                      PROJECT_STATUS['completed'] ||
+                                    userRole === 'technician' ||
+                                    userRole === 'client' ||
+                                    userRole === 'guest'
                                   }
                                 >
                                   <Edit className="mr-1 h-3 w-3" />
@@ -709,6 +713,11 @@ export default function ManagerProjectsPage() {
                                   size="sm"
                                   className="text-red-500 hover:bg-red-100 hover:text-red-600"
                                   onClick={() => handleDeleteClick(project)}
+                                  disabled={
+                                    userRole === 'technician' ||
+                                    userRole === 'client' ||
+                                    userRole === 'guest'
+                                  }
                                 >
                                   <Trash2 className="mr-1 h-3 w-3" />
                                   <span className="hidden xl:inline">
@@ -2422,6 +2431,7 @@ const ProjectDataModal = ({
   onClose: () => void
 }) => {
   const { repairTypeList } = useRepairTypeStore()
+  const { userRole } = useCurrentUser()
 
   if (!projectData) return null
 
@@ -2632,29 +2642,36 @@ const ProjectDataModal = ({
                       <span className="font-medium">{rt.phases}</span>
                     </div>
 
-                    <div className="flex flex-col">
-                      <span className="text-muted-foreground">Price</span>
-                      <span className="font-medium">${rt.price}</span>
-                    </div>
+                    {userRole === 'admin' ||
+                      (userRole === 'manager' && (
+                        <>
+                          <div className="flex flex-col">
+                            <span className="text-muted-foreground">Price</span>
+                            <span className="font-medium">${rt.price}</span>
+                          </div>
 
-                    <div className="flex flex-col">
-                      <span className="text-muted-foreground">Unit</span>
-                      <span className="font-medium">{rt.unit_to_charge}</span>
-                    </div>
+                          <div className="flex flex-col">
+                            <span className="text-muted-foreground">Unit</span>
+                            <span className="font-medium">
+                              {rt.unit_to_charge}
+                            </span>
+                          </div>
 
-                    <div className="flex flex-col">
-                      <span className="text-muted-foreground">MC/R</span>
-                      <span className="font-medium">
-                        {rt.minimum_charge_per_repair}
-                      </span>
-                    </div>
+                          <div className="flex flex-col">
+                            <span className="text-muted-foreground">MC/R</span>
+                            <span className="font-medium">
+                              {rt.minimum_charge_per_repair}
+                            </span>
+                          </div>
 
-                    <div className="flex flex-col">
-                      <span className="text-muted-foreground">MC/D</span>
-                      <span className="font-medium">
-                        {rt.minimum_charge_per_drop}
-                      </span>
-                    </div>
+                          <div className="flex flex-col">
+                            <span className="text-muted-foreground">MC/D</span>
+                            <span className="font-medium">
+                              {rt.minimum_charge_per_drop}
+                            </span>
+                          </div>
+                        </>
+                      ))}
                   </div>
                 </div>
               ))}

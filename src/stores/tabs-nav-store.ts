@@ -163,11 +163,11 @@ const NAV_TABS: {
       href: '/dashboard/technician/repairs',
       icon: Wrench,
     },
-    {
-      title: "Map's View",
-      href: '/dashboard/technician/maps-view',
-      icon: MapIcon,
-    },
+    // {
+    //   title: "Map's View",
+    //   href: '/dashboard/technician/maps-view',
+    //   icon: MapIcon,
+    // },
     {
       title: 'Profile',
       href: '/dashboard/technician/profile',
@@ -185,11 +185,11 @@ const NAV_TABS: {
       href: '/dashboard/client/repairs',
       icon: Wrench,
     },
-    {
-      title: "Map's View",
-      href: '/dashboard/client/maps-view',
-      icon: MapIcon,
-    },
+    // {
+    //   title: "Map's View",
+    //   href: '/dashboard/client/maps-view',
+    //   icon: MapIcon,
+    // },
     {
       title: 'Profile',
       href: '/dashboard/client/profile',

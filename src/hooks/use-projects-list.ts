@@ -28,7 +28,7 @@ export function useProjectsList(limit: number = 20): UseProjectsListReturn {
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(1)  
 
   const fetchProjects = async (page: number = currentPage) => {
     if (!accessToken || !isAuthenticated) {

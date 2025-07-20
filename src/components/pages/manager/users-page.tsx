@@ -115,6 +115,7 @@ export default function ManagerUsersPage() {
           email: user.email,
           role: user.role,
           status: user.status,
+          avatar: user.avatar,
           // La función genera automáticamente el avatar y createdAt
         },
         accessToken
@@ -128,7 +129,8 @@ export default function ManagerUsersPage() {
           position: 'bottom-center',
           style: {
             background: '#07c',
-            color: '#000',
+            color: '#FFF',
+            fontWeight: 'bold',
           },
         })
 
@@ -452,7 +454,21 @@ export default function ManagerUsersPage() {
                           <TableCell>{user.last_name}</TableCell>
                           <TableCell>{user.email}</TableCell>
                           <TableCell>
-                            <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 capitalize">
+                            <span
+                              className={`${
+                                user.role === 'admin'
+                                  ? ' border-black '
+                                  : user.role === 'manager'
+                                  ? ' border-sky-500 '
+                                  : user.role === 'technician'
+                                  ? ' border-green-500 '
+                                  : user.role === 'client'
+                                  ? ' border-red-500 '
+                                  : user.role === 'guest'
+                                  ? ' border-amber-500 '
+                                  : ' border-gray-700 '
+                              } inline-flex items-center rounded-full border-2 bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 capitalize`}
+                            >
                               {user.role}
                             </span>
                           </TableCell>
@@ -461,8 +477,8 @@ export default function ManagerUsersPage() {
                             <span
                               className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${
                                 user.status === 'active'
-                                  ? 'bg-green-100 text-green-800'
-                                  : 'bg-red-100 text-red-800'
+                                  ? 'bg-green-200 text-green-800 '
+                                  : 'bg-red-100 text-red-800 '
                               }`}
                             >
                               {user.status}
@@ -510,6 +526,14 @@ export default function ManagerUsersPage() {
                     of {pagination.total} users
                   </div>
                   <div className="flex items-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage(1)}
+                      disabled={currentPage === 1}
+                    >
+                      Initial
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"

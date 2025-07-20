@@ -28,8 +28,9 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     },
     created_by_user_name: 'admin',
     created_by_user_id: 1,
-    created_at: "2025-01-01",
+    created_at: '2025-01-01',
     status: 'active',
+    color: 'blue',
   },
   {
     id: 2,
@@ -53,8 +54,9 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     },
     created_by_user_name: 'admin',
     created_by_user_id: 1,
-    created_at: "2025-01-01",
+    created_at: '2025-01-01',
     status: 'active',
+    color: 'red',
   },
   {
     id: 3,
@@ -74,8 +76,9 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     },
     created_by_user_name: 'admin',
     created_by_user_id: 1,
-    created_at: "2025-01-01",
+    created_at: '2025-01-01',
     status: 'active',
+    color: 'green',
   },
   {
     id: 4,
@@ -95,8 +98,9 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     },
     created_by_user_name: 'admin',
     created_by_user_id: 1,
-    created_at: "2025-01-01",
+    created_at: '2025-01-01',
     status: 'active',
+    color: 'green',
   },
   {
     id: 5,
@@ -116,8 +120,9 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     },
     created_by_user_name: 'admin',
     created_by_user_id: 1,
-    created_at: "2025-01-01",
+    created_at: '2025-01-01',
     status: 'active',
+    color: 'orange',
   },
   {
     id: 6,
@@ -132,8 +137,9 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     unit_to_charge: 'Unit',
     created_by_user_name: 'admin',
     created_by_user_id: 1,
-    created_at: "2025-01-01",
+    created_at: '2025-01-01',
     status: 'active',
+    color: 'blue',
   },
   {
     id: 7,
@@ -148,8 +154,9 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     unit_to_charge: 'Unit',
     created_by_user_name: 'admin',
     created_by_user_id: 1,
-    created_at: "2025-01-01",
+    created_at: '2025-01-01',
     status: 'active',
+    color: 'red',
   },
   {
     id: 8,
@@ -164,8 +171,9 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     unit_to_charge: 'Unit',
     created_by_user_name: 'admin',
     created_by_user_id: 1,
-    created_at: "2025-01-01",
+    created_at: '2025-01-01',
     status: 'active',
+    color: 'green',
   },
   {
     id: 9,
@@ -180,8 +188,9 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     unit_to_charge: 'Unit',
     created_by_user_name: 'admin',
     created_by_user_id: 1,
-    created_at: "2025-01-01",
+    created_at: '2025-01-01',
     status: 'active',
+    color: 'orange',
   },
   {
     id: 10,
@@ -196,8 +205,9 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     unit_to_charge: 'unit',
     created_by_user_name: 'admin',
     created_by_user_id: 1,
-    created_at: "2025-01-01",
+    created_at: '2025-01-01',
     status: 'active',
+    color: 'orange',
   },
   {
     id: 11,
@@ -212,7 +222,7 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     unit_to_charge: 'unit',
     created_by_user_name: 'admin',
     created_by_user_id: 1,
-    created_at: "2025-01-01",
+    created_at: '2025-01-01',
     status: 'active',
   },
   {
@@ -233,7 +243,7 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     },
     created_by_user_name: 'admin',
     created_by_user_id: 1,
-    created_at: "2025-01-01",
+    created_at: '2025-01-01',
     status: 'active',
   },
   {
@@ -249,7 +259,7 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     unit_to_charge: 'Unit',
     created_by_user_name: 'admin',
     created_by_user_id: 1,
-    created_at: "2025-01-01",
+    created_at: '2025-01-01',
     status: 'active',
   },
   {
@@ -270,7 +280,7 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     },
     created_by_user_name: 'admin',
     created_by_user_id: 1,
-    created_at: "2025-01-01",
+    created_at: '2025-01-01',
     status: 'active',
   },
   {
@@ -291,7 +301,7 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     },
     created_by_user_name: 'admin',
     created_by_user_id: 1,
-    created_at: "2025-01-01",
+    created_at: '2025-01-01',
     status: 'active',
   },
   {
@@ -307,7 +317,7 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     unit_to_charge: 'Unit',
     created_by_user_name: 'admin',
     created_by_user_id: 1,
-    created_at: "2025-01-01",
+    created_at: '2025-01-01',
     status: 'active',
   },
   {
@@ -334,7 +344,7 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     },
     created_by_user_name: 'admin',
     created_by_user_id: 1,
-    created_at: "2025-01-01",
+    created_at: '2025-01-01',
     status: 'active',
   },
   {
@@ -361,7 +371,7 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     },
     created_by_user_name: 'admin',
     created_by_user_id: 1,
-    created_at: "2025-01-01",
+    created_at: '2025-01-01',
     status: 'inactive',
   },
   {
@@ -388,7 +398,7 @@ export const REPAIR_TYPE_LIST: RepairType[] = [
     },
     created_by_user_name: 'admin',
     created_by_user_id: 1,
-    created_at: "2025-01-01",
+    created_at: '2025-01-01',
     status: 'inactive',
   },
 ]

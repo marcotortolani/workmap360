@@ -26,6 +26,7 @@ export interface RepairType {
   created_at: string // Date string ISO
   updated_at?: string // Date string ISO
   status: 'active' | 'inactive'
+  color?: string
 }
 
 export type RepairDataStatusType = 'approved' | 'pending' | 'rejected'

@@ -4,7 +4,6 @@ import type React from 'react'
 import { useCurrentUser } from '@/stores/user-store'
 import { Sidebar } from '@/components/sidebar'
 import { Header } from '@/components/header'
-import { LogoutButton } from '@/components/logout-button'
 
 // import { redirect } from 'next/navigation'
 // import { createClient } from '@/lib/supabase/server'
@@ -38,15 +37,14 @@ export default function ClientLayout({
   }
 
   return (
-    <div className="flex h-screen">
+    <div className="flex flex-col md:flex-row w-full h-screen">
       <Header role="client" userData={user} />
       <Sidebar role="client" userData={user} />
-      <main className="py-8 px-10 flex-1 space-y-6 overflow-auto bg-gray-50">
+      <main className="py-8 sm:px-2 md:px-10 flex-1 space-y-6 overflow-auto bg-gray-50">
         <div className="hidden md:flex items-center justify-between ">
           <h2 className=" text-3xl font-bold text-orange-500">
             Client Dashboard
           </h2>
-          <LogoutButton />
         </div>
         {/* <TabsNavigation tabs={managerTabs} basePath="/dashboard/manager" /> */}
         {children}
