@@ -350,6 +350,7 @@ const RepairCard = ({
   )
 }
 
+
 export default function ManagerRepairsPage() {
   const {
     repairs,
@@ -361,7 +362,7 @@ export default function ManagerRepairsPage() {
     setFilters: setApiFilters,
     currentPage,
     totalPages,
-  } = useRepairsList(20)
+  } = useRepairsList(20)  
 
   const { projects } = useProjectsList()
 

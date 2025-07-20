@@ -40,7 +40,7 @@ import { UserRole, UserType } from '@/types/user-types'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 export default function ManagerUsersPage() {
-  const { accessToken } = useCurrentUser()
+  const { accessToken, refreshCurrentUser } = useCurrentUser()
   const [showForm, setShowForm] = useState(false)
   const [editingUser, setEditingUser] = useState<UserType | null>(null)
   const [userToDelete, setUserToDelete] = useState<UserType['id'] | null>(null)
@@ -401,7 +401,10 @@ export default function ManagerUsersPage() {
               <p className="font-medium">Error loading users:</p>
               <p>{error}</p>
               <Button
-                onClick={refetch}
+                onClick={() => {
+                  refreshCurrentUser()
+                  refetch()
+                }}
                 className="mt-2 bg-red-600 text-white hover:bg-red-700"
                 size="sm"
               >

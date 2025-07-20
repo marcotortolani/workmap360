@@ -451,10 +451,3 @@ export function validateUserData(userData: {
     errors,
   }
 }
-
-// 🔧 FUNCIÓN PARA GENERAR AVATAR ALEATORIO
-export function generateRandomAvatar(): string {
-  return ''
-  const randomNumber = Math.floor(Math.random() * 49 + 1)
-  return `https://avatar.iran.liara.run/public/${randomNumber}`
-}

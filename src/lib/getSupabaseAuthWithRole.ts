@@ -5,7 +5,7 @@ import { Role } from '@/types/database-types'
 export async function getSupabaseAuthWithRole(req: Request) {
   const authHeader = req.headers.get('Authorization')
   if (!authHeader || !authHeader.startsWith('Bearer '))
-    return { error: 'No autorizado' }
+    return { error: 'No authorized' }
 
   const token = authHeader.replace('Bearer ', '')
 
@@ -23,7 +23,7 @@ export async function getSupabaseAuthWithRole(req: Request) {
   } = await supabase.auth.getUser(token)
 
   if (error || !user)
-    return { error: 'Token inválido o usuario no autenticado' }
+    return { error: 'Invalid Token or User not authenticated' }
 
   const { data: dbUser, error: dbError } = await supabase
     .from('users')
@@ -32,7 +32,7 @@ export async function getSupabaseAuthWithRole(req: Request) {
     .single()
 
   if (dbError || !dbUser)
-    return { error: 'No se pudo obtener el rol del usuario' }
+    return { error: 'Can`t find user in database' }
 
   return { supabase, user, role: dbUser.role as Role }
 }

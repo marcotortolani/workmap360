@@ -1302,8 +1302,7 @@ const ProjectForm = ({
 
     try {
       if (projectData) {
-        // 🔧 MODO EDICIÓN - Usar API en lugar de Zustand
-        console.log('Updating project via API:', projectData.id)
+        // 🔧 MODO EDICIÓN - Via API
 
         const result = await updateProjectViaAPI(
           projectData.id,

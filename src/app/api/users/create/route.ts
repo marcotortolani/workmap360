@@ -11,7 +11,6 @@ export async function POST(req: Request) {
   }
 
   const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
-  //const redirectTo = `${window.location.origin}/dashboard`
 
   try {
     const { user, role, error } = await getSupabaseAuthWithRole(req)
@@ -22,7 +21,7 @@ export async function POST(req: Request) {
 
     if (!['admin', 'manager'].includes(role)) {
       return NextResponse.json(
-        { error: 'You dont have permission to create users' },
+        { error: 'You don`t have permission to create users' },
         { status: 403 }
       )
     }
@@ -113,12 +112,12 @@ export async function POST(req: Request) {
 
     if (insertError) {
       console.error(
-        'Error insertando usuario en la tabla users:',
+        'Error inserting user in table:',
         insertError.message
       )
       await serviceClient.auth.admin.deleteUser(uid)
       return NextResponse.json(
-        { error: 'Error guardando usuario' },
+        { error: 'Error saving user' },
         { status: 500 }
       )
     }

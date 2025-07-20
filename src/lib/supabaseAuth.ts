@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 export async function getSupabaseAuth(req: Request) {
   const authHeader = req.headers.get('Authorization')
   if (!authHeader || !authHeader.startsWith('Bearer '))
-    return { error: 'No autorizado' }
+    return { error: 'No authorized' }
 
   const token = authHeader.replace('Bearer ', '')
 
@@ -21,7 +21,7 @@ export async function getSupabaseAuth(req: Request) {
     error,
   } = await supabase.auth.getUser()
   if (error || !user)
-    return { error: 'Token inválido o usuario no autenticado' }
+    return { error: 'Invalid Token or User not authenticated' }
 
   return { supabase, user }
 }
