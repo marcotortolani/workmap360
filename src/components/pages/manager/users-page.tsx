@@ -38,6 +38,7 @@ import { toast } from 'sonner'
 import { UserPlus, Edit, Trash2 } from 'lucide-react'
 import { UserRole, UserType } from '@/types/user-types'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Pagination } from '@/components/pagination'
 
 export default function ManagerUsersPage() {
   const { accessToken, refreshCurrentUser } = useCurrentUser()
@@ -57,7 +58,7 @@ export default function ManagerUsersPage() {
     currentPage,
     totalPages,
     currentRole,
-  } = useUsersList(20)
+  } = useUsersList(4)
 
   const handleCreateButton = () => {
     setEditingUser(null)
@@ -517,48 +518,12 @@ export default function ManagerUsersPage() {
               </div>
 
               {/* Pagination */}
-              {pagination && pagination.totalPages > 1 && (
-                <div className="flex items-center justify-between mt-4">
-                  <div className="text-sm text-gray-700">
-                    Showing {(currentPage - 1) * (pagination.limit || 20) + 1}{' '}
-                    to{' '}
-                    {Math.min(
-                      currentPage * (pagination.limit || 20),
-                      pagination.total
-                    )}{' '}
-                    of {pagination.total} users
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setPage(1)}
-                      disabled={currentPage === 1}
-                    >
-                      Initial
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setPage(currentPage - 1)}
-                      disabled={currentPage <= 1}
-                    >
-                      Previous
-                    </Button>
-                    <span className="text-sm">
-                      Page {currentPage} of {totalPages}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setPage(currentPage + 1)}
-                      disabled={currentPage >= totalPages}
-                    >
-                      Next
-                    </Button>
-                  </div>
-                </div>
-              )}
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                isLoading={isLoading}
+              />
             </>
           )}
         </div>
