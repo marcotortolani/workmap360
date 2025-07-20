@@ -61,7 +61,7 @@ export function useUsersList(limit: number = 20): UseUsersListReturn {
     setError(null)
 
     try {
-      let endpoint = `/api/users/list?page=${page}&limit=${limit}`
+      let endpoint = `/api/users/list?page=${page}&limit=${limit}`      
 
       // Si hay un rol seleccionado, usar el endpoint específico
       if (role) {

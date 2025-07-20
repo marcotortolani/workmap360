@@ -197,6 +197,7 @@ export async function updateUserViaAPI(
   updateData: Partial<UserType>,
   accessToken: string
 ): Promise<{ success: boolean; user?: UserType; error?: string }> {
+  
   try {
     const response = await fetch('/api/users/edit', {
       method: 'PUT',

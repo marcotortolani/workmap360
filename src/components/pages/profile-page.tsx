@@ -4,7 +4,7 @@
 
 import type React from 'react'
 import { useState, useEffect } from 'react'
-import { useUserStore, useCurrentUser } from '@/stores/user-store'
+import {  useCurrentUser } from '@/stores/user-store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -19,8 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 // import AvatarCustomizer from "../avatar-customizer"
 
 export default function ProfilePage() {
-  const { user, isLoading: userLoading } = useCurrentUser()
-  const { refreshCurrentUser, session } = useUserStore()
+  const { user, isLoading: userLoading, accessToken, refreshCurrentUser } = useCurrentUser()
   const [isSubmitting, setIsSubmitting] = useState(false)
   //const [showCustomizer, setShowCustomizer] = useState(false)
 
@@ -48,13 +47,9 @@ export default function ProfilePage() {
     e.preventDefault()
     setIsSubmitting(true)
 
-    const success = await updateUserViaAPI(
-      user!.id,
-      formData,
-      session!.access_token
-    )
+    const res = await updateUserViaAPI(user!.id, formData, accessToken!)
 
-    if (success) {
+    if (res.success) {
       toast.success('Profile updated successfully!')
       await refreshCurrentUser() // Re-fetch user data to reflect changes everywhere
     } else {

@@ -58,7 +58,7 @@ export default function ManagerUsersPage() {
     currentPage,
     totalPages,
     currentRole,
-  } = useUsersList(4)
+  } = useUsersList(20)
 
   const handleCreateButton = () => {
     setEditingUser(null)

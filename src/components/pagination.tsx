@@ -1,7 +1,6 @@
 // src/components/pagination.tsx
 
 import { Button } from './ui/button'
-
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 // Componente de paginación responsive

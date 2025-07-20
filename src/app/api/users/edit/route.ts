@@ -19,12 +19,10 @@ export async function PUT(req: NextRequest) {
 
   if (error || !user) {
     return NextResponse.json(
-      { error: error ?? 'No autorizado' },
+      { error: error ?? 'No authorized' },
       { status: 401 }
     )
   }
-
-  // const { id: targetId } = await context.params
 
   // Si el usuario no es admin y está editando a otro, denegar
   if (user.id !== targetId) {
@@ -34,7 +32,7 @@ export async function PUT(req: NextRequest) {
 
   if (!first_name && !last_name && !email && !newRole && !status && !avatar) {
     return NextResponse.json(
-      { error: 'Al menos un campo debe ser proporcionado para actualizar' },
+      { error: 'At least one field must be updated' },
       { status: 400 }
     )
   }
@@ -58,7 +56,7 @@ export async function PUT(req: NextRequest) {
   }
 
   return NextResponse.json(
-    { user: data?.[0], message: 'Usuario actualizado exitosamente' },
+    { user: data?.[0], message: 'User updated successfully' },
     { status: 200 }
   )
 }

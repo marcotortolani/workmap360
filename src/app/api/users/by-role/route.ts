@@ -12,14 +12,14 @@ export async function GET(req: Request) {
   const targetRole = searchParams.get('role') || 'guest'
 
   if (!validRoles.includes(targetRole)) {
-    return NextResponse.json({ error: 'Rol inválido' }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
   }
 
   const { supabase, user, role, error } = await getSupabaseAuthWithRole(req)
 
   if (error || !user || !role) {
     return NextResponse.json(
-      { error: error ?? 'No autorizado' },
+      { error: error ?? 'No authorized' },
       { status: 401 }
     )
   }
@@ -29,7 +29,7 @@ export async function GET(req: Request) {
 
   if (role === 'technician' && targetRole === 'admin') {
     return NextResponse.json(
-      { error: 'No tenés permisos para ver estos usuarios' },
+      { error: 'You don`t have permission to view admin users' },
       { status: 403 }
     )
   }

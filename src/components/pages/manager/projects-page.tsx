@@ -700,9 +700,10 @@ export default function ManagerProjectsPage() {
                                   disabled={
                                     project.status ===
                                       PROJECT_STATUS['completed'] ||
-                                    userRole === 'technician' ||
-                                    userRole === 'client' ||
-                                    userRole === 'guest'
+                                    !(
+                                      userRole === 'admin' ||
+                                      userRole === 'manager'
+                                    )
                                   }
                                 >
                                   <Edit className="mr-1 h-3 w-3" />
@@ -714,9 +715,10 @@ export default function ManagerProjectsPage() {
                                   className="text-red-500 hover:bg-red-100 hover:text-red-600"
                                   onClick={() => handleDeleteClick(project)}
                                   disabled={
-                                    userRole === 'technician' ||
-                                    userRole === 'client' ||
-                                    userRole === 'guest'
+                                    !(
+                                      userRole === 'admin' ||
+                                      userRole === 'manager'
+                                    )
                                   }
                                 >
                                   <Trash2 className="mr-1 h-3 w-3" />
@@ -819,21 +821,24 @@ export default function ManagerProjectsPage() {
       </div>
 
       {/* Modales de crear/editar y ver */}
-      <div
-        className={`${
-          actionSelected === 'new' || actionSelected === 'edit'
-            ? ' translate-y-0 scale-100 bg-black/50 '
-            : ' translate-y-[200%] scale-50 bg-black/0 '
-        } fixed top-0 left-0 z-50 w-screen h-screen flex items-center justify-center transition-all duration-300 ease-in-out px-2 sm:px-4`}
-      >
-        <ProjectForm
-          projectData={selectedProject || undefined}
-          onClose={() => {
-            setActionSelected('close')
-            handleProjectChange()
-          }}
-        />
-      </div>
+      {userRole === 'admin' ||
+        (userRole === 'manager' && (
+          <div
+            className={`${
+              actionSelected === 'new' || actionSelected === 'edit'
+                ? ' translate-y-0 scale-100 bg-black/50 '
+                : ' translate-y-[200%] scale-50 bg-black/0 '
+            } fixed top-0 left-0 z-50 w-screen h-screen flex items-center justify-center transition-all duration-300 ease-in-out px-2 sm:px-4`}
+          >
+            <ProjectForm
+              projectData={selectedProject || undefined}
+              onClose={() => {
+                setActionSelected('close')
+                handleProjectChange()
+              }}
+            />
+          </div>
+        ))}
 
       <div
         className={`${

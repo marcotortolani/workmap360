@@ -29,6 +29,7 @@ const permissions: PermissionMatrix = {
     projects: ['read'],
   },
   client: {
+    users: ['read', 'update'],
     projects: ['read'],
     repairs: ['read', 'update'],
   },
@@ -50,7 +51,7 @@ export function checkPermissionOrFail(
   action: Action
 ): Response | null {
   if (!canUserPerform(role, resource, action)) {
-    return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
+    return NextResponse.json({ error: 'No authorization' }, { status: 403 })
   }
   return null
 }
