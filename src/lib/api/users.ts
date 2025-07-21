@@ -1,6 +1,6 @@
 // lib/api/users.ts
 import { UserType, UserRole, UserStatus } from '@/types/user-types'
-import { generateRandomPeepsAvatar } from "../utils/avatar-peeps";
+import { generateRandomPeepsAvatar } from '../utils/avatar-peeps'
 
 // 🔧 FUNCIÓN PRINCIPAL: Lista de usuarios con paginación y filtros
 export async function fetchUsersListViaAPI(
@@ -197,7 +197,6 @@ export async function updateUserViaAPI(
   updateData: Partial<UserType>,
   accessToken: string
 ): Promise<{ success: boolean; user?: UserType; error?: string }> {
-  
   try {
     const response = await fetch('/api/users/edit', {
       method: 'PUT',
@@ -226,6 +225,39 @@ export async function updateUserViaAPI(
     return { success: false, error: 'Network error occurred' }
   }
 }
+
+// 🔧 FUNCIÓN PARA CAMBIAR CONTRASEÑA
+// export async function changePasswordViaAPI(
+//   passwordData: {
+//     newPassword: string
+//   },
+//   accessToken: string
+// ): Promise<{ success: boolean; error?: string }> {
+//   try {
+//     const response = await fetch('/api/users/change-password', {
+//       method: 'PUT',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Authorization: `Bearer ${accessToken}`,
+//       },
+//       body: JSON.stringify(passwordData),
+//     })
+
+//     const result = await response.json()
+
+//     if (!response.ok) {
+//       return {
+//         success: false,
+//         error: result.error || 'Failed to change password',
+//       }
+//     }
+
+//     return { success: true }
+//   } catch (error) {
+//     console.error('Error changing password:', error)
+//     return { success: false, error: 'Network error occurred' }
+//   }
+// }
 
 // 🔧 FUNCIÓN PARA ELIMINAR USUARIO
 export async function deleteUserViaAPI(

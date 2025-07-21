@@ -31,6 +31,7 @@ interface UserState {
   // Funciones principales
   initializeUser: () => Promise<void>
   refreshCurrentUser: () => Promise<void>
+  refreshSession: () => Promise<void>
   updateUserProfile: (updates: Partial<UserType>) => Promise<boolean>
   logout: () => Promise<void>
 }
@@ -184,6 +185,12 @@ export const useUserStore = create<UserState>()(
         }
       },
 
+      // Refrescar el access token y la session
+      refreshSession: async () => {
+        const supabase = await createClient()
+        await supabase.auth.refreshSession()
+      },
+
       // Actualizar perfil del usuario
       updateUserProfile: async (updates): Promise<boolean> => {
         const currentUser = get().currentUser
@@ -272,6 +279,7 @@ export const useCurrentUser = () => {
     userEmail: currentUser?.email || '',
     userRole: currentUser?.role || 'guest',
     refreshCurrentUser: useUserStore.getState().refreshCurrentUser,
+    refreshSession: useUserStore.getState().refreshSession,
   }
 }
 

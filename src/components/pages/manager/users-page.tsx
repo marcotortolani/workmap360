@@ -41,7 +41,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Pagination } from '@/components/pagination'
 
 export default function ManagerUsersPage() {
-  const { accessToken, refreshCurrentUser } = useCurrentUser()
+  const { accessToken, refreshSession } = useCurrentUser()
   const [showForm, setShowForm] = useState(false)
   const [editingUser, setEditingUser] = useState<UserType | null>(null)
   const [userToDelete, setUserToDelete] = useState<UserType['id'] | null>(null)
@@ -403,7 +403,7 @@ export default function ManagerUsersPage() {
               <p>{error}</p>
               <Button
                 onClick={() => {
-                  refreshCurrentUser()
+                  refreshSession()
                   refetch()
                 }}
                 className="mt-2 bg-red-600 text-white hover:bg-red-700"
