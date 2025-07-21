@@ -30,10 +30,6 @@ export async function getSupabaseAuthWithRole(req: Request) {
     .select('role')
     .eq('uid', user.id)
     .single()
-
-    console.log(dbUser);
-    console.log(dbError);
-    
     
 
   if (dbError || !dbUser) return { error: 'Can`t find user in database' }

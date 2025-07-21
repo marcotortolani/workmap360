@@ -821,24 +821,23 @@ export default function ManagerProjectsPage() {
       </div>
 
       {/* Modales de crear/editar y ver */}
-      {userRole === 'admin' ||
-        (userRole === 'manager' && (
-          <div
-            className={`${
-              actionSelected === 'new' || actionSelected === 'edit'
-                ? ' translate-y-0 scale-100 bg-black/50 '
-                : ' translate-y-[200%] scale-50 bg-black/0 '
-            } fixed top-0 left-0 z-50 w-screen h-screen flex items-center justify-center transition-all duration-300 ease-in-out px-2 sm:px-4`}
-          >
-            <ProjectForm
-              projectData={selectedProject || undefined}
-              onClose={() => {
-                setActionSelected('close')
-                handleProjectChange()
-              }}
-            />
-          </div>
-        ))}
+      {(userRole === 'admin' || userRole === 'manager') && (
+        <div
+          className={`${
+            actionSelected === 'new' || actionSelected === 'edit'
+              ? ' translate-y-0 scale-100 bg-black/50 '
+              : ' translate-y-[200%] scale-50 bg-black/0 '
+          } fixed top-0 left-0 z-50 w-screen h-screen flex items-center justify-center transition-all duration-300 ease-in-out px-2 sm:px-4`}
+        >
+          <ProjectForm
+            projectData={selectedProject || undefined}
+            onClose={() => {
+              setActionSelected('close')
+              handleProjectChange()
+            }}
+          />
+        </div>
+      )}
 
       <div
         className={`${
@@ -2646,36 +2645,35 @@ const ProjectDataModal = ({
                       <span className="font-medium">{rt.phases}</span>
                     </div>
 
-                    {userRole === 'admin' ||
-                      (userRole === 'manager' && (
-                        <>
-                          <div className="flex flex-col">
-                            <span className="text-muted-foreground">Price</span>
-                            <span className="font-medium">${rt.price}</span>
-                          </div>
+                    {(userRole === 'admin' || userRole === 'manager') && (
+                      <>
+                        <div className="flex flex-col">
+                          <span className="text-muted-foreground">Price</span>
+                          <span className="font-medium">${rt.price}</span>
+                        </div>
 
-                          <div className="flex flex-col">
-                            <span className="text-muted-foreground">Unit</span>
-                            <span className="font-medium">
-                              {rt.unit_to_charge}
-                            </span>
-                          </div>
+                        <div className="flex flex-col">
+                          <span className="text-muted-foreground">Unit</span>
+                          <span className="font-medium">
+                            {rt.unit_to_charge}
+                          </span>
+                        </div>
 
-                          <div className="flex flex-col">
-                            <span className="text-muted-foreground">MC/R</span>
-                            <span className="font-medium">
-                              {rt.minimum_charge_per_repair}
-                            </span>
-                          </div>
+                        <div className="flex flex-col">
+                          <span className="text-muted-foreground">MC/R</span>
+                          <span className="font-medium">
+                            {rt.minimum_charge_per_repair}
+                          </span>
+                        </div>
 
-                          <div className="flex flex-col">
-                            <span className="text-muted-foreground">MC/D</span>
-                            <span className="font-medium">
-                              {rt.minimum_charge_per_drop}
-                            </span>
-                          </div>
-                        </>
-                      ))}
+                        <div className="flex flex-col">
+                          <span className="text-muted-foreground">MC/D</span>
+                          <span className="font-medium">
+                            {rt.minimum_charge_per_drop}
+                          </span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               ))}
