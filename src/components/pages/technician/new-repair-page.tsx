@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 // src/components/pages/technician/new-repair-page.tsx
 
 'use client'
@@ -140,6 +139,9 @@ export default function TechnicianNewRepairPage() {
   const maxLevelsRef = useRef<number | undefined>(undefined)
 
   // Estados
+  const [projectSelected, setProjectSelected] = useState<ProjectData | null>(
+    null
+  )
   const [currentPhase, setCurrentPhase] = useState<
     'survey' | 'progress' | 'finish' | null
   >(null)
@@ -687,7 +689,13 @@ export default function TechnicianNewRepairPage() {
       )
 
       // Resetear formulario
-      reset({ drop: 1, level: 1, repair_type: '', repair_index: 1 })
+      reset({
+        project_id: projectSelected?.id || 0,
+        // drop: 1,
+        // level: 1,
+        repair_type: '',
+        repair_index: 1,
+      })
       setMeasurements({})
       setComments('')
       setCurrentPhase(null)
@@ -844,6 +852,7 @@ export default function TechnicianNewRepairPage() {
                     const project = projects.find(
                       (p: ProjectData) => p.id === parseInt(value)
                     )
+                    setProjectSelected(project || null)
                     setFolderName(project?.name || '')
                   }}
                 >
