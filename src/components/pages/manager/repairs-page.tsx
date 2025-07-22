@@ -286,6 +286,7 @@ export default function ManagerRepairsPage() {
     refetch,
     setPage,
     setFilters: setApiFilters,
+    updateStatus,
     currentPage,
     totalPages,
   } = useRepairsList(20)
@@ -312,9 +313,19 @@ export default function ManagerRepairsPage() {
     () => [...new Set(repairs.map((r) => r.project_name))],
     [repairs]
   )
-  const uniqueElevations = useMemo(
-    () => [...new Set(repairs.map((r) => r.elevation_name))],
-    [repairs]
+  
+
+  // unique elevations in project selected
+  const uniqueElevationsInProject = useMemo(
+    () => [
+      ...new Set(
+        repairs
+          .filter((r) => r.project_name === localFilters.project)
+          .map((r) => r.elevation_name)
+      ),
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [localFilters.project]
   )
 
   // Helper function to get total phases for a repair
@@ -354,6 +365,16 @@ export default function ManagerRepairsPage() {
   const filteredRepairs = useMemo(() => {
     let filtered = [...repairs]
 
+    console.log(localFilters.project)
+
+    if (localFilters.project && localFilters.project !== 'all') {
+      filtered = filtered.filter(
+        (repair) => repair.project_name === localFilters.project
+      )
+
+      console.log(filtered)
+    }
+
     // Aplicar filtro de búsqueda localmente
     if (localFilters.searchTerm) {
       const searchLower = localFilters.searchTerm.toLowerCase()
@@ -376,7 +397,7 @@ export default function ManagerRepairsPage() {
     }
 
     return filtered
-  }, [repairs, localFilters.searchTerm])
+  }, [repairs, localFilters.searchTerm, localFilters.project])
 
   const handleFilter = (newFilters: FilterOptions) => {
     setLocalFilters(newFilters)
@@ -396,6 +417,7 @@ export default function ManagerRepairsPage() {
       sortBy,
       sortOrder,
     }))
+
   }
 
   const handleViewRepair = (repair: RepairData) => {
@@ -411,7 +433,7 @@ export default function ManagerRepairsPage() {
   const handlePhaseFormSuccess = () => {
     setIsPhaseFormOpen(false)
     setPhaseFormRepair(null)
-    refetch() // Refrescar la lista de reparaciones
+    handleRefresh()
     toast.success('Phase added successfully!', {
       duration: 3000,
       position: 'bottom-right',
@@ -430,25 +452,12 @@ export default function ManagerRepairsPage() {
     repairId: number
     status: RepairDataStatusType
   }) => {
-    try {
-      console.log(`Updated repair ${repairId} status to ${status}`)
-      await refetch()
-
-      toast.success('Repair status updated successfully', {
-        duration: 3000,
-        position: 'bottom-right',
-      })
-    } catch (error) {
-      toast.error('Failed to update repair status', {
-        description: 'Error' + error,
-        duration: 5000,
-        position: 'bottom-right',
-      })
-    }
+    await updateStatus(repairId, status)
+    handleRefresh()
   }
 
-  const handleRefresh = () => {
-    refetch()
+  const handleRefresh = async () => {
+    await refetch()
   }
 
   return (
@@ -489,7 +498,7 @@ export default function ManagerRepairsPage() {
             onFilter={handleFilter}
             onSort={handleSort}
             projects={uniqueProjects}
-            elevations={uniqueElevations}
+            elevations={uniqueElevationsInProject}
           />
 
           {/* Loading State */}

@@ -40,7 +40,7 @@ import {
   ProgressPhase,
   FinishPhase,
 } from '@/types/repair-type'
-import { getRepairType, getRepairStatus } from '@/lib/utils'
+import { getRepairType } from '@/lib/utils'
 import Image from 'next/image'
 
 interface RepairDetailModalProps {
@@ -308,17 +308,8 @@ export function RepairDetailModal({
               <div>
                 <Label className="text-sm font-medium">Status</Label>
                 <div className="mt-1">
-                  <Badge
-                    variant={
-                      repair.status === 'approved'
-                        ? 'default'
-                        : repair.status === 'pending'
-                        ? 'secondary'
-                        : 'destructive'
-                    }
-                    className="text-sm"
-                  >
-                    {getRepairStatus(repair)}
+                  <Badge variant={repair.status} className="text-sm">
+                    {repair.status}
                   </Badge>
                 </div>
               </div>

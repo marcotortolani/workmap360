@@ -3,7 +3,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, Filter, SortAsc, X, SortDesc } from 'lucide-react'
+import { Search, Filter, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -50,7 +50,7 @@ interface RepairsFilterProps {
 
 export function RepairsFilter({
   onFilter,
-  onSort,
+  //onSort,
   projects = [],
   elevations = [],
 }: RepairsFilterProps) {
@@ -70,22 +70,22 @@ export function RepairsFilter({
     onFilter(newFilters)
   }
 
-  const handleSortChange = (sortBy: string) => {
-    const newSortOrder =
-      filters.sortBy === sortBy && filters.sortOrder === 'asc' ? 'desc' : 'asc'
+  // const handleSortChange = (sortBy: string) => {
+  //   const newSortOrder =
+  //     filters.sortBy === sortBy && filters.sortOrder === 'asc' ? 'desc' : 'asc'
 
-    const newFilters = {
-      ...filters,
-      sortBy: sortBy as FilterOptions['sortBy'],
-      sortOrder: newSortOrder,
-    }
+  //   const newFilters = {
+  //     ...filters,
+  //     sortBy: sortBy as FilterOptions['sortBy'],
+  //     sortOrder: newSortOrder,
+  //   }
 
-    setFilters(newFilters as FilterOptions)
-    onSort({
-      sortBy: sortBy as FilterOptions['sortBy'],
-      sortOrder: newSortOrder,
-    })
-  }
+  //   setFilters(newFilters as FilterOptions)
+  //   onSort({
+  //     sortBy: sortBy as FilterOptions['sortBy'],
+  //     sortOrder: newSortOrder,
+  //   })
+  // }
 
   const clearFilters = () => {
     const defaultFilters: FilterOptions = {
@@ -219,7 +219,7 @@ export function RepairsFilter({
 
         {/* Sort Options */}
         <div className=" flex gap-2">
-          <Button
+          {/* <Button
             variant="outline"
             size="sm"
             onClick={() => handleSortChange('date')}
@@ -231,7 +231,7 @@ export function RepairsFilter({
               <SortDesc className="h-4 w-4 mr-1" />
             )}
             Date
-          </Button>
+          </Button> */}
           {/* <Button
             variant="outline"
             size="sm"

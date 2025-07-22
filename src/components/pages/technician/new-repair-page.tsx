@@ -612,7 +612,30 @@ export default function TechnicianNewRepairPage() {
           { phases: updatedPhases },
           accessToken
         )
-        console.log('Update Repair Result:', result)
+        if (!result.success) {
+          toast.error('Failed to update repair', {
+            description: result.error || 'Failed to update repair',
+            duration: 5000,
+            position: 'bottom-right',
+            style: {
+              background: '#EF4444',
+              color: '#fff',
+              fontWeight: 'bold',
+              fontSize: '16px',
+            },
+          })
+        }
+        toast.success('Repair updated', {
+          description: 'Repair has been updated successfully',
+          duration: 3000,
+          position: 'bottom-right',
+          style: {
+            background: '#10B981',
+            color: '#fff',
+            fontWeight: 'bold',
+            fontSize: '16px',
+          },
+        })
       } else {
         // Crear nueva reparación
         const newRepairData = {
@@ -664,7 +687,7 @@ export default function TechnicianNewRepairPage() {
       )
 
       // Resetear formulario
-      reset()
+      reset({ drop: 1, level: 1, repair_type: '', repair_index: 1 })
       setMeasurements({})
       setComments('')
       setCurrentPhase(null)
@@ -801,7 +824,6 @@ export default function TechnicianNewRepairPage() {
       </div>
     )
   }
-
 
   return (
     <div className="w-full flex flex-col gap-8 p-2 md:p-8">

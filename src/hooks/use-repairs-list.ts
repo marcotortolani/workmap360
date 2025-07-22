@@ -3,10 +3,11 @@
 
 import { useState, useEffect } from 'react'
 import { useCurrentUser } from '@/stores/user-store'
-import { getRepairsViaAPI } from '@/lib/api/repairs'
+import { getRepairsViaAPI, updateRepairStatusViaAPI } from '@/lib/api/repairs'
 
 import {
   RepairData,
+  RepairDataStatusType,
   RepairListParams,
   RepairListResponse,
 } from '@/types/repair-type'
@@ -23,6 +24,8 @@ export interface UseRepairsListReturn {
   currentPage: number
   totalPages: number
   currentFilters: Omit<RepairListParams, 'page' | 'limit'>
+  setCurrentFilters: (filters: Omit<RepairListParams, 'page' | 'limit'>) => void
+  updateStatus: (id: number, status: RepairDataStatusType) => Promise<void>
 }
 
 export function useRepairsList(limit: number = 20): UseRepairsListReturn {
@@ -93,6 +96,26 @@ export function useRepairsList(limit: number = 20): UseRepairsListReturn {
     }
   }
 
+  const updateStatus = async (repairId: number, status: string) => {
+    try {
+      await updateRepairStatusViaAPI(
+        repairId,
+        status as RepairDataStatusType,
+        accessToken as string
+      )
+      toast.success('Repair status updated successfully', {
+        duration: 3000,
+        position: 'bottom-right',
+      })
+    } catch (error) {
+      toast.error('Failed to update repair status', {
+        description: 'Error: ' + error,
+        duration: 5000,
+        position: 'bottom-right',
+      })
+    }
+  }
+
   const refetch = async () => {
     await fetchRepairs(currentPage, currentFilters)
   }
@@ -126,5 +149,7 @@ export function useRepairsList(limit: number = 20): UseRepairsListReturn {
     currentPage,
     totalPages: pagination?.totalPages || 1,
     currentFilters,
+    setCurrentFilters,
+    updateStatus,
   }
 }
