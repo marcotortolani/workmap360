@@ -285,7 +285,7 @@ const ProjectCard = ({
 }
 
 export default function ManagerProjectsPage() {
-  const { refreshCurrentUser } = useUserStore()
+  const { refreshCurrentUser, refreshSession } = useUserStore()
   const [actionSelected, setActionSelected] = useState<
     'close' | 'new' | 'edit' | 'view'
   >('close')
@@ -488,6 +488,12 @@ export default function ManagerProjectsPage() {
     setSelectedProject(project)
   }
 
+  const handleRefreshSession = async () => {
+    await refreshCurrentUser()
+    await refreshSession()
+    await refetch()
+  }
+
   return (
     <div className="relative w-full max-w-screen-2xl flex flex-col gap-4 sm:gap-6 lg:gap-8 p-2 sm:p-4 lg:p-8 mx-auto">
       <Card className="w-full  ">
@@ -543,7 +549,7 @@ export default function ManagerProjectsPage() {
               </p>
               <p className="text-sm">{error}</p>
               <Button
-                onClick={refreshCurrentUser}
+                onClick={() => handleRefreshSession()}
                 className="mt-2 bg-red-600 text-white hover:bg-red-700"
                 size="sm"
               >

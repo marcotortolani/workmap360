@@ -3,7 +3,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, Filter, SortAsc, X, SortDesc } from 'lucide-react'
+import { Search, Filter, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -43,7 +43,7 @@ interface ProjectsFilterProps {
 
 export function ProjectsFilter({
   onFilter,
-  onSort,
+  // onSort,
   clients = [],
 }: ProjectsFilterProps) {
   const [filters, setFilters] = useState<ProjectFilterOptions>({
@@ -64,22 +64,22 @@ export function ProjectsFilter({
     onFilter(newFilters)
   }
 
-  const handleSortChange = (sortBy: string) => {
-    const newSortOrder =
-      filters.sortBy === sortBy && filters.sortOrder === 'asc' ? 'desc' : 'asc'
+  // const handleSortChange = (sortBy: string) => {
+  //   const newSortOrder =
+  //     filters.sortBy === sortBy && filters.sortOrder === 'asc' ? 'desc' : 'asc'
 
-    const newFilters = {
-      ...filters,
-      sortBy: sortBy as ProjectFilterOptions['sortBy'],
-      sortOrder: newSortOrder,
-    }
+  //   const newFilters = {
+  //     ...filters,
+  //     sortBy: sortBy as ProjectFilterOptions['sortBy'],
+  //     sortOrder: newSortOrder,
+  //   }
 
-    setFilters(newFilters as ProjectFilterOptions)
-    onSort({
-      sortBy: sortBy as ProjectFilterOptions['sortBy'],
-      sortOrder: newSortOrder,
-    })
-  }
+  //   setFilters(newFilters as ProjectFilterOptions)
+  //   onSort({
+  //     sortBy: sortBy as ProjectFilterOptions['sortBy'],
+  //     sortOrder: newSortOrder,
+  //   })
+  // }
 
   const clearFilters = () => {
     const defaultFilters: ProjectFilterOptions = {
@@ -188,7 +188,7 @@ export function ProjectsFilter({
 
         {/* Sort Options */}
         <div className="flex gap-2">
-          <Button
+          {/* <Button
             variant="outline"
             size="sm"
             onClick={() => handleSortChange('date')}
@@ -200,7 +200,7 @@ export function ProjectsFilter({
               <SortDesc className="h-4 w-4 mr-1" />
             )}
             Date
-          </Button>
+          </Button> */}
           {/* <Button
             variant="outline"
             size="sm"

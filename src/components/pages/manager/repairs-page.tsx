@@ -313,7 +313,6 @@ export default function ManagerRepairsPage() {
     () => [...new Set(repairs.map((r) => r.project_name))],
     [repairs]
   )
-  
 
   // unique elevations in project selected
   const uniqueElevationsInProject = useMemo(
@@ -365,14 +364,10 @@ export default function ManagerRepairsPage() {
   const filteredRepairs = useMemo(() => {
     let filtered = [...repairs]
 
-    console.log(localFilters.project)
-
     if (localFilters.project && localFilters.project !== 'all') {
       filtered = filtered.filter(
         (repair) => repair.project_name === localFilters.project
       )
-
-      console.log(filtered)
     }
 
     // Aplicar filtro de búsqueda localmente
@@ -417,7 +412,6 @@ export default function ManagerRepairsPage() {
       sortBy,
       sortOrder,
     }))
-
   }
 
   const handleViewRepair = (repair: RepairData) => {

@@ -96,11 +96,11 @@ const NAV_TABS: {
       href: '/dashboard/manager/projects',
       icon: FolderKanban,
     },
-    {
-      title: 'Roles',
-      href: '/dashboard/manager/roles',
-      icon: UserCog,
-    },
+    // {
+    //   title: 'Roles',
+    //   href: '/dashboard/manager/roles',
+    //   icon: UserCog,
+    // },
     {
       title: 'Users',
       href: '/dashboard/manager/users',
