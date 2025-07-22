@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // src/components/pages/manager/projects-page.tsx
 
 'use client'
