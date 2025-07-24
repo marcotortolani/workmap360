@@ -1,9 +1,8 @@
-/* eslint-disable @next/next/no-img-element */
 // src/components/pages/technician/new-repair-page.tsx
 
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -132,7 +131,7 @@ const getPhaseStatus = (repair: RepairData | null, totalPhases: number) => {
 
 export default function TechnicianNewRepairPage() {
   const { projects, isLoading: projectsLoading } = useProjectsList()
-  const { repairs, isLoading: repairsLoading } = useRepairsList()
+  const { repairs, isLoading: repairsLoading, refetch } = useRepairsList()
   const { userId, fullName, accessToken } = useCurrentUser()
 
   // Referencias para validación
@@ -143,6 +142,9 @@ export default function TechnicianNewRepairPage() {
   const [projectSelected, setProjectSelected] = useState<ProjectData | null>(
     null
   )
+  const [dropSelected, setDropSelected] = useState<number>(1)
+  const [levelSelected, setLevelSelected] = useState<number>(1)
+
   const [currentPhase, setCurrentPhase] = useState<
     'survey' | 'progress' | 'finish' | null
   >(null)
@@ -316,15 +318,25 @@ export default function TechnicianNewRepairPage() {
     setShowImageUpload(false)
   }, [currentPhase])
 
-  // Filtrar reparaciones existentes
-  const matchingRepairs = repairs.filter(
-    (repair) =>
-      repair.project_id === project_id &&
-      // repair.elevation_name === elevation &&
-      repair.drop === drop &&
-      repair.level === level &&
-      repair.phases.survey?.repair_type === repair_type
-  )
+  // Filtrar reparaciones existentes con useMemo
+  const matchingRepairs = useMemo(() => {
+    return repairs.filter(
+      (repair) =>
+        repair.project_id === project_id &&
+        // repair.elevation_name === elevation &&
+        repair.drop === drop &&
+        repair.level === level &&
+        repair.phases.survey?.repair_type === repair_type
+    )
+  }, [repairs, project_id, drop, level, repair_type])
+  // const matchingRepairs = repairs.filter(
+  //   (repair) =>
+  //     repair.project_id === project_id &&
+  //     // repair.elevation_name === elevation &&
+  //     repair.drop === drop &&
+  //     repair.level === level &&
+  //     repair.phases.survey?.repair_type === repair_type
+  // )
 
   // Calcular el próximo repairIndex
   const nextRepairIndex =
@@ -692,11 +704,12 @@ export default function TechnicianNewRepairPage() {
       // Resetear formulario
       reset({
         project_id: projectSelected?.id || 0,
-        // drop: 1,
-        // level: 1,
+        drop: dropSelected || 1,
+        level: levelSelected || 1,
         repair_type: '',
         repair_index: 1,
       })
+      refetch()
       setMeasurements({})
       setComments('')
       setCurrentPhase(null)
@@ -923,6 +936,9 @@ export default function TechnicianNewRepairPage() {
                   type="number"
                   disabled={!project_id}
                   {...register('drop', { valueAsNumber: true })}
+                  onChange={(e) => {
+                    setDropSelected(parseInt(e.target.value))
+                  }}
                   max={maxDrops}
                   min={1}
                 />
@@ -947,6 +963,9 @@ export default function TechnicianNewRepairPage() {
                   type="number"
                   disabled={!project_id}
                   {...register('level', { valueAsNumber: true })}
+                  onChange={(e) => {
+                    setLevelSelected(parseInt(e.target.value))
+                  }}
                   max={maxLevels}
                   min={1}
                 />

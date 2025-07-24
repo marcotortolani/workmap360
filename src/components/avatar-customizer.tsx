@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 // src/components/ui/avatar-customizer.tsx
 
 'use client'
@@ -393,6 +392,49 @@ export default function AvatarCustomizer({
       setPreviewUrl(newUrl)
     }
   }, [isOpen, currentAvatar, features])
+
+  // useEffect(() => {
+  //   if (currentAvatar && isOpen) {
+  //     parseCurrentAvatar()
+  //     // Si tienes un avatar actual, podrías intentar parsearlo,
+  //     // pero por simplicidad, mantener valores por defecto
+  //     // const newUrl = generateAvatarUrl(features)
+  //     // setPreviewUrl(newUrl)
+  //   }
+  // }, [])
+
+  // const parseCurrentAvatar = () => {
+  //   // generate features from avatar url
+  //   const parsedFeatures: AvatarFeatures = {
+  //     accessories: 'none',
+  //     backgroundColor: 'f8f9fa',
+  //     headContrastColor: '724133',
+  //     head: 'short1',
+  //     clothingColor: 'e78276',
+  //     face: 'smile',
+  //     skinColor: 'ffdbb4',
+  //     facialHair: 'none',
+  //     mask: 'none',
+  //   }
+
+  //   const url = new URL(currentAvatar || '')
+  //   const params = url.searchParams
+
+  //   parsedFeatures.backgroundColor = params.get('backgroundColor') || 'f8f9fa'
+  //   parsedFeatures.skinColor = params.get('skinColor') || 'ffdbb4'
+  //   parsedFeatures.head = params.get('head') || 'short1'
+  //   parsedFeatures.headContrastColor =
+  //     params.get('headContrastColor') || '724133'
+  //   parsedFeatures.face = params.get('face') || 'smile'
+  //   parsedFeatures.clothingColor = params.get('clothingColor') || 'e78276'
+  //   parsedFeatures.accessories = params.get('accessories') || 'none'
+  //   parsedFeatures.facialHair = params.get('facialHair') || 'none'
+  //   parsedFeatures.mask = params.get('mask') || 'none'
+
+  //   setFeatures(parsedFeatures)
+  //   const newUrl = generateAvatarUrl(parsedFeatures)
+  //   setPreviewUrl(newUrl)
+  // }
 
   // Función para actualizar una característica específica
   const updateFeature = (key: keyof AvatarFeatures, value: string) => {

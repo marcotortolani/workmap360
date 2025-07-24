@@ -182,9 +182,9 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
-                <div className="w-full max-w-[200px]">
-                  <Avatar className="w-24 h-24 lg:w-40 lg:h-40 overflow-hidden rounded-full">
+              <div className="flex flex-col items-center gap-6 lg:flex-row lg:items-start">
+                <div className="w-full flex sm:flex-col items-center gap-4 md:max-w-[300px] mx-auto ">
+                  <Avatar className="w-32 h-32 lg:w-40 lg:h-40 overflow-hidden rounded-full">
                     <AvatarImage src={formData.avatar} alt="Avatar" />
                     <AvatarFallback className="flex items-center justify-center text-4xl bg-gradient-to-br font-bold text-sky-100 from-blue-500 to-purple-600">
                       {getUserInitials(formData as UserType)}

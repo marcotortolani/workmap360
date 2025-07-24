@@ -599,10 +599,10 @@ export default function ManagerProjectsPage() {
                         </TableHead>
                         <TableHead className="w-32">Created by</TableHead>
                         <TableHead className="w-32">Client</TableHead>
-                        <TableHead className="min-w-[150px]">Repairs</TableHead>
+                        <TableHead className="min-w-[120px]">Repairs</TableHead>
                         <TableHead className="w-24">Status</TableHead>
-                        <TableHead className="w-24">Created</TableHead>
-                        <TableHead className="w-24">Updated</TableHead>
+                        <TableHead className="w-32">Created</TableHead>
+                        <TableHead className="w-32">Updated</TableHead>
                         <TableHead className="w-48">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
