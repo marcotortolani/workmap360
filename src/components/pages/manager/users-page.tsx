@@ -41,7 +41,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Pagination } from '@/components/pagination'
 
 export default function ManagerUsersPage() {
-  const { accessToken, refreshSession } = useCurrentUser()
+  const {
+    accessToken,
+    refreshSession,
+    userRole: currentUserRole,
+  } = useCurrentUser()
   const [showForm, setShowForm] = useState(false)
   const [editingUser, setEditingUser] = useState<UserType | null>(null)
   const [userToDelete, setUserToDelete] = useState<UserType['id'] | null>(null)
@@ -533,7 +537,7 @@ export default function ManagerUsersPage() {
             {editingUser ? 'Edit User' : 'Create User'}
           </h2>
           <UserForm
-            adminPermissions={true}
+            adminPermissions={currentUserRole === 'admin'}
             user={editingUser}
             onSubmit={editingUser ? confirmEdit : createUser}
             onCancel={() => setShowForm(false)}

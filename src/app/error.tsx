@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { PageWrapper } from '@/components/page-wrapper'
+import { useCurrentUser } from '@/stores/user-store'
 
 interface ErrorProps {
   error: Error & { digest?: string }
@@ -18,10 +19,16 @@ interface ErrorProps {
 }
 
 export default function Error({ error, reset }: ErrorProps) {
+  const { refreshCurrentUser } = useCurrentUser()
   useEffect(() => {
     // Log the error to an error reporting service
     console.error('Application error:', error)
   }, [error])
+
+  const handleReset = () => {
+    refreshCurrentUser()
+    reset()
+  }
 
   const handleGoHome = () => {
     window.location.href = '/'
@@ -62,7 +69,7 @@ export default function Error({ error, reset }: ErrorProps) {
 
           <div className="flex flex-col gap-3 sm:flex-row">
             <Button
-              onClick={reset}
+              onClick={handleReset}
               className="flex-1 bg-sky-500 text-white hover:bg-sky-400"
             >
               <RefreshCw className="mr-2 h-4 w-4" />

@@ -30,6 +30,13 @@ export async function PUT(req: NextRequest) {
     if (deny) return deny
   }
 
+  if (role !== 'admin' && role !== 'manager') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  if (role !== 'admin' && newRole === 'admin') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   if (!first_name && !last_name && !email && !newRole && !status && !avatar) {
     return NextResponse.json(
       { error: 'At least one field must be updated' },

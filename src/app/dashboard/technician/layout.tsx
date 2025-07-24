@@ -4,34 +4,31 @@ import type React from 'react'
 import { useCurrentUser } from '@/stores/user-store'
 import { Sidebar } from '@/components/sidebar'
 import { Header } from '@/components/header'
-
-// import { redirect } from 'next/navigation'
-// import { createClient } from '@/lib/supabase/server'
+import { useUserStatusCheck } from "@/hooks/use-user-status-check"
 
 export default function TechnicianLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const { user } = useCurrentUser()
-  // const supabase = await createClient()
+  const { user, isLoading } = useCurrentUser()
 
-  // const { data, error } = await supabase.auth.getUser()
-  // if (error || !data?.user) {
-  //   redirect('/auth/login')
-  // }
+  // ✅ Verificar estado del usuario cada 5 minutos
+  useUserStatusCheck(5)
 
-  // const { data: dbUser, error: dbError } = await supabase
-  //   .from('users')
-  //   .select('*')
-  //   .eq('email', data.user.email)
-  //   .single()
-  // if (dbError || !dbUser) {
-  //   redirect('/auth/login')
-  // }
-  // if (dbUser.role !== 'technician') {
-  //   redirect('/')
-  // }
+  // El UserProvider ya maneja las redirecciones, así que solo necesitamos verificar loading
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Si no hay usuario, el UserProvider se encargará de redirigir
   if (!user) {
     return null
   }
@@ -46,7 +43,6 @@ export default function TechnicianLayout({
             Technician Dashboard
           </h2>
         </div>
-        {/* <TabsNavigation tabs={managerTabs} basePath="/dashboard/manager" /> */}
         {children}
       </main>
     </div>

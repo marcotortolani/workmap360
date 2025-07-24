@@ -71,8 +71,6 @@ export async function POST(req: Request) {
       authPayload.email_confirm = true // el correo se confirma automaticamente
     }
 
-    console.log('payload', authPayload)
-
     const { data: authUser, error: authError } =
       await serviceClient.auth.admin.createUser(authPayload)
 

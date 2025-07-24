@@ -197,16 +197,16 @@ const NAV_TABS: {
     },
   ],
   guest: [
-    {
-      title: 'Projects',
-      href: '/dashboard/guest/projects',
-      icon: FolderKanban,
-    },
-    {
-      title: 'Repairs',
-      href: '/dashboard/guest/repairs',
-      icon: Wrench,
-    },
+    // {
+    //   title: 'Projects',
+    //   href: '/dashboard/guest/projects',
+    //   icon: FolderKanban,
+    // },
+    // {
+    //   title: 'Repairs',
+    //   href: '/dashboard/guest/repairs',
+    //   icon: Wrench,
+    // },
     {
       title: 'Profile',
       href: '/dashboard/guest/profile',
