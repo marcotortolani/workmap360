@@ -566,13 +566,13 @@ export default function ManagerRepairsPage() {
                         <TableHead className="w-16">ID</TableHead>
                         <TableHead className="w-20">Type</TableHead>
                         <TableHead className="w-16">Index</TableHead>
-                        <TableHead className="min-w-[160px]">
+                        <TableHead className="w-40">
                           Repair Code
                         </TableHead>
-                        <TableHead className="min-w-[200px]">
+                        <TableHead className="w-80">
                           Project Name
                         </TableHead>
-                        <TableHead className="w-24">Elevation</TableHead>
+                        <TableHead className="w-40">Elevation</TableHead>
                         <TableHead className="w-16">Drop</TableHead>
                         <TableHead className="w-16">Level</TableHead>
                         <TableHead className="w-32">Phases</TableHead>
@@ -620,7 +620,7 @@ export default function ManagerRepairsPage() {
                                 {getRepairType(repair.phases)}.
                                 {repair.repair_index}
                               </TableCell>
-                              <TableCell className="truncate max-w-[200px]">
+                              <TableCell className="truncate max-w-[200px] line-clamp-1">
                                 {repair.project_name}
                               </TableCell>
                               <TableCell>{repair.elevation_name}</TableCell>

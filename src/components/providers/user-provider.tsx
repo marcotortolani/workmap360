@@ -35,31 +35,39 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
   }, [mounted, isPublicRoute, isAuthenticated, isLoading, initializeUser])
 
-  // ✅ Manejar redirecciones en useEffect para evitar setState durante render
+  // ✅ Manejar redirecciones en useEffect separado para evitar setState durante render
   useEffect(() => {
     if (!mounted) return
 
-    // Redirigir usuarios autenticados desde login a su dashboard
-    if (isAuthenticated && currentUser?.role && pathname === '/auth/login') {
-      // ✅ Verificar que el usuario esté activo antes de redirigir
-      if (currentUser.status !== 'active') {
-        router.push('/inactive')
-      } else {
-        router.push(`/dashboard/${currentUser.role}`)
+    // Pequeño delay para asegurar que el estado esté estable
+    const timeoutId = setTimeout(() => {
+      // Redirigir usuarios autenticados desde login a su dashboard
+      if (isAuthenticated && currentUser?.role && pathname === '/auth/login') {
+        // ✅ Verificar que el usuario esté activo antes de redirigir
+        if (currentUser.status !== 'active') {
+          
+          router.push('/inactive')
+        } else {
+          
+          router.push(`/dashboard/${currentUser.role}`)
+        }
       }
-    }
-    // Redirigir usuarios inactivos a /inactive
-    else if (
-      isAuthenticated &&
-      currentUser?.status === 'inactive' &&
-      pathname !== '/inactive'
-    ) {
-      router.push('/inactive')
-    }
-    // Redirigir usuarios no autenticados desde rutas protegidas al login
-    else if (!isPublicRoute && !isAuthenticated && !isLoading && mounted) {
-      router.push('/auth/login')
-    }
+      // Redirigir usuarios inactivos a /inactive
+      else if (
+        isAuthenticated &&
+        currentUser?.status === 'inactive' &&
+        pathname !== '/inactive'
+      ) {
+        router.push('/inactive')
+      }
+      // Redirigir usuarios no autenticados desde rutas protegidas al login
+      else if (!isPublicRoute && !isAuthenticated && !isLoading && mounted) {
+        
+        router.push('/auth/login')
+      }
+    }, 100) // Pequeño delay para evitar redirecciones durante hydratación
+
+    return () => clearTimeout(timeoutId)
   }, [
     mounted,
     isAuthenticated,
@@ -70,11 +78,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     router,
   ])
 
-  // No renderizar hasta estar montado para evitar hydration issues
-  if (!mounted) {
-    return <div suppressHydrationWarning>{children}</div>
-  }
-
+  // ✅ Siempre renderizar children sin condiciones
   return <>{children}</>
 }
 

@@ -42,6 +42,7 @@ import {
 } from '@/types/repair-type'
 import { getRepairType } from '@/lib/utils'
 import Image from 'next/image'
+import { useCurrentUser } from '@/stores/user-store'
 
 interface RepairDetailModalProps {
   open: boolean
@@ -140,7 +141,7 @@ function PhaseInfo({
   phase: SurveyPhase | ProgressPhase | FinishPhase | null | undefined
   isCompleted: boolean
 }) {
-  console.log('is completed', isCompleted)
+  console.log('isCompleted', isCompleted)
 
   if (!phase) {
     return (
@@ -248,6 +249,7 @@ export function RepairDetailModal({
   onStatusUpdate,
   canEditStatus = false,
 }: RepairDetailModalProps) {
+  const { userRole } = useCurrentUser()
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
   const [newStatus, setNewStatus] = useState<RepairDataStatusType>('pending')
   const [statusComments, setStatusComments] = useState('')
@@ -402,6 +404,13 @@ export function RepairDetailModal({
                       onValueChange={(value) =>
                         setNewStatus(value as RepairDataStatusType)
                       }
+                      disabled={
+                        !(
+                          userRole === 'admin' ||
+                          userRole === 'manager' ||
+                          userRole === 'client'
+                        )
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select new status" />
@@ -422,6 +431,13 @@ export function RepairDetailModal({
                       value={statusComments}
                       onChange={(e) => setStatusComments(e.target.value)}
                       rows={3}
+                      disabled={
+                        !(
+                          userRole === 'admin' ||
+                          userRole === 'manager' ||
+                          userRole === 'client'
+                        )
+                      }
                     />
                   </div>
                 </div>
