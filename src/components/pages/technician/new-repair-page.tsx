@@ -1596,7 +1596,7 @@ export default function TechnicianNewRepairPage() {
                           // folderName={selectedProject?.name || folderName}
                           userName={fullName || 'Unknown'}
                           onImageProcessed={handleImageProcessed}
-                          disabled={!validateMeasurements() || isSubmitting}
+                          disabled={!validateMeasurements() || isSubmitting || (hasMeasurementsChanged() && comments.length === 0)}
                           allowMultiple={allowsMultiplePhotos}
                           maxPhotos={maxPhotos}
                           currentCount={processedImages.length}
@@ -1623,7 +1623,9 @@ export default function TechnicianNewRepairPage() {
                           type="button"
                           onClick={handleSubmitRepairData}
                           disabled={
-                            isSubmitting || processedImages.length === 0
+                            isSubmitting ||
+                            processedImages.length === 0 ||
+                            !validateMeasurements()
                           }
                           className="w-full bg-orange-500 hover:bg-orange-600 text-white"
                         >
