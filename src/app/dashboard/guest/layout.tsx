@@ -11,7 +11,20 @@ export default function GuestLayout({
 }: {
   children: React.ReactNode
 }) {
-  const { user } = useCurrentUser()
+  const { user, isLoading } = useCurrentUser()
+
+  // El UserProvider ya maneja las redirecciones, así que solo necesitamos verificar loading
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
   if (!user) {
     redirect('/')
   }

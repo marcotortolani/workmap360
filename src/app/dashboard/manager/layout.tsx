@@ -2,10 +2,11 @@
 
 'use client'
 import type React from 'react'
+import { redirect } from 'next/navigation'
 import { useCurrentUser } from '@/stores/user-store'
 import { Sidebar } from '@/components/sidebar'
 import { Header } from '@/components/header'
-import { useUserStatusCheck } from "@/hooks/use-user-status-check"
+import { useUserStatusCheck } from '@/hooks/use-user-status-check'
 
 export default function ManagerLayout({
   children,
@@ -31,7 +32,7 @@ export default function ManagerLayout({
 
   // Si no hay usuario, el UserProvider se encargará de redirigir
   if (!user) {
-    return null
+    redirect('/')
   }
 
   return (

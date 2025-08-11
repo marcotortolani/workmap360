@@ -91,6 +91,67 @@ export async function getRepairViaAPI(
   }
 }
 
+// Función para obtener reparaciones por ubicación específica
+export async function getRepairsByLocationViaAPI(
+  accessToken: string,
+  projectId: number,
+  drop: number,
+  level: number,
+  repairType?: string
+): Promise<{
+  success: boolean
+  repairs?: RepairData[]
+  location?: {
+    project_id: number
+    drop: number
+    level: number
+    repair_type?: string
+  }
+  total?: number
+  error?: string
+}> {
+  try {
+    const searchParams = new URLSearchParams({
+      project_id: projectId.toString(),
+      drop: drop.toString(),
+      level: level.toString(),
+    })
+
+    // Agregar repair_type si se proporciona
+    if (repairType) {
+      searchParams.append('repair_type', repairType)
+    }
+
+    const response = await fetch(
+      `/api/repairs/by-location?${searchParams.toString()}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    )
+
+    const result = await response.json()
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: result.error || 'Failed to fetch repairs by location',
+      }
+    }
+
+    return {
+      success: true,
+      repairs: result.repairs,
+      location: result.location,
+      total: result.total,
+    }
+  } catch (error) {
+    console.error('Error fetching repairs by location:', error)
+    return { success: false, error: 'Network error occurred' }
+  }
+}
+
 // Función para crear una reparación
 export async function createRepairViaAPI(
   repairData: {

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // hooks/useProjectsList.ts - Hook mejorado sin hooks condicionales
 // import { useState, useEffect, useCallback, useRef } from 'react'
 // import { useCurrentUser } from '@/stores/user-store'

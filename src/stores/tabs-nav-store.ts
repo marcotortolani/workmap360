@@ -45,12 +45,12 @@ const NAV_TABS: {
       icon: Users,
     },
     {
-      title: 'New Repair',
+      title: 'New Repair Entry',
       href: '/dashboard/admin/new-repair',
       icon: PenToolIcon,
     },
     {
-      title: 'Repairs',
+      title: 'Repairs List',
       href: '/dashboard/admin/repairs',
       icon: Wrench,
     },
@@ -107,12 +107,12 @@ const NAV_TABS: {
       icon: Users,
     },
     {
-      title: 'New Repair',
+      title: 'New Repair Entry',
       href: '/dashboard/manager/new-repair',
       icon: PenToolIcon,
     },
     {
-      title: 'Repairs',
+      title: 'Repairs List',
       href: '/dashboard/manager/repairs',
       icon: Wrench,
     },
@@ -154,12 +154,12 @@ const NAV_TABS: {
       icon: FolderKanban,
     },
     {
-      title: 'New Repair',
+      title: 'New Repair Entry',
       href: '/dashboard/technician/new-repair',
       icon: PenToolIcon,
     },
     {
-      title: 'Repairs',
+      title: 'Repairs List',
       href: '/dashboard/technician/repairs',
       icon: Wrench,
     },
@@ -181,7 +181,7 @@ const NAV_TABS: {
       icon: FolderKanban,
     },
     {
-      title: 'Repairs',
+      title: 'Repairs List',
       href: '/dashboard/client/repairs',
       icon: Wrench,
     },
@@ -203,7 +203,7 @@ const NAV_TABS: {
     //   icon: FolderKanban,
     // },
     // {
-    //   title: 'Repairs',
+    //   title: 'Repairs List',
     //   href: '/dashboard/guest/repairs',
     //   icon: Wrench,
     // },

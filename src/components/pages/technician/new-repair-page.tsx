@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 // src/components/pages/technician/new-repair-page.tsx
 
 'use client'
@@ -24,7 +25,7 @@ import { Separator } from '@/components/ui/separator'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { useProjectsList } from '@/hooks/use-projects-list'
-import { useRepairsList } from '@/hooks/use-repairs-list'
+import { useRepairsByLocation } from '@/hooks/use-repairs-by-location'
 
 // import { useRepairsDataStore } from '@/stores/repairs-data-store'
 import { useCurrentUser } from '@/stores/user-store'
@@ -131,7 +132,15 @@ const getPhaseStatus = (repair: RepairData | null, totalPhases: number) => {
 
 export default function TechnicianNewRepairPage() {
   const { projects, isLoading: projectsLoading } = useProjectsList()
-  const { repairs, isLoading: repairsLoading, refetch } = useRepairsList()
+  // ✅ Cambiar a usar el hook específico por ubicación
+  const {
+    repairs: locationRepairs,
+    isLoading: locationRepairsLoading,
+    fetchRepairsByLocation,
+    clearRepairs,
+    // total: totalLocationRepairs,
+  } = useRepairsByLocation()
+
   const { userId, fullName, accessToken } = useCurrentUser()
 
   // Referencias para validación
@@ -271,6 +280,8 @@ export default function TechnicianNewRepairPage() {
     setComments('')
     setProcessedImages([])
     setShowImageUpload(false)
+    setSelectedRepair(null)
+    setCurrentPhase(null)
   }, [project_id, setValue])
 
   // Reiniciar campos cuando cambia la elevación
@@ -318,17 +329,64 @@ export default function TechnicianNewRepairPage() {
     setShowImageUpload(false)
   }, [currentPhase])
 
-  // Filtrar reparaciones existentes con useMemo
+  // ✅ Efecto para cargar repairs cuando cambian project, drop, level o repair_type
+  useEffect(() => {
+    if (project_id && drop && level) {
+      console.log('Loading repairs for location:', {
+        project_id,
+        drop,
+        level,
+        repair_type,
+      })
+
+      // Si hay repair_type seleccionado, filtrarlo también
+      if (repair_type) {
+        fetchRepairsByLocation(project_id, drop, level, repair_type)
+      } else {
+        // Si no hay repair_type, obtener todos los repairs en esa ubicación
+        fetchRepairsByLocation(project_id, drop, level)
+      }
+    } else {
+      // Limpiar repairs si no hay ubicación completa
+      clearRepairs()
+    }
+  }, [
+    project_id,
+    drop,
+    level,
+    repair_type,
+    fetchRepairsByLocation,
+    clearRepairs,
+  ])
+
+  // ✅ Usar locationRepairs en lugar de repairs para filtering
   const matchingRepairs = useMemo(() => {
-    return repairs.filter(
-      (repair) =>
-        repair.project_id === project_id &&
-        // repair.elevation_name === elevation &&
-        repair.drop === drop &&
-        repair.level === level &&
-        repair.phases.survey?.repair_type === repair_type
+    if (!repair_type) return locationRepairs
+
+    // Si hay repair_type, filtrar los repairs que ya vienen filtrados del backend
+    return locationRepairs.filter(
+      (repair) => repair.phases.survey?.repair_type === repair_type
     )
-  }, [repairs, project_id, drop, level, repair_type])
+  }, [locationRepairs, repair_type])
+
+  // ✅ Calcular el próximo repairIndex basado en los repairs de esta ubicación
+  const nextRepairIndex = useMemo(() => {
+    if (matchingRepairs.length === 0) return 1
+    return Math.max(...matchingRepairs.map((r) => r.repair_index)) + 1
+  }, [matchingRepairs])
+
+  // Filtrar reparaciones existentes con useMemo
+  // const matchingRepairs = useMemo(() => {
+  //   return repairs.filter(
+  //     (repair) =>
+  //       repair.project_id === project_id &&
+  //       // repair.elevation_name === elevation &&
+  //       repair.drop === drop &&
+  //       repair.level === level &&
+  //       repair.phases.survey?.repair_type === repair_type
+  //   )
+  // }, [repairs, project_id, drop, level, repair_type])
+
   // const matchingRepairs = repairs.filter(
   //   (repair) =>
   //     repair.project_id === project_id &&
@@ -339,10 +397,13 @@ export default function TechnicianNewRepairPage() {
   // )
 
   // Calcular el próximo repairIndex
-  const nextRepairIndex =
-    matchingRepairs.length > 0
-      ? Math.max(...matchingRepairs.map((r) => r.repair_index)) + 1
-      : 1
+  // const nextRepairIndex =
+  //   matchingRepairs.length > 0
+  //     ? Math.max(...matchingRepairs.map((r) => r.repair_index)) + 1
+  //     : 1
+
+  console.log(selectedRepair);
+  
 
   // Generar campos de medición dinámicos
   const getMeasurementFields = (): MeasurementField[] => {
@@ -709,7 +770,7 @@ export default function TechnicianNewRepairPage() {
         repair_type: '',
         repair_index: 1,
       })
-      refetch()
+      clearRepairs()
       setMeasurements({})
       setComments('')
       setCurrentPhase(null)
@@ -839,7 +900,7 @@ export default function TechnicianNewRepairPage() {
     }
   }
 
-  if (projectsLoading || repairsLoading) {
+  if (projectsLoading) {
     return (
       <div className="w-full flex justify-center items-center min-h-[400px]">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -876,7 +937,7 @@ export default function TechnicianNewRepairPage() {
                   <SelectContent>
                     {projects.map((project: ProjectData) => (
                       <SelectItem
-                        key={project.id}
+                        key={`Project-${project.id}`}
                         value={project.id.toString()}
                       >
                         {project.name}
@@ -997,9 +1058,9 @@ export default function TechnicianNewRepairPage() {
                   </SelectTrigger>
                   <SelectContent>
                     {selectedProject?.repair_types.map(
-                      (rt: ProjectRepairType) => (
+                      (rt: ProjectRepairType, index) => (
                         <SelectItem
-                          key={rt.repair_type_id}
+                          key={`RepairType${rt.repair_type_id}-${index}`}
                           value={rt.repair_type}
                         >
                           {rt.repair_type} ({rt.phases} phases)
@@ -1016,12 +1077,24 @@ export default function TechnicianNewRepairPage() {
               </div>
 
               <div>
-                <Label>Index Repair Selection</Label>
+                <div className=" mb-2 flex items-center gap-2">
+                  <Label>Index Repair Selection</Label>
+                  {locationRepairsLoading && (
+                    <Loader2 className=" w-4 h-4 animate-spin" />
+                  )}
+                </div>
                 <Select
+                  // value={
+                  //   repair_index === nextRepairIndex && !selectedRepair
+                  //     ? ''
+                  //     : repair_index.toString()
+                  // }
                   value={
-                    repair_index === nextRepairIndex && !selectedRepair
-                      ? ''
-                      : repair_index.toString()
+                    selectedRepair
+                      ? selectedRepair.repair_index.toString() // Repair existente seleccionado
+                      : repair_index === nextRepairIndex
+                      ? 'new' // ← Solución: cuando es "new", mostrar "new"
+                      : '' // Placeholder por defecto
                   }
                   onValueChange={handleRepairSelection}
                   disabled={!repair_type}
@@ -1031,7 +1104,7 @@ export default function TechnicianNewRepairPage() {
                   </SelectTrigger>
                   <SelectContent>
                     {matchingRepairs.map((repair) => {
-                      const phaseStatus = getPhaseStatus(repair, phases)
+                      //const phaseStatus = getPhaseStatus(repair, phases)
                       const nextPhaseInfo = determineCurrentPhase(
                         repair,
                         phases
@@ -1039,20 +1112,12 @@ export default function TechnicianNewRepairPage() {
 
                       return (
                         <SelectItem
-                          key={repair.id}
+                          key={`${project_id}-${repair.id}-${repair.repair_index}-${repair.drop}-${repair.level}-${repair.status}`}
                           value={repair.repair_index.toString()}
                         >
                           <div className="flex items-center gap-2">
                             <span>Index #{repair.repair_index}</span>
-                            <Badge
-                              variant={
-                                repair.status === 'approved'
-                                  ? 'default'
-                                  : repair.status === 'pending'
-                                  ? 'secondary'
-                                  : 'destructive'
-                              }
-                            >
+                            <Badge variant={'approved'}>
                               {getRepairStatus(repair)}
                             </Badge>
                             {nextPhaseInfo && (
@@ -1063,14 +1128,14 @@ export default function TechnicianNewRepairPage() {
                                   : nextPhaseInfo.phase.toUpperCase()}
                               </Badge>
                             )}
-                            {phaseStatus?.isComplete && (
+                            {/* {phaseStatus?.isComplete && (
                               <Badge
                                 variant="default"
                                 className="text-xs bg-green-600"
                               >
                                 Complete
                               </Badge>
-                            )}
+                            )} */}
                           </div>
                         </SelectItem>
                       )
@@ -1078,7 +1143,7 @@ export default function TechnicianNewRepairPage() {
                     <SelectItem value="new">
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="h-4 w-4 text-green-600" />
-                        Create new repair (Index: {nextRepairIndex})
+                        New repair (Index: {nextRepairIndex})
                         <Badge variant="outline" className="text-xs">
                           Start: Survey
                         </Badge>
@@ -1208,7 +1273,7 @@ export default function TechnicianNewRepairPage() {
 
                             return (
                               <div
-                                key={progressIndex}
+                                key={`P-${progressIndex}`}
                                 className={`flex items-center gap-1 px-2 py-1 rounded ${
                                   isCompleted
                                     ? 'bg-green-100 text-green-800'
@@ -1274,10 +1339,10 @@ export default function TechnicianNewRepairPage() {
                   {/* Dynamic Measurements Input */}
                   {selectedRepairType && getCurrentPhaseName() !== 'Finish' && (
                     <div>
-                      <Label>Measurements</Label>
+                      <Label>Measurements - {currentPhase}</Label>
                       <div className="grid gap-3 md:grid-cols-3 mt-2">
-                        {getMeasurementFields().map((field) => (
-                          <div key={field.key}>
+                        {getMeasurementFields().map((field, index) => (
+                          <div key={`Measurement-${field.key}-${index}`}>
                             <Label className="text-sm">
                               {field.label}
                               {field.required && (
@@ -1288,7 +1353,8 @@ export default function TechnicianNewRepairPage() {
                               type="number"
                               step="0.01"
                               placeholder={field.placeholder}
-                              value={measurements[field.key] || ''}
+                              value={currentPhase === 'progress' ? 
+                                10 : ''}
                               onChange={(e) => {
                                 const value = parseFloat(e.target.value) || 0
                                 setMeasurements((prev) => ({
@@ -1366,7 +1432,10 @@ export default function TechnicianNewRepairPage() {
                     {processedImages.length > 0 && (
                       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                         {processedImages.map((image, index) => (
-                          <div key={image.id} className="relative">
+                          <div
+                            key={`Processed-Image-${image.id}`}
+                            className="relative"
+                          >
                             <img
                               src={image.previewUrl}
                               alt={`${getCurrentPhaseName()} ${index + 1}`}
