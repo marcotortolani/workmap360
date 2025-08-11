@@ -1,9 +1,8 @@
-/* eslint-disable @next/next/no-img-element */
 // src/components/pages/technician/new-repair-page.tsx
 
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -162,6 +161,8 @@ export default function TechnicianNewRepairPage() {
   const [folderName, setFolderName] = useState<string>('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [measurements, setMeasurements] = useState<Record<string, number>>({})
+  const [measurementsModified, setMeasurementsModified] = useState(false)
+
   const [comments, setComments] = useState<string>('')
 
   // Estados para múltiples imágenes
@@ -402,9 +403,6 @@ export default function TechnicianNewRepairPage() {
   //     ? Math.max(...matchingRepairs.map((r) => r.repair_index)) + 1
   //     : 1
 
-  console.log(selectedRepair);
-  
-
   // Generar campos de medición dinámicos
   const getMeasurementFields = (): MeasurementField[] => {
     if (!selectedRepairType) return []
@@ -478,30 +476,95 @@ export default function TechnicianNewRepairPage() {
     return fields
   }
 
-  // Calcular el valor convertido para mostrar
-  const getConvertedValue = () => {
-    if (!selectedRepairType || !selectedRepairType.conversion) return null
+  // Compare measurements with previous measurements
+  const hasMeasurementsChanged = useCallback(() => {
+    if (!selectedRepair?.phases.survey?.measurements) return false
 
-    try {
-      const value =
-        selectedRepairType.conversion.conversion_factor(measurements)
-      return {
-        value: value.toFixed(3),
-        unit: selectedRepairType.unit_to_charge,
+    const surveyMeasurements = selectedRepair.phases.survey.measurements
+
+    return Object.keys(surveyMeasurements).some((key) => {
+      const surveyValue = surveyMeasurements[key] || 0
+      const currentValue = measurements[key] || 0
+      return Math.abs(surveyValue - currentValue) > 0.001 // Considerar diferencias mínimas como iguales
+    })
+  }, [selectedRepair, measurements])
+
+  // Función para obtener el valor a mostrar en cada input
+  const getInputValue = useCallback(
+    (fieldKey: string) => {
+      if (currentPhase === 'survey') {
+        // En survey, siempre usar el estado measurements
+        return measurements[fieldKey] || 0
       }
-    } catch (error) {
-      toast.error('Error calculating conversion', {
-        description: 'Error: ' + error,
-        duration: 5000,
-        style: {
-          background: '#FF0000',
-          color: '#FFFFFF',
-          fontWeight: 'bold',
-        },
-      })
-      return null
+
+      if (currentPhase === 'progress') {
+        if (measurementsModified) {
+          // Si se han modificado, usar los nuevos valores
+          return measurements[fieldKey] || 0
+        } else {
+          // Si no se han modificado, usar los valores del survey
+          return selectedRepair?.phases.survey?.measurements?.[fieldKey] || 0
+        }
+      }
+
+      // Para finish u otras fases
+      return measurements[fieldKey] || 0
+    },
+    [currentPhase, measurements, measurementsModified, selectedRepair]
+  )
+
+  useEffect(() => {
+    if (
+      currentPhase === 'progress' &&
+      selectedRepair?.phases.survey?.measurements
+    ) {
+      // Al entrar en progress, inicializar con valores del survey
+      const surveyMeasurements = selectedRepair.phases.survey.measurements
+      setMeasurements(surveyMeasurements)
+      setMeasurementsModified(false)
+    } else if (currentPhase === 'survey') {
+      // Reset del flag cuando volvemos a survey
+      setMeasurementsModified(false)
+    }
+  }, [currentPhase, selectedRepair])
+
+  // Función para manejar cambios en los inputs
+  const handleMeasurementChange = (fieldKey: string, value: number) => {
+    setMeasurements((prev) => ({
+      ...prev,
+      [fieldKey]: value,
+    }))
+
+    // Marcar como modificado si estamos en progress
+    if (currentPhase === 'progress') {
+      setMeasurementsModified(true)
     }
   }
+
+  // Calcular el valor convertido para mostrar
+  // const getConvertedValue = () => {
+  //   if (!selectedRepairType || !selectedRepairType.conversion) return null
+
+  //   try {
+  //     const value =
+  //       selectedRepairType.conversion.conversion_factor(measurements)
+  //     return {
+  //       value: value.toFixed(3),
+  //       unit: selectedRepairType.unit_to_charge,
+  //     }
+  //   } catch (error) {
+  //     toast.error('Error calculating conversion', {
+  //       description: 'Error: ' + error,
+  //       duration: 5000,
+  //       style: {
+  //         background: '#FF0000',
+  //         color: '#FFFFFF',
+  //         fontWeight: 'bold',
+  //       },
+  //     })
+  //     return null
+  //   }
+  // }
 
   // Manejar selección de reparación
   const handleRepairSelection = (value: string) => {
@@ -1311,19 +1374,19 @@ export default function TechnicianNewRepairPage() {
                   )}
 
                   {/* Repair Code Display */}
-                  <div className="bg-muted p-3 rounded-md">
+                  <div className="bg-muted p-3 rounded-md flex flex-col lg:flex-row lg:items-center gap-1 lg:gap-4">
                     <p className="text-sm font-medium">Repair Code:</p>
                     <p className="text-lg font-mono">{getFullRepairCode()}</p>
-                    {getMeasurementsString() && (
+                    {/* {getMeasurementsString() && (
                       <p className="text-xs text-muted-foreground mt-1">
                         Format: D{drop}.L{level}.{repair_type}.{repair_index}.
                         {getMeasurementsString()}.{getPhaseCode()}
                       </p>
-                    )}
+                    )} */}
                   </div>
 
                   {/* Repair Type Information */}
-                  {selectedRepairType && (
+                  {/* {selectedRepairType && (
                     <div className="bg-blue-50 p-3 rounded-md border">
                       <p className="text-sm font-medium text-blue-900">
                         {selectedRepairType.variation} (
@@ -1334,12 +1397,25 @@ export default function TechnicianNewRepairPage() {
                         {selectedRepairType.unit_to_charge}
                       </p>
                     </div>
-                  )}
+                  )} */}
 
                   {/* Dynamic Measurements Input */}
                   {selectedRepairType && getCurrentPhaseName() !== 'Finish' && (
                     <div>
-                      <Label>Measurements - {currentPhase}</Label>
+                      <Label>Measurements</Label>
+
+                      {/* ✅ Mostrar indicador si estamos en progress y usando valores del survey */}
+                      {currentPhase === 'progress' &&
+                        !measurementsModified &&
+                        selectedRepair?.phases.survey?.measurements && (
+                          <div className="mb-2 p-2 bg-blue-50 rounded-md border border-blue-200">
+                            <p className="text-xs text-blue-700">
+                              📋 Using measurements from Survey phase. Modify
+                              any value to update.
+                            </p>
+                          </div>
+                        )}
+
                       <div className="grid gap-3 md:grid-cols-3 mt-2">
                         {getMeasurementFields().map((field, index) => (
                           <div key={`Measurement-${field.key}-${index}`}>
@@ -1348,33 +1424,52 @@ export default function TechnicianNewRepairPage() {
                               {field.required && (
                                 <span className="text-red-500 ml-1">*</span>
                               )}
+                              {/* ✅ Indicador visual si el valor viene del survey */}
+                              {currentPhase === 'progress' &&
+                                !measurementsModified && (
+                                  <span className="text-blue-500 ml-1 text-xs">
+                                    (from Survey)
+                                  </span>
+                                )}
                             </Label>
                             <Input
                               type="number"
-                              step="0.01"
+                              step="1"
                               placeholder={field.placeholder}
-                              value={currentPhase === 'progress' ? 
-                                10 : ''}
+                              value={getInputValue(field.key)}
                               onChange={(e) => {
                                 const value = parseFloat(e.target.value) || 0
-                                setMeasurements((prev) => ({
-                                  ...prev,
-                                  [field.key]: value,
-                                }))
+                                handleMeasurementChange(field.key, value)
                               }}
-                              disabled={!!field.defaultValue || isSubmitting}
+                              disabled={isSubmitting}
+                              className={
+                                currentPhase === 'progress' &&
+                                !measurementsModified
+                                  ? 'border-blue-300 bg-blue-50' // Visual feedback que viene del survey
+                                  : ''
+                              }
                             />
-                            {field.defaultValue && (
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Default value: {field.defaultValue}
-                              </p>
-                            )}
+                            {/* ✅ Mostrar valor original del survey si estamos en progress y se ha modificado */}
+                            {currentPhase === 'progress' &&
+                              measurementsModified &&
+                              selectedRepair?.phases.survey?.measurements?.[
+                                field.key
+                              ] && (
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Survey value:{' '}
+                                  {
+                                    selectedRepair.phases.survey.measurements[
+                                      field.key
+                                    ]
+                                  }
+                                </p>
+                              )}
                           </div>
                         ))}
                       </div>
 
                       {/* Converted Value Display */}
-                      {(() => {
+                      {/* {(() => {
                         const converted = getConvertedValue()
                         return (
                           converted && (
@@ -1384,25 +1479,44 @@ export default function TechnicianNewRepairPage() {
                                   Converted Value:
                                 </span>{' '}
                                 {converted.value} {converted.unit}
+                                
+                                {currentPhase === 'progress' &&
+                                  !measurementsModified && (
+                                    <span className="text-blue-600 ml-2 text-xs">
+                                      (based on Survey measurements)
+                                    </span>
+                                  )}
                               </p>
                             </div>
                           )
                         )
-                      })()}
+                      })()} */}
                     </div>
                   )}
 
                   {/* Comments */}
-                  <div>
-                    <Label>Comments</Label>
-                    <Textarea
-                      value={comments}
-                      onChange={(e) => setComments(e.target.value)}
-                      placeholder="Add any relevant comments about this repair phase..."
-                      rows={3}
-                      disabled={isSubmitting}
-                    />
-                  </div>
+                  {hasMeasurementsChanged() && (
+                    <div>
+                      <Label>
+                        Comments{' '}
+                        {currentPhase === 'progress' &&
+                          hasMeasurementsChanged() && (
+                            <span className="text-red-500 ml-1">*</span>
+                          )}
+                      </Label>
+                      <Textarea
+                        value={comments}
+                        onChange={(e) => setComments(e.target.value)}
+                        placeholder="Add any relevant comments about this repair phase..."
+                        rows={3}
+                        disabled={isSubmitting}
+                        required={
+                          currentPhase === 'progress' &&
+                          hasMeasurementsChanged()
+                        }
+                      />
+                    </div>
+                  )}
 
                   {/* Image Management Section */}
                   <div className="space-y-4">
