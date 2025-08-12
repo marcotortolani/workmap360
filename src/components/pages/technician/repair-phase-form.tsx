@@ -126,7 +126,6 @@ const getPhaseStatus = (repair: RepairData | null, totalPhases: number) => {
 export default function RepairPhaseForm({
   projectId,
   projectName,
-  clientName,
   elevationName,
   drop,
   level,
@@ -1023,7 +1022,7 @@ export default function RepairPhaseForm({
                   phase: getPhaseCode(),
                 }}
                 userName={fullName || 'Unknown'}
-                clientName={clientName || 'Unknown'}
+                projectName={projectName || 'Unknown'}
                 onImageProcessed={handleImageProcessed}
                 disabled={!validateMeasurements() || isSubmitting || disabled}
                 allowMultiple={allowsMultiplePhotos}

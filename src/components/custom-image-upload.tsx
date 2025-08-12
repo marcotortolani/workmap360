@@ -53,8 +53,8 @@ interface CustomImageUploadProps {
     phase: string
   }
   // folderName: string
+  projectName: string
   userName: string
-  clientName: string
   disabled?: boolean
   allowMultiple?: boolean
   maxPhotos?: number
@@ -66,8 +66,8 @@ export default function CustomImageUpload({
   fieldName,
   fileNameData,
   // folderName,
+  projectName,
   userName,
-  clientName,
   disabled = false,
   allowMultiple = false,
   maxPhotos = 1,
@@ -445,19 +445,19 @@ export default function CustomImageUpload({
 
       const fileName = handleFileName()
       const dateTimeText = formatDateTime()
+      const projectNameText = 'Project: ' + (projectName || 'Project Unknown')
       const userNameText = 'Photo by: ' + (userName || 'User Unknown')
-      const clientNameText = 'Client: ' + (clientName || 'Client Unknown')
       const fileNameText = fileName || 'WorkMap'
 
       // Calcular dimensiones del watermark
       ctx.font = `bold ${fontSize}px Arial`
       const fileNameWidth = ctx.measureText(fileNameText).width
       ctx.font = `${fontSize}px Arial`
+      const projectNameWidth = ctx.measureText(projectNameText).width
       const userNameWidth = ctx.measureText(userNameText).width
-      const clientNameWidth = ctx.measureText(clientNameText).width
       const dateTimeWidth = ctx.measureText(dateTimeText).width
 
-      const maxTextWidth = Math.max(fileNameWidth, userNameWidth, clientNameWidth, dateTimeWidth)
+      const maxTextWidth = Math.max(fileNameWidth, projectNameWidth, userNameWidth, dateTimeWidth)
       const backgroundWidth = maxTextWidth + padding * 2
       const backgroundHeight = lineHeight * 3 + padding * 2
 
@@ -483,12 +483,12 @@ export default function CustomImageUpload({
       ctx.fillText(dateTimeText, textX, textY)
       textY += lineHeight
 
-      // Usuario segundo
-      ctx.fillText(userNameText, textX, textY)
+      // Proyecto segundo
+      ctx.fillText(projectNameText, textX, textY)
       textY += lineHeight
 
-      // Nombre del cliente tercero
-      ctx.fillText(clientNameText, textX, textY)
+      // Usuario tercero
+      ctx.fillText(userNameText, textX, textY)
       textY += lineHeight
 
       // Nombre del archivo último, en negrita

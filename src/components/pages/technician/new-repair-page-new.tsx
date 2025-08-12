@@ -162,8 +162,6 @@ export default function TechnicianNewRepairPage() {
   // const [showRestoreBanner, setShowRestoreBanner] = useState(false)
   // const [restoredData, setRestoredData] = useState<any>(null)
 
-  
-
   // Referencias para validación
   const maxDropsRef = useRef<number | undefined>(undefined)
   const maxLevelsRef = useRef<number | undefined>(undefined)
@@ -1899,8 +1897,8 @@ export default function TechnicianNewRepairPage() {
                             phase: getPhaseCode(),
                           }}
                           // folderName={selectedProject?.name || folderName}
+                          projectName={selectedProject?.name || 'Unknown'}
                           userName={fullName || 'Unknown'}
-                          clientName={projectSelected?.client_name || 'Unknown'}
                           onImageProcessed={handleImageProcessed}
                           disabled={
                             !validateMeasurements() ||
