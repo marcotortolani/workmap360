@@ -331,38 +331,38 @@ export default function RepairPhaseForm({
   }
 
   // Calcular el valor convertido para mostrar
-  const getConvertedValue = () => {
-    if (!selectedRepairType || !selectedRepairType.conversion) return null
+  // const getConvertedValue = () => {
+  //   if (!selectedRepairType || !selectedRepairType.conversion) return null
 
-    try {
-      // Para tipos que no tienen conversión (como 'each'), no mostrar valor convertido
-      if (
-        selectedRepairType.unit_measure.type === 'each' &&
-        !selectedRepairType.conversion
-      ) {
-        return null
-      }
+  //   try {
+  //     // Para tipos que no tienen conversión (como 'each'), no mostrar valor convertido
+  //     if (
+  //       selectedRepairType.unit_measure.type === 'each' &&
+  //       !selectedRepairType.conversion
+  //     ) {
+  //       return null
+  //     }
 
-      const value =
-        selectedRepairType.conversion.conversion_factor(measurements)
-      return {
-        value: value.toFixed(3),
-        unit: selectedRepairType.unit_to_charge,
-      }
-    } catch (error) {
-      console.error('Error calculating conversion:', error)
-      toast.error('Error calculating conversion', {
-        description: 'Error: ' + error,
-        duration: 5000,
-        style: {
-          background: '#FF0000',
-          color: '#FFFFFF',
-          fontWeight: 'bold',
-        },
-      })
-      return null
-    }
-  }
+  //     const value =
+  //       selectedRepairType.conversion.conversion_factor(measurements)
+  //     return {
+  //       value: value.toFixed(3),
+  //       unit: selectedRepairType.unit_to_charge,
+  //     }
+  //   } catch (error) {
+  //     console.error('Error calculating conversion:', error)
+  //     toast.error('Error calculating conversion', {
+  //       description: 'Error: ' + error,
+  //       duration: 5000,
+  //       style: {
+  //         background: '#FF0000',
+  //         color: '#FFFFFF',
+  //         fontWeight: 'bold',
+  //       },
+  //     })
+  //     return null
+  //   }
+  // }
 
   // Manejar cuando se procesa una imagen en el CustomImageUpload
   const handleImageProcessed = (processedImage: ProcessedImage) => {
@@ -871,7 +871,7 @@ export default function RepairPhaseForm({
         </div>
 
         {/* Repair Type Information */}
-        {selectedRepairType && (
+        {/* {selectedRepairType && (
           <div className="bg-blue-50 p-3 rounded-md border">
             <p className="text-sm font-medium text-blue-900">
               {selectedRepairType.variation} ({selectedRepairType.type})
@@ -881,7 +881,7 @@ export default function RepairPhaseForm({
               {selectedRepairType.unit_to_charge}
             </p>
           </div>
-        )}
+        )} */}
 
         {/* Dynamic Measurements Input */}
         {selectedRepairType && getCurrentPhaseName() !== 'Finish' && (
@@ -920,7 +920,7 @@ export default function RepairPhaseForm({
             </div>
 
             {/* Converted Value Display */}
-            {(() => {
+            {/* {(() => {
               const converted = getConvertedValue()
               return (
                 converted && (
@@ -932,7 +932,7 @@ export default function RepairPhaseForm({
                   </div>
                 )
               )
-            })()}
+            })()} */}
           </div>
         )}
 
