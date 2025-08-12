@@ -67,7 +67,7 @@ export async function POST(req: Request) {
       authPayload.options.emailRedirectTo = redirectTo
       authPayload.email_confirm = true // el correo se confirma automaticamente
     } else {
-      authPayload.password = `${firstName.toLowerCase()}123`
+      authPayload.password = `${firstName.replaceAll(' ', '').toLowerCase()}123`
       authPayload.email_confirm = true // el correo se confirma automaticamente
     }
 
