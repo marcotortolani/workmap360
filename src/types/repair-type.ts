@@ -1,7 +1,19 @@
 // src/types/repair-type.ts
 
+// export interface UnitMeasure {
+//   type: 'length' | 'area' | 'volume' | 'unit' | 'custom'
+//   value: string // ex: 'mm', "mm x mm", 'mm x mm x mm', 'unit', '1m bar'
+//   default_values?: Partial<Record<string, number>> // Para valores predeterminados, ej. { depth: 10 }
+//   dimensions?: string[]
+// }
 export interface UnitMeasure {
-  type: 'length' | 'area' | 'volume' | 'unit' | 'custom'
+  type:
+    | 'length'
+    | 'area'
+    | 'volume'
+    | 'each'
+    | 'length_thickness'
+    | 'area_thickness'
   value: string // ex: 'mm', "mm x mm", 'mm x mm x mm', 'unit', '1m bar'
   default_values?: Partial<Record<string, number>> // Para valores predeterminados, ej. { depth: 10 }
   dimensions?: string[]

@@ -24,6 +24,9 @@ export default function ManagerRepairTypePage() {
 
   const { repairTypeList, setRepairTypeList } = useRepairTypeStore()
 
+  console.log(repairTypeList[4].unit_measure.type.replace('_', ' + '));
+  
+
   // const handleFilter = (filters: any) => {
   //   console.log('Applying filters:', filters)
   //   // In a real app, you would filter the repairs based on the filters
@@ -146,7 +149,7 @@ export default function ManagerRepairTypePage() {
                     <TableCell className="font-medium">{repair.id}</TableCell>
                     <TableCell>{repair.variation}</TableCell>
                     <TableCell>{repair.type}</TableCell>
-                    <TableCell>{repair.unit_measure.type}</TableCell>
+                    <TableCell className=" capitalize bg-red-300 ">{repair?.unit_measure?.type?.replace('_', ' + ')}</TableCell>
                     <TableCell>{repair.unit_measure.value}</TableCell>
                     <TableCell>{repair.unit_to_charge}</TableCell>
                     <TableCell>{repair.created_by_user_name}</TableCell>

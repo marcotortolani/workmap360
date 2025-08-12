@@ -333,12 +333,12 @@ export default function TechnicianNewRepairPage() {
   // ✅ Efecto para cargar repairs cuando cambian project, drop, level o repair_type
   useEffect(() => {
     if (project_id && drop && level) {
-      console.log('Loading repairs for location:', {
-        project_id,
-        drop,
-        level,
-        repair_type,
-      })
+      // console.log('Loading repairs for location:', {
+      //   project_id,
+      //   drop,
+      //   level,
+      //   repair_type,
+      // })
 
       // Si hay repair_type seleccionado, filtrarlo también
       if (repair_type) {
@@ -404,6 +404,7 @@ export default function TechnicianNewRepairPage() {
   //     : 1
 
   // Generar campos de medición dinámicos
+  // ✅ Generar campos de medición dinámicos - ACTUALIZADO
   const getMeasurementFields = (): MeasurementField[] => {
     if (!selectedRepairType) return []
 
@@ -454,6 +455,32 @@ export default function TechnicianNewRepairPage() {
         )
         break
 
+      case 'area_thickness': // ✅ NUEVO
+        fields.push(
+          {
+            key: 'width',
+            label: 'Width (mm)',
+            required: true,
+            placeholder: 'Enter width in mm',
+          },
+          {
+            key: 'height',
+            label: 'Height (mm)',
+            required: true,
+            placeholder: 'Enter height in mm',
+          },
+          {
+            key: 'thickness',
+            label: 'Thickness (mm)',
+            required: false,
+            defaultValue: unit_measure.default_values?.thickness,
+            placeholder: `Default: ${
+              unit_measure.default_values?.thickness || 'N/A'
+            } mm`,
+          }
+        )
+        break
+
       case 'length':
         fields.push({
           key: 'length',
@@ -463,13 +490,37 @@ export default function TechnicianNewRepairPage() {
         })
         break
 
-      case 'unit':
+      case 'length_thickness': // ✅ NUEVO
+        fields.push(
+          {
+            key: 'length',
+            label: 'Length (mm)',
+            required: true,
+            placeholder: 'Enter length in mm',
+          },
+          {
+            key: 'thickness',
+            label: 'Thickness (mm)',
+            required: false,
+            defaultValue: unit_measure.default_values?.thickness,
+            placeholder: `Default: ${
+              unit_measure.default_values?.thickness || 'N/A'
+            } mm`,
+          }
+        )
+        break
+
+      case 'each': // ✅ CAMBIADO de 'unit' a 'each'
         fields.push({
-          key: 'count',
-          label: 'Count',
+          key: 'each',
+          label: 'Quantity',
           required: true,
           placeholder: 'Enter quantity',
         })
+        break
+
+      default:
+        console.warn(`Unknown unit measure type: ${unit_measure.type}`)
         break
     }
 
@@ -546,13 +597,18 @@ export default function TechnicianNewRepairPage() {
   //   if (!selectedRepairType || !selectedRepairType.conversion) return null
 
   //   try {
-  //     const value =
-  //       selectedRepairType.conversion.conversion_factor(measurements)
+  //     // Para tipos que no tienen conversión (como 'each'), no mostrar valor convertido
+  //     if (selectedRepairType.unit_measure.type === 'each' && !selectedRepairType.conversion) {
+  //       return null
+  //     }
+
+  //     const value = selectedRepairType.conversion.conversion_factor(measurements)
   //     return {
   //       value: value.toFixed(3),
   //       unit: selectedRepairType.unit_to_charge,
   //     }
   //   } catch (error) {
+  //     console.error('Error calculating conversion:', error)
   //     toast.error('Error calculating conversion', {
   //       description: 'Error: ' + error,
   //       duration: 5000,
@@ -880,6 +936,7 @@ export default function TechnicianNewRepairPage() {
   }
 
   // Generar string de mediciones basado en el tipo de reparación
+  // ✅ Generar string de mediciones basado en el tipo de reparación - ACTUALIZADO
   const getMeasurementsString = () => {
     if (!selectedRepairType || Object.keys(measurements).length === 0) return ''
 
@@ -898,15 +955,31 @@ export default function TechnicianNewRepairPage() {
         const areaHeight = measurements.height || 0
         return `${areaWidth}x${areaHeight}`
 
+      case 'area_thickness': // ✅ NUEVO
+        const areaThickWidth = measurements.width || 0
+        const areaThickHeight = measurements.height || 0
+        const thickness =
+          measurements.thickness || unit_measure.default_values?.thickness || 0
+        return `${areaThickWidth}x${areaThickHeight}x${thickness}`
+
       case 'length':
         const length = measurements.length || 0
         return `${length}`
 
-      case 'unit':
-        const count = measurements.count || 0
+      case 'length_thickness': // ✅ NUEVO
+        const lengthThickLength = measurements.length || 0
+        const lengthThickness =
+          measurements.thickness || unit_measure.default_values?.thickness || 0
+        return `${lengthThickLength}x${lengthThickness}`
+
+      case 'each': // ✅ CAMBIADO de 'unit' a 'each'
+        const count = measurements.each || 0
         return `${count}`
 
       default:
+        console.warn(
+          `Unknown unit measure type for measurements string: ${unit_measure.type}`
+        )
         return ''
     }
   }
@@ -930,7 +1003,7 @@ export default function TechnicianNewRepairPage() {
     return `D${drop}.L${level}.${repair_type}.${repair_index}.${measurementsStr}.${phaseCode}`
   }
 
-  // Función para validar que todos los campos de medición requeridos estén completos
+  // ✅ Función para validar que todos los campos de medición requeridos estén completos - ACTUALIZADA
   const validateMeasurements = (): boolean => {
     if (!selectedRepairType) return false
     if (getCurrentPhaseName() === 'Finish') return true
@@ -950,15 +1023,31 @@ export default function TechnicianNewRepairPage() {
         const areaHeight = measurements.height || 0
         return areaWidth > 0 && areaHeight > 0
 
+      case 'area_thickness': // ✅ NUEVO
+        const areaThickWidth = measurements.width || 0
+        const areaThickHeight = measurements.height || 0
+        const thickness =
+          measurements.thickness || unit_measure.default_values?.thickness || 0
+        return areaThickWidth > 0 && areaThickHeight > 0 && thickness > 0
+
       case 'length':
         const length = measurements.length || 0
         return length > 0
 
-      case 'unit':
-        const count = measurements.count || 0
+      case 'length_thickness': // ✅ NUEVO
+        const lengthThickLength = measurements.length || 0
+        const lengthThickness =
+          measurements.thickness || unit_measure.default_values?.thickness || 0
+        return lengthThickLength > 0 && lengthThickness > 0
+
+      case 'each': // ✅ CAMBIADO de 'unit' a 'each'
+        const count = measurements.each || 0
         return count > 0
 
       default:
+        console.warn(
+          `Unknown unit measure type for validation: ${unit_measure.type}`
+        )
         return false
     }
   }
@@ -1469,10 +1558,15 @@ export default function TechnicianNewRepairPage() {
                       </div>
 
                       {/* Converted Value Display */}
-                      {/* {(() => {
+                              {/* {(() => {
                         const converted = getConvertedValue()
+                        
+                        // Solo mostrar para tipos que tienen conversión
+                        const showConversion = selectedRepairType?.conversion && 
+                          selectedRepairType.unit_measure.type !== 'each'
+                        
                         return (
-                          converted && (
+                          converted && showConversion && (
                             <div className="mt-3 p-2 bg-green-50 rounded-md border border-green-200">
                               <p className="text-sm text-green-800">
                                 <span className="font-medium">
@@ -1480,6 +1574,7 @@ export default function TechnicianNewRepairPage() {
                                 </span>{' '}
                                 {converted.value} {converted.unit}
                                 
+                                // Indicar si el cálculo está basado en valores del survey
                                 {currentPhase === 'progress' &&
                                   !measurementsModified && (
                                     <span className="text-blue-600 ml-2 text-xs">
@@ -1487,6 +1582,14 @@ export default function TechnicianNewRepairPage() {
                                     </span>
                                   )}
                               </p>
+                              
+                              // Mostrar la fórmula de conversión para tipos complejos
+                              {(selectedRepairType.unit_measure.type === 'area_thickness' || 
+                                selectedRepairType.unit_measure.type === 'length_thickness') && (
+                                <p className="text-xs text-green-600 mt-1">
+                                  Formula: {selectedRepairType.unit_measure.value} → {selectedRepairType.unit_to_charge}
+                                </p>
+                              )}
                             </div>
                           )
                         )
@@ -1596,7 +1699,11 @@ export default function TechnicianNewRepairPage() {
                           // folderName={selectedProject?.name || folderName}
                           userName={fullName || 'Unknown'}
                           onImageProcessed={handleImageProcessed}
-                          disabled={!validateMeasurements() || isSubmitting || (hasMeasurementsChanged() && comments.length === 0)}
+                          disabled={
+                            !validateMeasurements() ||
+                            isSubmitting ||
+                            (hasMeasurementsChanged() && comments.length === 0)
+                          }
                           allowMultiple={allowsMultiplePhotos}
                           maxPhotos={maxPhotos}
                           currentCount={processedImages.length}
