@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 // src/components/pages/technician/new-repair-page.tsx
 
 'use client'
@@ -1778,6 +1779,7 @@ export default function TechnicianNewRepairPage() {
                           }}
                           // folderName={selectedProject?.name || folderName}
                           userName={fullName || 'Unknown'}
+                          clientName={projectSelected?.client_name || 'Unknown'}
                           onImageProcessed={handleImageProcessed}
                           disabled={
                             !validateMeasurements() ||

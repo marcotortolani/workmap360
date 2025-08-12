@@ -54,6 +54,7 @@ interface CustomImageUploadProps {
   }
   // folderName: string
   userName: string
+  clientName: string
   disabled?: boolean
   allowMultiple?: boolean
   maxPhotos?: number
@@ -66,6 +67,7 @@ export default function CustomImageUpload({
   fileNameData,
   // folderName,
   userName,
+  clientName,
   disabled = false,
   allowMultiple = false,
   maxPhotos = 1,
@@ -444,6 +446,7 @@ export default function CustomImageUpload({
       const fileName = handleFileName()
       const dateTimeText = formatDateTime()
       const userNameText = 'Photo by: ' + (userName || 'User Unknown')
+      const clientNameText = 'Client: ' + (clientName || 'Client Unknown')
       const fileNameText = fileName || 'WorkMap'
 
       // Calcular dimensiones del watermark
@@ -451,9 +454,10 @@ export default function CustomImageUpload({
       const fileNameWidth = ctx.measureText(fileNameText).width
       ctx.font = `${fontSize}px Arial`
       const userNameWidth = ctx.measureText(userNameText).width
+      const clientNameWidth = ctx.measureText(clientNameText).width
       const dateTimeWidth = ctx.measureText(dateTimeText).width
 
-      const maxTextWidth = Math.max(fileNameWidth, userNameWidth, dateTimeWidth)
+      const maxTextWidth = Math.max(fileNameWidth, userNameWidth, clientNameWidth, dateTimeWidth)
       const backgroundWidth = maxTextWidth + padding * 2
       const backgroundHeight = lineHeight * 3 + padding * 2
 
@@ -481,6 +485,10 @@ export default function CustomImageUpload({
 
       // Usuario segundo
       ctx.fillText(userNameText, textX, textY)
+      textY += lineHeight
+
+      // Nombre del cliente tercero
+      ctx.fillText(clientNameText, textX, textY)
       textY += lineHeight
 
       // Nombre del archivo último, en negrita
