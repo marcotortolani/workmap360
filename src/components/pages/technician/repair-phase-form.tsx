@@ -258,6 +258,32 @@ export default function RepairPhaseForm({
         )
         break
 
+      case 'area_thickness': // ✅ NUEVO
+        fields.push(
+          {
+            key: 'width',
+            label: 'Width (mm)',
+            required: true,
+            placeholder: 'Enter width in mm',
+          },
+          {
+            key: 'height',
+            label: 'Height (mm)',
+            required: true,
+            placeholder: 'Enter height in mm',
+          },
+          {
+            key: 'thickness',
+            label: 'Thickness (mm)',
+            required: false,
+            defaultValue: unit_measure.default_values?.thickness,
+            placeholder: `Default: ${
+              unit_measure.default_values?.thickness || 'N/A'
+            } mm`,
+          }
+        )
+        break
+
       case 'length':
         fields.push({
           key: 'length',
@@ -267,13 +293,37 @@ export default function RepairPhaseForm({
         })
         break
 
-      case 'unit':
+      case 'length_thickness': // ✅ NUEVO
+        fields.push(
+          {
+            key: 'length',
+            label: 'Length (mm)',
+            required: true,
+            placeholder: 'Enter length in mm',
+          },
+          {
+            key: 'thickness',
+            label: 'Thickness (mm)',
+            required: false,
+            defaultValue: unit_measure.default_values?.thickness,
+            placeholder: `Default: ${
+              unit_measure.default_values?.thickness || 'N/A'
+            } mm`,
+          }
+        )
+        break
+
+      case 'each': // ✅ CAMBIADO de 'unit' a 'each'
         fields.push({
-          key: 'count',
-          label: 'Count',
+          key: 'each',
+          label: 'Quantity',
           required: true,
           placeholder: 'Enter quantity',
         })
+        break
+
+      default:
+        console.warn(`Unknown unit measure type: ${unit_measure.type}`)
         break
     }
 
@@ -285,6 +335,14 @@ export default function RepairPhaseForm({
     if (!selectedRepairType || !selectedRepairType.conversion) return null
 
     try {
+      // Para tipos que no tienen conversión (como 'each'), no mostrar valor convertido
+      if (
+        selectedRepairType.unit_measure.type === 'each' &&
+        !selectedRepairType.conversion
+      ) {
+        return null
+      }
+
       const value =
         selectedRepairType.conversion.conversion_factor(measurements)
       return {
@@ -292,6 +350,7 @@ export default function RepairPhaseForm({
         unit: selectedRepairType.unit_to_charge,
       }
     } catch (error) {
+      console.error('Error calculating conversion:', error)
       toast.error('Error calculating conversion', {
         description: 'Error: ' + error,
         duration: 5000,
@@ -573,15 +632,31 @@ export default function RepairPhaseForm({
         const areaHeight = measurements.height || 0
         return `${areaWidth}x${areaHeight}`
 
+      case 'area_thickness': // ✅ NUEVO
+        const areaThickWidth = measurements.width || 0
+        const areaThickHeight = measurements.height || 0
+        const thickness =
+          measurements.thickness || unit_measure.default_values?.thickness || 0
+        return `${areaThickWidth}x${areaThickHeight}x${thickness}`
+
       case 'length':
         const length = measurements.length || 0
         return `${length}`
 
-      case 'unit':
-        const count = measurements.count || 0
+      case 'length_thickness': // ✅ NUEVO
+        const lengthThickLength = measurements.length || 0
+        const lengthThickness =
+          measurements.thickness || unit_measure.default_values?.thickness || 0
+        return `${lengthThickLength}x${lengthThickness}`
+
+      case 'each': // ✅ CAMBIADO de 'unit' a 'each'
+        const count = measurements.each || 0
         return `${count}`
 
       default:
+        console.warn(
+          `Unknown unit measure type for measurements string: ${unit_measure.type}`
+        )
         return ''
     }
   }
@@ -625,15 +700,31 @@ export default function RepairPhaseForm({
         const areaHeight = measurements.height || 0
         return areaWidth > 0 && areaHeight > 0
 
+      case 'area_thickness': // ✅ NUEVO
+        const areaThickWidth = measurements.width || 0
+        const areaThickHeight = measurements.height || 0
+        const thickness =
+          measurements.thickness || unit_measure.default_values?.thickness || 0
+        return areaThickWidth > 0 && areaThickHeight > 0 && thickness > 0
+
       case 'length':
         const length = measurements.length || 0
         return length > 0
 
-      case 'unit':
-        const count = measurements.count || 0
+      case 'length_thickness': // ✅ NUEVO
+        const lengthThickLength = measurements.length || 0
+        const lengthThickness =
+          measurements.thickness || unit_measure.default_values?.thickness || 0
+        return lengthThickLength > 0 && lengthThickness > 0
+
+      case 'each': // ✅ CAMBIADO de 'unit' a 'each'
+        const count = measurements.each || 0
         return count > 0
 
       default:
+        console.warn(
+          `Unknown unit measure type for validation: ${unit_measure.type}`
+        )
         return false
     }
   }
