@@ -1121,9 +1121,9 @@ export default function TechnicianNewRepairPage() {
   }
 
   return (
-    <div className="w-full flex flex-col gap-8 p-2 md:p-8">
+    <div className="w-full flex flex-col gap-8 p-1 sm:p-2 md:p-8">
       <Card className="w-full lg:max-w-4xl">
-        <CardHeader className="relative">
+        <CardHeader className="relative px-2 md:px-4">
           <CardTitle>New Repair Entry</CardTitle>
 
           {/* ✅ Botones de acción en la esquina superior derecha */}
@@ -1140,7 +1140,7 @@ export default function TechnicianNewRepairPage() {
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className=" px-2 md:px-4">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Project Selection */}
             <div className="grid gap-4 md:grid-cols-2">

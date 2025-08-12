@@ -566,12 +566,8 @@ export default function ManagerRepairsPage() {
                         <TableHead className="w-16">ID</TableHead>
                         <TableHead className="w-20">Type</TableHead>
                         <TableHead className="w-16">Index</TableHead>
-                        <TableHead className="w-40">
-                          Repair Code
-                        </TableHead>
-                        <TableHead className="w-80">
-                          Project Name
-                        </TableHead>
+                        <TableHead className="w-40">Repair Code</TableHead>
+                        <TableHead className="w-80">Project Name</TableHead>
                         <TableHead className="w-40">Elevation</TableHead>
                         <TableHead className="w-16">Drop</TableHead>
                         <TableHead className="w-16">Level</TableHead>
@@ -725,6 +721,10 @@ export default function ManagerRepairsPage() {
               <RepairPhaseForm
                 projectId={phaseFormRepair.project_id}
                 projectName={phaseFormRepair.project_name}
+                clientName={
+                  projects.find((p) => p.id === selectedRepair?.project_id)
+                    ?.client_name || ''
+                }
                 elevationName={phaseFormRepair.elevation_name}
                 drop={phaseFormRepair.drop}
                 level={phaseFormRepair.level}

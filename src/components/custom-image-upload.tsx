@@ -661,7 +661,7 @@ export default function CustomImageUpload({
                   onClick={startCamera}
                 >
                   <WebcamIcon className="mr-2 h-4 w-4" />
-                  Use camera web
+                  Use camera
                 </Button>
               )}
 

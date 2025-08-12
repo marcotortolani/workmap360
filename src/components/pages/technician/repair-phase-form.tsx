@@ -44,6 +44,7 @@ interface RepairPhaseFormProps {
   // Datos de la reparación (requeridos)
   projectId: number
   projectName: string
+  clientName: string
   elevationName: string
   drop: number
   level: number
@@ -125,6 +126,7 @@ const getPhaseStatus = (repair: RepairData | null, totalPhases: number) => {
 export default function RepairPhaseForm({
   projectId,
   projectName,
+  clientName,
   elevationName,
   drop,
   level,
@@ -1021,6 +1023,7 @@ export default function RepairPhaseForm({
                   phase: getPhaseCode(),
                 }}
                 userName={fullName || 'Unknown'}
+                clientName={clientName || 'Unknown'}
                 onImageProcessed={handleImageProcessed}
                 disabled={!validateMeasurements() || isSubmitting || disabled}
                 allowMultiple={allowsMultiplePhotos}

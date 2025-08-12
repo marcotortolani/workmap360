@@ -1900,6 +1900,7 @@ export default function TechnicianNewRepairPage() {
                           }}
                           // folderName={selectedProject?.name || folderName}
                           userName={fullName || 'Unknown'}
+                          clientName={projectSelected?.client_name || 'Unknown'}
                           onImageProcessed={handleImageProcessed}
                           disabled={
                             !validateMeasurements() ||

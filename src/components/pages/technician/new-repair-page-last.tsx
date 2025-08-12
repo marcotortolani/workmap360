@@ -531,6 +531,7 @@ export default function TechnicianNewRepairPage() {
         <RepairPhaseForm
           projectId={project_id}
           projectName={selectedProject.name}
+          clientName={selectedProject.client_name}
           elevationName={getElevationNameByDrop(
             drop,
             selectedProject.elevations
