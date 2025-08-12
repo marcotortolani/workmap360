@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 // src/components/pages/technician/new-repair-page.tsx
 
 'use client'
@@ -25,7 +26,6 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { useProjectsList } from '@/hooks/use-projects-list'
 import { useRepairsByLocation } from '@/hooks/use-repairs-by-location'
-import { useNewRepairForm } from '@/hooks/use-new-repair-form'
 
 // import { useRepairsDataStore } from '@/stores/repairs-data-store'
 import { useCurrentUser } from '@/stores/user-store'
@@ -39,9 +39,6 @@ import {
   Plus,
   X,
   Camera,
-  // RotateCcw,
-  // Save,
-  Trash2,
 } from 'lucide-react'
 import { RepairData, ProgressPhase, RepairType } from '@/types/repair-type'
 import { REPAIR_TYPE_LIST } from '@/data/repair-type-list'
@@ -146,22 +143,6 @@ export default function TechnicianNewRepairPage() {
 
   const { userId, fullName, accessToken } = useCurrentUser()
 
-  // Hook para el store del formulario
-  const {
-    hasStoredData,
-    restoreFormState,
-    saveProject,
-    saveLocation,
-    //saveComplete,
-    clearFormState,
-    //getLastUpdated,
-  } = useNewRepairForm()
-  // ✅ Estado para controlar si mostrar el banner de restauración
-  // const [showRestoreBanner, setShowRestoreBanner] = useState(false)
-  // const [restoredData, setRestoredData] = useState<any>(null)
-
-  
-
   // Referencias para validación
   const maxDropsRef = useRef<number | undefined>(undefined)
   const maxLevelsRef = useRef<number | undefined>(undefined)
@@ -170,14 +151,13 @@ export default function TechnicianNewRepairPage() {
   const [projectSelected, setProjectSelected] = useState<ProjectData | null>(
     null
   )
-  // const [dropSelected, setDropSelected] = useState<number>(1)
-  // const [levelSelected, setLevelSelected] = useState<number>(1)
+  const [dropSelected, setDropSelected] = useState<number>(1)
+  const [levelSelected, setLevelSelected] = useState<number>(1)
 
   const [currentPhase, setCurrentPhase] = useState<
     'survey' | 'progress' | 'finish' | null
   >(null)
   const [selectedRepair, setSelectedRepair] = useState<RepairData | null>(null)
-  const [selectValueRepair, setSelectValueRepair] = useState<string>('')
   const [progressPhaseNumber, setProgressPhaseNumber] = useState<number>(1)
   const [folderName, setFolderName] = useState<string>('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -292,47 +272,31 @@ export default function TechnicianNewRepairPage() {
 
   // Reiniciar campos dependientes cuando cambia el proyecto
   useEffect(() => {
-    reset({
-      project_id,
-      // elevation: '',
-      drop: 1,
-      level: 1,
-      repair_type: '',
-      repair_index: 1,
-      progress_image: [],
-    })
-
-    // setValue('drop', 1)
-    // setValue('level', 1)
-    // setValue('repair_type', '')
-    // setValue('repair_index', 1)
-    // setValue('progress_image', [])
-
-    // ✅ Reset estados del Select y repair
-    setSelectValueRepair('') // ← NUEVO
-    setSelectedRepair(null)
-    setCurrentPhase(null)
-
+    // setValue('elevation', '')
+    setValue('drop', 1)
+    setValue('level', 1)
+    setValue('repair_type', '')
+    setValue('repair_index', 1)
+    setValue('progress_image', [])
     setMeasurements({})
     setComments('')
     setProcessedImages([])
     setShowImageUpload(false)
+    setSelectedRepair(null)
+    setCurrentPhase(null)
   }, [project_id, setValue])
 
-  // ✅ 3. AGREGAR un nuevo useEffect DESPUÉS del anterior (alrededor línea 240)
-  useEffect(() => {
-    // Reset cuando cambia ubicación o tipo de reparación
-    setSelectValueRepair('') // ← NUEVO
-    setSelectedRepair(null)
-    setCurrentPhase(null)
-    setProgressPhaseNumber(1)
-
-    setMeasurements({})
-    setMeasurementsModified(false)
-    setComments('')
-    setProcessedImages([])
-    setShowImageUpload(false)
-  }, [project_id, drop, level, repair_type])
+  // Reiniciar campos cuando cambia la elevación
+  // useEffect(() => {
+  //   setValue('drop', 1)
+  //   setValue('level', 1)
+  //   setValue('repair_type', '')
+  //   setValue('repair_index', 1)
+  //   setValue('progress_image', [])
+  //   setMeasurements({})
+  //   setProcessedImages([])
+  //   setShowImageUpload(false)
+  // }, [elevation, setValue])
 
   // Reiniciar mediciones cuando cambia el tipo de reparación
   useEffect(() => {
@@ -396,103 +360,6 @@ export default function TechnicianNewRepairPage() {
     fetchRepairsByLocation,
     clearRepairs,
   ])
-
-  // ✅ Efecto para verificar si hay datos guardados al cargar la página
-  useEffect(() => {
-    if (projects.length > 0 && hasStoredData) {
-      const restored = restoreFormState(projects)
-      if (restored && !restored.isExpired) {
-        // setRestoredData(restored)
-        // setShowRestoreBanner(true)
-      } else if (restored && restored.isExpired) {
-        // Datos expirados, limpiar automáticamente
-        clearFormState()
-      }
-    }
-  }, [projects, hasStoredData, restoreFormState, clearFormState])
-
-  // ✅ Función para restaurar los datos guardados
-  // const handleRestoreData = () => {
-  //   if (restoredData) {
-  //     // Restaurar proyecto
-  //     setValue('project_id', restoredData.project_id)
-  //     const project = projects.find((p) => p.id === restoredData.project_id)
-  //     if (project) {
-  //       setProjectSelected(project)
-  //       setFolderName(project.name)
-  //     }
-
-  //     // Restaurar ubicación
-  //     setValue('drop', restoredData.drop, {
-  //       shouldValidate: true,
-  //       shouldDirty: true,
-  //       shouldTouch: true,
-  //     })
-  //     setValue('level', restoredData.level, {
-  //       shouldValidate: true,
-  //       shouldDirty: true,
-  //       shouldTouch: true,
-  //     })
-  //     // setDropSelected(restoredData.drop)
-  //     // setLevelSelected(restoredData.level)
-
-  //     setShowRestoreBanner(false)
-  //     setRestoredData(null)
-  //   }
-  // }
-
-  // ✅ Función para descartar datos guardados
-  // const handleDiscardSavedData = () => {
-  //   clearFormState()
-  //   setShowRestoreBanner(false)
-  //   setRestoredData(null)
-  // }
-
-  // ✅ Función para limpiar todo el formulario
-  const handleClearForm = () => {
-    // Limpiar formulario
-    reset({
-      project_id: 0,
-      drop: 1,
-      level: 1,
-      repair_type: '',
-      repair_index: 1,
-      survey_image: '',
-      progress_image: [],
-      finish_image: '',
-    })
-
-    // Limpiar estados
-    setProjectSelected(null)
-    // setDropSelected(1)
-    // setLevelSelected(1)
-    setSelectedRepair(null)
-    setSelectValueRepair('')
-    setCurrentPhase(null)
-    setMeasurements({})
-    setComments('')
-    setProcessedImages([])
-    setShowImageUpload(false)
-    setFolderName('')
-
-    // Limpiar datos guardados
-    clearFormState()
-    clearRepairs()
-  }
-
-  // ✅ Efecto para guardar proyecto cuando cambia
-  useEffect(() => {
-    if (project_id > 0 && projectSelected) {
-      saveProject(projectSelected)
-    }
-  }, [project_id, projectSelected, saveProject])
-
-  // ✅ Efecto para guardar ubicación cuando cambia
-  useEffect(() => {
-    if (project_id > 0 && drop > 0 && level > 0) {
-      saveLocation(drop, level)
-    }
-  }, [project_id, drop, level, saveLocation])
 
   // ✅ Usar locationRepairs en lugar de repairs para filtering
   const matchingRepairs = useMemo(() => {
@@ -758,8 +625,6 @@ export default function TechnicianNewRepairPage() {
 
   // Manejar selección de reparación
   const handleRepairSelection = (value: string) => {
-    setSelectValueRepair(value)
-
     if (value === 'new') {
       setValue('repair_index', nextRepairIndex)
       setSelectedRepair(null)
@@ -1020,10 +885,8 @@ export default function TechnicianNewRepairPage() {
       // Resetear formulario
       reset({
         project_id: projectSelected?.id || 0,
-        // drop: dropSelected || 1,
-        // level: levelSelected || 1,
-        drop: 1,
-        level: 1,
+        drop: dropSelected || 1,
+        level: levelSelected || 1,
         repair_type: '',
         repair_index: 1,
       })
@@ -1201,71 +1064,9 @@ export default function TechnicianNewRepairPage() {
   return (
     <div className="w-full flex flex-col gap-8 p-2 md:p-8">
       <Card className="w-full lg:max-w-4xl">
-        <CardHeader className="relative">
+        <CardHeader>
           <CardTitle>New Repair Entry</CardTitle>
-
-          {/* ✅ Botones de acción en la esquina superior derecha */}
-          <div className="absolute top-4 right-4 flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleClearForm}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Clear Form
-            </Button>
-          </div>
         </CardHeader>
-
-        {/* ✅ Banner para restaurar datos guardados */}
-        {/* {showRestoreBanner && restoredData && (
-          <div className="mx-6 mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <div className="flex items-start justify-between">
-              <div className="flex items-start space-x-3">
-                <Save className="h-5 w-5 text-blue-600 mt-0.5" />
-                <div>
-                  <h4 className="text-sm font-medium text-blue-900">
-                    Previous work session found
-                  </h4>
-                  <p className="text-sm text-blue-700 mt-1">
-                    We found your previous work:{' '}
-                    <strong>{restoredData.project_name}</strong>, Drop{' '}
-                    {restoredData.drop}, Level {restoredData.level}
-                  </p>
-                  {getLastUpdated() && (
-                    <p className="text-xs text-blue-600 mt-1">
-                      Last worked: {getLastUpdated()?.toLocaleDateString()} at{' '}
-                      {getLastUpdated()?.toLocaleTimeString()}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="flex space-x-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={handleRestoreData}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  <RotateCcw className="h-4 w-4 mr-2" />
-                  Restore
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleDiscardSavedData}
-                  className="text-gray-600"
-                >
-                  Dismiss
-                </Button>
-              </div>
-            </div>
-          </div>
-        )} */}
-
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Project Selection */}
@@ -1349,11 +1150,9 @@ export default function TechnicianNewRepairPage() {
                   type="number"
                   disabled={!project_id}
                   {...register('drop', { valueAsNumber: true })}
-                  // onChange={(e) => {
-                  //   const value = parseInt(e.target.value)
-                  //   setValue('drop', value) // ✅ Actualizar el formulario
-                  //   setDropSelected(value) // ✅ Actualizar el estado local
-                  // }}
+                  onChange={(e) => {
+                    setDropSelected(parseInt(e.target.value))
+                  }}
                   max={maxDrops}
                   min={1}
                 />
@@ -1378,11 +1177,9 @@ export default function TechnicianNewRepairPage() {
                   type="number"
                   disabled={!project_id}
                   {...register('level', { valueAsNumber: true })}
-                  // onChange={(e) => {
-                  //   const value = parseInt(e.target.value)
-                  //   setValue('level', value) // ✅ Actualizar el formulario
-                  //   setLevelSelected(value) // ✅ Actualizar el estado local
-                  // }}
+                  onChange={(e) => {
+                    setLevelSelected(parseInt(e.target.value))
+                  }}
                   max={maxLevels}
                   min={1}
                 />
@@ -1441,13 +1238,17 @@ export default function TechnicianNewRepairPage() {
                 </div>
                 <Select
                   // value={
-                  //   selectedRepair
-                  //     ? selectedRepair.repair_index.toString()
-                  //     : repair_index === nextRepairIndex
-                  //     ? 'new'
-                  //     : ''
+                  //   repair_index === nextRepairIndex && !selectedRepair
+                  //     ? ''
+                  //     : repair_index.toString()
                   // }
-                  value={selectValueRepair}
+                  value={
+                    selectedRepair
+                      ? selectedRepair.repair_index.toString() // Repair existente seleccionado
+                      : repair_index === nextRepairIndex
+                      ? 'new' // ← Solución: cuando es "new", mostrar "new"
+                      : '' // Placeholder por defecto
+                  }
                   onValueChange={handleRepairSelection}
                   disabled={!repair_type}
                 >
