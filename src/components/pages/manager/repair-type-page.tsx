@@ -92,7 +92,7 @@ export default function ManagerRepairTypePage() {
                     <TableCell className="font-medium">{repair.id}</TableCell>
                     <TableCell>{repair.variation}</TableCell>
                     <TableCell>{repair.type}</TableCell>
-                    <TableCell>{repair.unit_measure.type}</TableCell>
+                    <TableCell className=" capitalize">{repair.unit_measure.type.replace('_', ' + ')}</TableCell>
                     <TableCell>{repair.unit_measure.value}</TableCell>
                     <TableCell>{repair.unit_to_charge}</TableCell>
                     <TableCell>{repair.created_by_user_name}</TableCell>
@@ -149,7 +149,7 @@ export default function ManagerRepairTypePage() {
                     <TableCell className="font-medium">{repair.id}</TableCell>
                     <TableCell>{repair.variation}</TableCell>
                     <TableCell>{repair.type}</TableCell>
-                    <TableCell className=" capitalize bg-red-300 ">{repair?.unit_measure?.type?.replace('_', ' + ')}</TableCell>
+                    <TableCell className=" capitalize">{repair?.unit_measure?.type?.replace('_', ' + ')}</TableCell>
                     <TableCell>{repair.unit_measure.value}</TableCell>
                     <TableCell>{repair.unit_to_charge}</TableCell>
                     <TableCell>{repair.created_by_user_name}</TableCell>
