@@ -207,23 +207,22 @@ export function useProjectsList(limit: number = 20): UseProjectsListReturn {
   const [currentPage, setCurrentPage] = useState(1)
 
   const fetchProjects = async (page: number = currentPage) => {
-    console.log('fetchProjects', page)
-
     if (!accessToken || !isAuthenticated) {
       const res = await refreshSession()
 
-      console.log('res', res)
+      if (!res) {
+        setError('Not authenticated')
+        toast.error('Not authenticated', {
+          duration: 5000,
+          position: 'bottom-right',
+          style: {
+            backgroundColor: 'red',
+            color: 'white',
+            fontSize: '14px',
+          },
+        })
+      }
 
-      setError('Not authenticated')
-      toast.error('Not authenticated', {
-        duration: 5000,
-        position: 'bottom-right',
-        style: {
-          backgroundColor: 'red',
-          color: 'white',
-          fontSize: '14px',
-        },
-      })
       return
     }
 

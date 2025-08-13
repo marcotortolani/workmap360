@@ -798,12 +798,20 @@ export default function TechnicianNewRepairPage() {
   // Función para enviar los datos de la reparación
   const handleSubmitRepairData = async () => {
     if (!userId || !fullName || !accessToken) {
-      toast.error('User information not found')
+      toast.error('User information not found', {
+        duration: 5000,
+        position: 'bottom-right',
+        style: { backgroundColor: 'red', color: 'white', fontSize: '14px' },
+      })
       return
     }
 
     if (processedImages.length === 0) {
-      toast.error('Please add at least one image before submitting')
+      toast.error('Please add at least one image before submitting', {
+        duration: 5000,
+        position: 'bottom-right',
+        style: { backgroundColor: 'red', color: 'white', fontSize: '14px' },
+      })
       return
     }
 
@@ -1777,7 +1785,9 @@ export default function TechnicianNewRepairPage() {
                           disabled={
                             !validateMeasurements() ||
                             isSubmitting ||
-                            (hasMeasurementsChanged() && comments.length === 0 && currentPhase !== "finish" )
+                            (hasMeasurementsChanged() &&
+                              comments.length === 0 &&
+                              currentPhase !== 'finish')
                           }
                           allowMultiple={allowsMultiplePhotos}
                           maxPhotos={maxPhotos}

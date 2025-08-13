@@ -358,6 +358,10 @@ export default function ManagerRepairsPage() {
       apiFilters.elevation_name = filters.elevation
     }
 
+    // if (filters.searchTerm) {
+    //   apiFilters.searchTerm = filters.searchTerm
+    // }
+
     return apiFilters
   }
 
@@ -398,6 +402,7 @@ export default function ManagerRepairsPage() {
   const handleFilter = (newFilters: FilterOptions) => {
     setLocalFilters(newFilters)
     const apiFilters = convertFiltersToAPI(newFilters)
+
     setApiFilters(apiFilters)
   }
 
@@ -462,7 +467,7 @@ export default function ManagerRepairsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <div>
               <CardTitle className="text-lg sm:text-xl lg:text-2xl font-semibold">
-                Repairs Management
+                Repairs List
               </CardTitle>
               {pagination && (
                 <p className="text-sm text-muted-foreground mt-1">
