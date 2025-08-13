@@ -54,12 +54,12 @@ export function useRepairsByLocation(): UseRepairsByLocationReturn {
       level: number,
       repairType?: string
     ) => {
-      console.log('fetchRepairsByLocation called:', {
-        projectId,
-        drop,
-        level,
-        repairType,
-      })
+      // console.log('fetchRepairsByLocation called:', {
+      //   projectId,
+      //   drop,
+      //   level,
+      //   repairType,
+      // })
 
       // Si el usuario aún está cargando, no hacer nada
       if (userLoading) {

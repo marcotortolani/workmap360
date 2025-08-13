@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // src/components/pages/manager/repairs-page.tsx
 
 'use client'
@@ -28,18 +29,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogHeader,
+//   DialogTitle,
+// } from '@/components/ui/dialog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { FilterOptions, RepairsFilter } from '@/components/repairs-filter'
 import { Pagination } from '@/components/pagination'
 import { RepairDetailModal } from '@/components/repair-detail-modal'
-import RepairPhaseForm from '../technician/repair-phase-form'
+//import RepairPhaseForm from '../technician/repair-phase-form'
 import {
   RepairData,
   RepairDataStatusType,
@@ -48,7 +49,7 @@ import {
 import { getRepairType } from '@/lib/utils'
 import { useRepairsList } from '@/hooks/use-repairs-list'
 import { useProjectsList } from '@/hooks/use-projects-list'
-import { toast } from 'sonner'
+//import { toast } from 'sonner'
 
 // Helper function to determine if repair can have next phase
 const canAddNextPhase = (repair: RepairData, totalPhases: number): boolean => {
@@ -295,10 +296,10 @@ export default function ManagerRepairsPage() {
 
   const [selectedRepair, setSelectedRepair] = useState<RepairData | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isPhaseFormOpen, setIsPhaseFormOpen] = useState(false)
-  const [phaseFormRepair, setPhaseFormRepair] = useState<RepairData | null>(
-    null
-  )
+  // const [isPhaseFormOpen, setIsPhaseFormOpen] = useState(false)
+  // const [phaseFormRepair, setPhaseFormRepair] = useState<RepairData | null>(
+  //   null
+  // )
   const [localFilters, setLocalFilters] = useState<FilterOptions>({
     status: 'all',
     project: 'all',
@@ -323,7 +324,7 @@ export default function ManagerRepairsPage() {
           .map((r) => r.elevation_name)
       ),
     ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [localFilters.project]
   )
 
@@ -419,25 +420,25 @@ export default function ManagerRepairsPage() {
     setIsModalOpen(true)
   }
 
-  const handleAddPhase = (repair: RepairData) => {
-    setPhaseFormRepair(repair)
-    setIsPhaseFormOpen(true)
-  }
+  // const handleAddPhase = (repair: RepairData) => {
+  //   setPhaseFormRepair(repair)
+  //   setIsPhaseFormOpen(true)
+  // }
 
-  const handlePhaseFormSuccess = () => {
-    setIsPhaseFormOpen(false)
-    setPhaseFormRepair(null)
-    handleRefresh()
-    toast.success('Phase added successfully!', {
-      duration: 3000,
-      position: 'bottom-right',
-    })
-  }
+  // const handlePhaseFormSuccess = () => {
+  //   setIsPhaseFormOpen(false)
+  //   setPhaseFormRepair(null)
+  //   handleRefresh()
+  //   toast.success('Phase added successfully!', {
+  //     duration: 3000,
+  //     position: 'bottom-right',
+  //   })
+  // }
 
-  const handlePhaseFormCancel = () => {
-    setIsPhaseFormOpen(false)
-    setPhaseFormRepair(null)
-  }
+  // const handlePhaseFormCancel = () => {
+  //   setIsPhaseFormOpen(false)
+  //   setPhaseFormRepair(null)
+  // }
 
   const handleStatusUpdate = async ({
     repairId,
@@ -547,7 +548,8 @@ export default function ManagerRepairsPage() {
                           key={repair.id}
                           repair={repair}
                           onViewRepair={handleViewRepair}
-                          onAddPhase={handleAddPhase}
+                          // onAddPhase={handleAddPhase}
+                          onAddPhase={() => {}}
                           canAddPhase={canAdd}
                           nextPhaseName={nextPhase}
                         />
@@ -590,12 +592,12 @@ export default function ManagerRepairsPage() {
                         </TableRow>
                       ) : (
                         filteredRepairs.map((repair) => {
-                          const totalPhases = getTotalPhases(repair)
-                          const canAdd = canAddNextPhase(repair, totalPhases)
-                          const nextPhase = getNextPhaseName(
-                            repair,
-                            totalPhases
-                          )
+                          // const totalPhases = getTotalPhases(repair)
+                          // const canAdd = canAddNextPhase(repair, totalPhases)
+                          // const nextPhase = getNextPhaseName(
+                          //   repair,
+                          //   totalPhases
+                          // )
 
                           return (
                             <TableRow
@@ -658,7 +660,7 @@ export default function ManagerRepairsPage() {
                                       View
                                     </span>
                                   </Button>
-                                  {canAdd && (
+                                  {/* {canAdd && (
                                     <Button
                                       variant="outline"
                                       size="sm"
@@ -671,7 +673,7 @@ export default function ManagerRepairsPage() {
                                         {nextPhase}
                                       </span>
                                     </Button>
-                                  )}
+                                  )} */}
                                 </div>
                               </TableCell>
                             </TableRow>
@@ -707,7 +709,7 @@ export default function ManagerRepairsPage() {
       )}
 
       {/* Repair Phase Form Dialog */}
-      {phaseFormRepair && (
+      {/* {phaseFormRepair && (
         <Dialog open={isPhaseFormOpen} onOpenChange={setIsPhaseFormOpen}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
@@ -739,7 +741,7 @@ export default function ManagerRepairsPage() {
             </div>
           </DialogContent>
         </Dialog>
-      )}
+      )} */}
     </div>
   )
 }

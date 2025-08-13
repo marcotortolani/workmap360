@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 // src/components/pages/technician/new-repair-page.tsx
 
 'use client'
