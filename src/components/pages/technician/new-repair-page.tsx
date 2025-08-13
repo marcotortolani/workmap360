@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 // src/components/pages/technician/new-repair-page.tsx
 
 'use client'
@@ -1120,6 +1119,9 @@ export default function TechnicianNewRepairPage() {
     )
   }
 
+  console.log('repair types: ', selectedProject?.repair_types)
+  console.log('matching repairs', matchingRepairs)
+
   return (
     <div className="w-full flex flex-col gap-8 p-1 sm:p-2 md:p-8">
       <Card className="w-full lg:max-w-4xl">
@@ -1316,18 +1318,6 @@ export default function TechnicianNewRepairPage() {
                   )}
                 </div>
                 <Select
-                  // value={
-                  //   repair_index === nextRepairIndex && !selectedRepair
-                  //     ? ''
-                  //     : repair_index.toString()
-                  // }
-                  // value={
-                  //   selectedRepair
-                  //     ? selectedRepair.repair_index.toString() // Repair existente seleccionado
-                  //     : repair_index === nextRepairIndex
-                  //     ? 'new' // ← Solución: cuando es "new", mostrar "new"
-                  //     : '' // Placeholder por defecto
-                  // }
                   value={selectValueRepair}
                   onValueChange={handleRepairSelection}
                   disabled={!repair_type}
@@ -1336,32 +1326,34 @@ export default function TechnicianNewRepairPage() {
                     <SelectValue placeholder="Select or create repair" />
                   </SelectTrigger>
                   <SelectContent>
-                    {matchingRepairs.map((repair) => {
-                      //const phaseStatus = getPhaseStatus(repair, phases)
-                      const nextPhaseInfo = determineCurrentPhase(
-                        repair,
-                        phases
-                      )
+                    {repair_type &&
+                      matchingRepairs.map((repair, index) => {
+                        //const phaseStatus = getPhaseStatus(repair, phases)
+                        const nextPhaseInfo = determineCurrentPhase(
+                          repair,
+                          phases
+                        )
 
-                      return (
-                        <SelectItem
-                          key={`${project_id}-${repair.id}-${repair.repair_index}-${repair.drop}-${repair.level}-${repair.status}`}
-                          value={repair.repair_index.toString()}
-                        >
-                          <div className="flex items-center gap-2">
-                            <span>Index #{repair.repair_index}</span>
-                            <Badge variant={'approved'}>
-                              {getRepairStatus(repair)}
-                            </Badge>
-                            {nextPhaseInfo && (
-                              <Badge variant="outline" className="text-xs">
-                                Next:{' '}
-                                {nextPhaseInfo.phase === 'progress'
-                                  ? `P${nextPhaseInfo.phaseNumber}`
-                                  : nextPhaseInfo.phase.toUpperCase()}
+                        return (
+                          <SelectItem
+                            // key={`${project_id}-${repair.id}-${repair.repair_index}-${repair.drop}-${repair.level}-${repair.status}`}
+                            key={`${repair.id}-${repair.created_at || index}`}
+                            value={repair.repair_index.toString()}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span>Index #{repair.repair_index}</span>
+                              <Badge variant={'approved'}>
+                                {getRepairStatus(repair)}
                               </Badge>
-                            )}
-                            {/* {phaseStatus?.isComplete && (
+                              {nextPhaseInfo && (
+                                <Badge variant="outline" className="text-xs">
+                                  Next:{' '}
+                                  {nextPhaseInfo.phase === 'progress'
+                                    ? `P${nextPhaseInfo.phaseNumber}`
+                                    : nextPhaseInfo.phase.toUpperCase()}
+                                </Badge>
+                              )}
+                              {/* {phaseStatus?.isComplete && (
                               <Badge
                                 variant="default"
                                 className="text-xs bg-green-600"
@@ -1369,10 +1361,10 @@ export default function TechnicianNewRepairPage() {
                                 Complete
                               </Badge>
                             )} */}
-                          </div>
-                        </SelectItem>
-                      )
-                    })}
+                            </div>
+                          </SelectItem>
+                        )
+                      })}
                     <SelectItem value="new">
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="h-4 w-4 text-green-600" />
@@ -1784,7 +1776,7 @@ export default function TechnicianNewRepairPage() {
                           disabled={
                             !validateMeasurements() ||
                             isSubmitting ||
-                            (hasMeasurementsChanged() && comments.length === 0)
+                            (hasMeasurementsChanged() && comments.length === 0 && currentPhase !== "finish" )
                           }
                           allowMultiple={allowsMultiplePhotos}
                           maxPhotos={maxPhotos}

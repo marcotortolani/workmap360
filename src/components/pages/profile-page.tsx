@@ -119,16 +119,46 @@ export default function ProfilePage() {
         console.error('Error updating password:', error)
 
         if (error.message.includes('session_not_found')) {
-          toast.error('Session expired. Please log out and log in again.')
+          toast.error('Session expired. Please log out and log in again.', {
+            duration: 5000,
+            style: {
+              backgroundColor: 'red',
+              color: 'white',
+              fontSize: '14px',
+            },
+          })
         } else if (error.message.includes('weak_password')) {
           toast.error(
-            'Password is too weak. Please choose a stronger password.'
+            'Password is too weak. Please choose a stronger password.',
+            {
+              duration: 5000,
+              style: {
+                backgroundColor: 'red',
+                color: 'white',
+                fontSize: '14px',
+              },
+            }
           )
         } else {
-          toast.error(error.message || 'Failed to change password')
+          toast.error(error.message || 'Failed to change password', {
+            duration: 5000,
+            style: {
+              backgroundColor: 'red',
+              color: 'white',
+              fontSize: '14px',
+            },
+          })
         }
       } else {
-        toast.success('Password changed successfully!')
+        toast.success('Password changed successfully!', {
+          duration: 3000,
+          position: 'bottom-right',
+          style: {
+            backgroundColor: 'green',
+            color: 'white',
+            fontSize: '14px',
+          },
+        })
         setPasswordData({
           newPassword: '',
           confirmPassword: '',
@@ -136,7 +166,14 @@ export default function ProfilePage() {
       }
     } catch (error) {
       console.error('Unexpected error:', error)
-      toast.error('An unexpected error occurred. Please try again.')
+      toast.error('An unexpected error occurred. Please try again.', {
+        duration: 5000,
+        style: {
+          backgroundColor: 'red',
+          color: 'white',
+          fontSize: '14px',
+        },
+      })
     }
 
     setIsChangingPassword(false)
@@ -150,7 +187,15 @@ export default function ProfilePage() {
   const handleCustomAvatar = (avatarUrl: string) => {
     setFormData({ ...formData, avatar: avatarUrl })
     setShowCustomizer(false)
-    toast.success('Avatar personalizado aplicado!')
+    toast.success('Avatar personalizado aplicado!', {
+      duration: 3000,
+      position: 'bottom-right',
+      style: {
+        backgroundColor: 'green',
+        color: 'white',
+        fontSize: '14px',
+      },
+    })
   }
 
   if (userLoading) {

@@ -68,6 +68,11 @@ export function useUsersList(limit: number = 20): UseUsersListReturn {
               description: 'Please log in again to continue',
               duration: 5000,
               position: 'bottom-right',
+              style: {
+                background: 'red',
+                color: 'white',
+                fontSize: '14px',
+              },
             })
             return
           }
@@ -77,6 +82,16 @@ export function useUsersList(limit: number = 20): UseUsersListReturn {
         } catch (refreshError) {
           console.error('Error refreshing session:', refreshError)
           setError('Failed to refresh authentication')
+          toast.error('Failed to refresh authentication', {
+            description: 'Please log in again to continue',
+            duration: 5000,
+            position: 'bottom-right',
+            style: {
+              background: 'red',
+              color: 'white',
+              fontSize: '14px',
+            },
+          })
           return
         }
       }
@@ -88,6 +103,11 @@ export function useUsersList(limit: number = 20): UseUsersListReturn {
           description: 'Please log in to view users',
           duration: 5000,
           position: 'bottom-right',
+          style: {
+            background: 'red',
+            color: 'white',
+            fontSize: '14px',
+          },
         })
         return
       }
@@ -119,6 +139,11 @@ export function useUsersList(limit: number = 20): UseUsersListReturn {
             description: result.error || 'Failed to fetch users',
             duration: 5000,
             position: 'bottom-right',
+            style: {
+              background: 'red',
+              color: 'white',
+              fontSize: '14px',
+            },
           })
           return
         }
@@ -139,6 +164,11 @@ export function useUsersList(limit: number = 20): UseUsersListReturn {
           description: error as string,
           duration: 5000,
           position: 'bottom-right',
+          style: {
+            background: 'red',
+            color: 'white',
+            fontSize: '14px',
+          },
         })
       } finally {
         setIsLoading(false)

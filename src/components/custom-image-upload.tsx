@@ -459,7 +459,7 @@ export default function CustomImageUpload({
 
       const maxTextWidth = Math.max(fileNameWidth, projectNameWidth, userNameWidth, dateTimeWidth)
       const backgroundWidth = maxTextWidth + padding * 2
-      const backgroundHeight = lineHeight * 3 + padding * 2
+      const backgroundHeight = lineHeight * 4 + padding * 2
 
       // Posición top-left
       const backgroundX = padding

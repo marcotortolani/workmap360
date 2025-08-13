@@ -17,8 +17,13 @@ const PUBLIC_ROUTES = [
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
-  const { initializeUser, isAuthenticated, currentUser, isLoading } =
-    useUserStore()
+  const {
+    initializeUser,
+    isAuthenticated,
+    currentUser,
+    isLoading,
+    refreshSession,
+  } = useUserStore()
   const [mounted, setMounted] = useState(false)
 
   const isPublicRoute = PUBLIC_ROUTES.includes(pathname)
@@ -45,10 +50,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       if (isAuthenticated && currentUser?.role && pathname === '/auth/login') {
         // ✅ Verificar que el usuario esté activo antes de redirigir
         if (currentUser.status !== 'active') {
-          
           router.push('/inactive')
         } else {
-          
+          refreshSession()
           router.push(`/dashboard/${currentUser.role}`)
         }
       }
@@ -62,7 +66,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       }
       // Redirigir usuarios no autenticados desde rutas protegidas al login
       else if (!isPublicRoute && !isAuthenticated && !isLoading && mounted) {
-        
         router.push('/auth/login')
       }
     }, 100) // Pequeño delay para evitar redirecciones durante hydratación
@@ -76,6 +79,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     isLoading,
     isPublicRoute,
     router,
+    refreshSession,
   ])
 
   // ✅ Siempre renderizar children sin condiciones

@@ -60,7 +60,6 @@ export function useRepairsList(limit: number = 20): UseRepairsListReturn {
       page: number = currentPage,
       filters: Omit<RepairListParams, 'page' | 'limit'> = currentFilters
     ) => {
-
       // Si el usuario aún está cargando, no hacer nada
       if (userLoading) {
         return
@@ -79,6 +78,10 @@ export function useRepairsList(limit: number = 20): UseRepairsListReturn {
               description: 'Please log in again to continue',
               duration: 5000,
               position: 'bottom-right',
+              style: {
+                background: 'red',
+                color: 'white',
+              },
             })
             return
           }
@@ -88,6 +91,15 @@ export function useRepairsList(limit: number = 20): UseRepairsListReturn {
         } catch (refreshError) {
           console.error('Error refreshing session:', refreshError)
           setError('Failed to refresh authentication')
+          toast.error('Failed to refresh authentication', {
+            description: 'Please log in again to continue',
+            duration: 5000,
+            position: 'bottom-right',
+            style: {
+              background: 'red',
+              color: 'white',
+            },
+          })
           return
         }
       }
@@ -99,6 +111,10 @@ export function useRepairsList(limit: number = 20): UseRepairsListReturn {
           description: 'Please log in to view repairs',
           duration: 5000,
           position: 'bottom-right',
+          style: {
+            background: 'red',
+            color: 'white',
+          },
         })
         return
       }
@@ -124,6 +140,10 @@ export function useRepairsList(limit: number = 20): UseRepairsListReturn {
             description: result.error || 'Failed to fetch repairs',
             duration: 5000,
             position: 'bottom-right',
+            style: {
+              background: 'red',
+              color: 'white',
+            },
           })
         }
       } catch (error) {
@@ -134,6 +154,10 @@ export function useRepairsList(limit: number = 20): UseRepairsListReturn {
           description: 'Error: ' + error,
           duration: 5000,
           position: 'bottom-right',
+          style: {
+            background: 'red',
+            color: 'white',
+          },
         })
       } finally {
         setIsLoading(false)
@@ -163,6 +187,10 @@ export function useRepairsList(limit: number = 20): UseRepairsListReturn {
         toast.success('Repair status updated successfully', {
           duration: 3000,
           position: 'bottom-right',
+          style: {
+            background: 'green',
+            color: 'white',
+          },
         })
 
         // Refetch to update the list
@@ -172,6 +200,10 @@ export function useRepairsList(limit: number = 20): UseRepairsListReturn {
           description: 'Error: ' + error,
           duration: 5000,
           position: 'bottom-right',
+          style: {
+            background: 'red',
+            color: 'white',
+          },
         })
       }
     },

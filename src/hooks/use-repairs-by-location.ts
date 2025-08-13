@@ -84,6 +84,10 @@ export function useRepairsByLocation(): UseRepairsByLocationReturn {
               description: 'Please log in again to continue',
               duration: 5000,
               position: 'bottom-right',
+              style: {
+                backgroundColor: 'red',
+                color: 'white',
+              },
             })
             return
           }
@@ -105,6 +109,10 @@ export function useRepairsByLocation(): UseRepairsByLocationReturn {
           description: 'Please log in to view repairs',
           duration: 5000,
           position: 'bottom-right',
+          style: {
+            backgroundColor: 'red',
+            color: 'white',
+          },
         })
         return
       }
@@ -113,10 +121,6 @@ export function useRepairsByLocation(): UseRepairsByLocationReturn {
       setError(null)
 
       try {
-        console.log(
-          'Fetching repairs by location with token:',
-          accessToken.substring(0, 20) + '...'
-        )
 
         const result = await getRepairsByLocationViaAPI(
           accessToken,
@@ -144,6 +148,10 @@ export function useRepairsByLocation(): UseRepairsByLocationReturn {
             description: result.error || 'Failed to fetch repairs by location',
             duration: 5000,
             position: 'bottom-right',
+            style: {
+              backgroundColor: 'red',
+              color: 'white',
+            },
           })
         }
       } catch (error) {
@@ -153,6 +161,10 @@ export function useRepairsByLocation(): UseRepairsByLocationReturn {
           description: 'Error: ' + error,
           duration: 5000,
           position: 'bottom-right',
+          style: {
+            backgroundColor: 'red',
+            color: 'white',
+          },
         })
       } finally {
         setIsLoading(false)
