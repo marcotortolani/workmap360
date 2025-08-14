@@ -58,7 +58,7 @@ export async function POST(req: Request) {
       },
     }
     if (useInviteFlow) {
-      authPayload.password = `${firstName.toLowerCase()}123`
+      authPayload.password = `${firstName.replaceAll(' ', '').toLowerCase()}123`
       authPayload.email_confirm = false
       authPayload.invited_by =
         user.user_metadata.first_name + ' ' + user.user_metadata.last_name
@@ -109,15 +109,9 @@ export async function POST(req: Request) {
       .single()
 
     if (insertError) {
-      console.error(
-        'Error inserting user in table:',
-        insertError.message
-      )
+      console.error('Error inserting user in table:', insertError.message)
       await serviceClient.auth.admin.deleteUser(uid)
-      return NextResponse.json(
-        { error: 'Error saving user' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Error saving user' }, { status: 500 })
     }
 
     return NextResponse.json({ user: data }, { status: 201 })
