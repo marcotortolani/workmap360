@@ -20,12 +20,16 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { RepairDataStatusType } from '@/types/repair-type'
+import { ProjectData, Elevation } from '@/types/project-types'
+import { getDropRangeForElevation } from '@/lib/utils/elevation-utils'
 
 export interface FilterOptions {
   status?: RepairDataStatusType | 'all'
-  project?: string
+  project?: { id: number; name: string }
   elevation?: string
-  searchTerm?: string
+  drop?: number | 'all'
+  level?: number | 'all'
+  repairCode?: string
   sortBy?: 'date' | 'status' | 'project' | 'id'
   sortOrder?: 'asc' | 'desc'
 }
@@ -44,8 +48,8 @@ interface RepairsFilterProps {
     sortBy: FilterOptions['sortBy']
     sortOrder: FilterOptions['sortOrder']
   }) => void
-  projects?: string[]
-  elevations?: string[]
+  projects?: ProjectData[]
+  elevations?: Elevation[]
 }
 
 export function RepairsFilter({
@@ -56,15 +60,151 @@ export function RepairsFilter({
 }: RepairsFilterProps) {
   const [filters, setFilters] = useState<FilterOptions>({
     status: 'all',
-    project: 'all',
+    project: { id: 0, name: 'all' },
     elevation: 'all',
-    searchTerm: '',
+    drop: 'all',
+    level: 'all',
+    repairCode: '',
     sortBy: 'date',
     sortOrder: 'desc',
   })
+
+  console.log('Filters:', filters)
+
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
+  const selectedProject = projects.find((p) => p.id === filters.project?.id)
+
+  const getDropConstraints = () => {
+    if (!filters.project) {
+      return {
+        min: 1,
+        max: 0,
+        placeholder: 'Select project first',
+        disabled: true,
+      }
+    }
+
+    if (!selectedProject) {
+      return { min: 1, max: 0, placeholder: 'Invalid project', disabled: true }
+    }
+
+    if (filters.elevation === 'all') {
+      // Si no hay elevation específica, permitir todos los drops del proyecto
+      const totalDrops = selectedProject.elevations.reduce(
+        (total, elev) => total + elev.drops,
+        0
+      )
+      return {
+        min: 1,
+        max: totalDrops,
+        placeholder: `1-${totalDrops} (All elevations)`,
+        disabled: false,
+      }
+    }
+
+    // Si hay elevation seleccionada, usar solo los drops de esa elevation
+    const range = getDropRangeForElevation(
+      filters.elevation as string,
+      selectedProject.elevations
+    )
+    if (range) {
+      return {
+        min: range.min,
+        max: range.max,
+        placeholder: `${range.min}-${range.max} (${range.elevation})`,
+        disabled: false,
+      }
+    }
+
+    return { min: 1, max: 0, placeholder: 'Invalid elevation', disabled: true }
+  }
+
+  const getLevelConstraints = () => {
+    if (!filters.project) {
+      return {
+        min: 1,
+        max: 0,
+        placeholder: 'Select project first',
+        disabled: true,
+      }
+    }
+
+    if (!selectedProject) {
+      return { min: 1, max: 0, placeholder: 'Invalid project', disabled: true }
+    }
+
+    if (filters.elevation === 'all') {
+      // Si no hay elevation específica, usar el máximo de levels del proyecto
+      const maxLevels = selectedProject.elevations.reduce(
+        (max, elev) => Math.max(max, elev.levels),
+        0
+      )
+      return {
+        min: 1,
+        max: maxLevels,
+        placeholder: `1-${maxLevels} (Max in project)`,
+        disabled: false,
+      }
+    }
+
+    // Si hay elevation seleccionada, usar los levels de esa elevation
+    const selectedElevation = selectedProject.elevations.find(
+      (e) => e.name === filters.elevation
+    )
+    if (selectedElevation) {
+      return {
+        min: 1,
+        max: selectedElevation.levels,
+        placeholder: `1-${selectedElevation.levels} (${selectedElevation.name})`,
+        disabled: false,
+      }
+    }
+
+    return { min: 1, max: 0, placeholder: 'Invalid elevation', disabled: true }
+  }
+
   const handleFilterChange = (key: keyof FilterOptions, value: string) => {
+    if (key === 'project') {
+      setFilters({
+        ...filters,
+        [key]: {
+          id: projects.find((p) => p.name === value)?.id || 0,
+          name: value,
+        },
+        elevation: 'all',
+        drop: 'all',
+        level: 'all',
+      })
+      onFilter({
+        ...filters,
+        [key]: {
+          id: projects.find((p) => p.name === value)?.id || 0,
+          name: value,
+        },
+        elevation: 'all',
+        drop: 'all',
+        level: 'all',
+      })
+      return
+    }
+
+    if (key === 'elevation') {
+      setFilters({
+        ...filters,
+        [key]: value,
+        drop: 'all',
+        level: 'all',
+      })
+      onFilter({
+        ...filters,
+        [key]: value,
+        drop: 'all',
+        level: 'all',
+      })
+      return
+    }
+
     const newFilters = { ...filters, [key]: value }
     setFilters(newFilters)
     onFilter(newFilters)
@@ -90,9 +230,11 @@ export function RepairsFilter({
   const clearFilters = () => {
     const defaultFilters: FilterOptions = {
       status: 'all',
-      project: 'all',
+      project: { id: 0, name: 'all' },
       elevation: 'all',
-      searchTerm: '',
+      drop: 'all',
+      level: 'all',
+      repairCode: '',
       sortBy: 'date',
       sortOrder: 'desc',
     }
@@ -102,42 +244,17 @@ export function RepairsFilter({
 
   const activeFiltersCount = [
     filters.status !== 'all',
-    filters.project !== 'all',
+    filters.project?.name !== 'all',
     filters.elevation !== 'all',
-    filters.searchTerm !== '',
+    filters.drop !== 'all',
+    filters.level !== 'all',
+    filters.repairCode !== '',
   ].filter(Boolean).length
 
   return (
     <div className="mb-6 space-y-4">
       <div className="h-full flex flex-wrap wrap-anywhere gap-2">
-        {/* Search Bar */}
-        <div className="relative flex-1 min-w-[200px] max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search repairs..."
-            value={filters.searchTerm}
-            onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
-            className="pl-9"
-          />
-        </div>
-
-        {/* Quick Status Filter */}
-        <Select
-          value={filters.status}
-          onValueChange={(value) => handleFilterChange('status', value)}
-        >
-          <SelectTrigger className="w-[120px]">
-            <SelectValue placeholder="All Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="approved">Approved</SelectItem>
-            <SelectItem value="rejected">Rejected</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {/* Advanced Filters */}
+       {/* Advanced Filters */}
         <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" className="gap-2">
@@ -158,7 +275,7 @@ export function RepairsFilter({
               <div>
                 <label className="text-sm font-medium">Project</label>
                 <Select
-                  value={filters.project}
+                  value={selectedProject?.name || 'all'}
                   onValueChange={(value) =>
                     handleFilterChange('project', value)
                   }
@@ -169,8 +286,8 @@ export function RepairsFilter({
                   <SelectContent>
                     <SelectItem value="all">All Projects</SelectItem>
                     {projects.map((project) => (
-                      <SelectItem key={project} value={project}>
-                        {project}
+                      <SelectItem key={project.id} value={project.name}>
+                        {project.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -191,13 +308,71 @@ export function RepairsFilter({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Elevations</SelectItem>
-                    {elevations.map((elevation) => (
-                      <SelectItem key={elevation} value={elevation}>
-                        {elevation}
+                    {elevations.map((elevation, i) => (
+                      <SelectItem
+                        key={`${i}-${elevation.name}`}
+                        value={elevation.name}
+                      >
+                        {elevation.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+              {/* Drops filter */}
+              <div>
+                {(() => {
+                  const constraints = getDropConstraints()
+                  return (
+                    <>
+                      <label className="text-sm font-medium">
+                        Drops{' '}
+                        {constraints.max > 0 &&
+                          `(${constraints.min}-${constraints.max})`}
+                      </label>
+                      <Input
+                        type="number"
+                        value={filters.drop}
+                        onChange={(e) =>
+                          handleFilterChange('drop', e.target.value)
+                        }
+                        className="mt-1"
+                        min={constraints.min}
+                        max={constraints.max}
+                        disabled={constraints.disabled}
+                        placeholder={constraints.placeholder}
+                      />
+                    </>
+                  )
+                })()}
+              </div>
+
+              {/* Levels filter */}
+              <div>
+                {(() => {
+                  const constraints = getLevelConstraints()
+                  return (
+                    <>
+                      <label className="text-sm font-medium">
+                        Levels{' '}
+                        {constraints.max > 0 &&
+                          `(${constraints.min}-${constraints.max})`}
+                      </label>
+                      <Input
+                        type="number"
+                        value={filters.level}
+                        onChange={(e) =>
+                          handleFilterChange('level', e.target.value)
+                        }
+                        className="mt-1"
+                        min={constraints.min}
+                        max={constraints.max}
+                        disabled={constraints.disabled}
+                        placeholder={constraints.placeholder}
+                      />
+                    </>
+                  )
+                })()}
               </div>
 
               <div className="flex justify-between">
@@ -216,6 +391,35 @@ export function RepairsFilter({
             </div>
           </PopoverContent>
         </Popover>
+
+        {/* Quick Status Filter */}
+        <Select
+          value={filters.status}
+          onValueChange={(value) => handleFilterChange('status', value)}
+        >
+          <SelectTrigger className="w-[120px]">
+            <SelectValue placeholder="All Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="approved">Approved</SelectItem>
+            <SelectItem value="rejected">Rejected</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Search Bar */}
+        <div className="relative flex-1 min-w-[200px] max-w-md">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search a repair code..."
+            // value={filters.searchTerm}
+            // onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
+            value={filters.repairCode}
+            onChange={(e) => handleFilterChange('repairCode', e.target.value)}
+            className="pl-9"
+          />
+        </div>
 
         {/* Sort Options */}
         <div className=" flex gap-2">
@@ -261,9 +465,9 @@ export function RepairsFilter({
               />
             </Badge>
           )}
-          {filters.project !== 'all' && (
+          {selectedProject?.id !== 0 && (
             <Badge variant="secondary" className="gap-1">
-              Project: {filters.project}
+              Project: {selectedProject?.name}
               <X
                 className="h-3 w-3 cursor-pointer"
                 onClick={() => handleFilterChange('project', 'all')}
@@ -279,12 +483,31 @@ export function RepairsFilter({
               />
             </Badge>
           )}
-          {filters.searchTerm && (
+          {filters.drop !== 'all' && (
             <Badge variant="secondary" className="gap-1">
-              Search: {filters.searchTerm}
+              Drop: {filters.drop}
               <X
                 className="h-3 w-3 cursor-pointer"
-                onClick={() => handleFilterChange('searchTerm', '')}
+                onClick={() => handleFilterChange('drop', 'all')}
+              />
+            </Badge>
+          )}
+          {filters.level !== 'all' && (
+            <Badge variant="secondary" className="gap-1">
+              Level: {filters.level}
+              <X
+                className="h-3 w-3 cursor-pointer"
+                onClick={() => handleFilterChange('level', 'all')}
+              />
+            </Badge>
+          )}
+
+          {filters.repairCode && (
+            <Badge variant="secondary" className="gap-1">
+              Search: {filters.repairCode}
+              <X
+                className="h-3 w-3 cursor-pointer"
+                onClick={() => handleFilterChange('repairCode', '')}
               />
             </Badge>
           )}

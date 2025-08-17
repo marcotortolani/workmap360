@@ -63,7 +63,7 @@ export function useRepairsList(limit: number = 20): UseRepairsListReturn {
       // Si el usuario aún está cargando, no hacer nada
       if (userLoading) {
         return
-      }
+      }      
 
       // ✅ Si no hay token o no está autenticado, intentar refrescar una sola vez
       if ((!accessToken || !isAuthenticated) && !retryAttempted.current) {

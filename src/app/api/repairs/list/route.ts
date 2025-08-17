@@ -36,6 +36,8 @@ export async function GET(req: NextRequest) {
     const projectIdFilter = searchParams.get('project_id')
     const statusFilter = searchParams.get('status')
     const elevationFilter = searchParams.get('elevation_name')
+    const dropFilter = searchParams.get('drop')
+    const levelFilter = searchParams.get('level')    
 
     const serviceClient = getServiceSupabase()
 
@@ -138,6 +140,14 @@ export async function GET(req: NextRequest) {
 
     if (elevationFilter) {
       query = query.ilike('elevation_name', `%${elevationFilter}%`)
+    }
+
+    if (dropFilter) {
+      query = query.eq('drop', dropFilter)
+    }
+
+    if (levelFilter) {
+      query = query.eq('level', levelFilter)
     }
 
     // Aplicar paginación y ordenamiento

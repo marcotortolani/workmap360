@@ -29,9 +29,12 @@ export async function getRepairsViaAPI(
     // Agregar filtros
     if (filters?.project_id)
       searchParams.append('project_id', filters.project_id.toString())
+
     if (filters?.status) searchParams.append('status', filters.status)
     if (filters?.elevation_name)
       searchParams.append('elevation_name', filters.elevation_name)
+    if (filters?.drop) searchParams.append('drop', filters.drop.toString())
+    if (filters?.level) searchParams.append('level', filters.level.toString())
 
     const response = await fetch(
       `/api/repairs/list?${searchParams.toString()}`,

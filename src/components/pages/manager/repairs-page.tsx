@@ -292,6 +292,8 @@ export default function ManagerRepairsPage() {
     totalPages,
   } = useRepairsList(20)
 
+  console.log(pagination)
+
   const { projects } = useProjectsList()
 
   const [selectedRepair, setSelectedRepair] = useState<RepairData | null>(null)
@@ -302,29 +304,26 @@ export default function ManagerRepairsPage() {
   // )
   const [localFilters, setLocalFilters] = useState<FilterOptions>({
     status: 'all',
-    project: 'all',
+    project: { id: 0, name: 'all' },
     elevation: 'all',
-    searchTerm: '',
+    drop: 'all',
+    level: 'all',
+    repairCode: '',
     sortBy: 'date',
     sortOrder: 'desc',
   })
 
-  // Obtener proyectos y elevaciones únicos para los filtros
-  const uniqueProjects = useMemo(
-    () => [...new Set(repairs.map((r) => r.project_name))],
-    [repairs]
-  )
+  console.log(localFilters.project)
 
-  // unique elevations in project selected
   const uniqueElevationsInProject = useMemo(
     () => [
       ...new Set(
-        repairs
-          .filter((r) => r.project_name === localFilters.project)
-          .map((r) => r.elevation_name)
+        projects
+          .filter((p) => p.name === localFilters.project?.name)
+          .map((p) => p.elevations)
+          .flat()
       ),
     ],
-
     [localFilters.project]
   )
 
@@ -350,12 +349,20 @@ export default function ManagerRepairsPage() {
       apiFilters.status = filters.status
     }
 
-    if (filters.project && filters.project !== 'all') {
-      apiFilters.project_name = filters.project
+    if (filters.project && filters.project?.name !== 'all') {
+      apiFilters.project_id = filters.project.id.toString()
     }
 
     if (filters.elevation && filters.elevation !== 'all') {
       apiFilters.elevation_name = filters.elevation
+    }
+
+    if (filters.drop && filters.drop !== 'all') {
+      apiFilters.drop = filters.drop.toString()
+    }
+
+    if (filters.level && filters.level !== 'all') {
+      apiFilters.level = filters.level.toString()
     }
 
     // if (filters.searchTerm) {
@@ -369,15 +376,15 @@ export default function ManagerRepairsPage() {
   const filteredRepairs = useMemo(() => {
     let filtered = [...repairs]
 
-    if (localFilters.project && localFilters.project !== 'all') {
+    if (localFilters.project && localFilters.project?.name !== 'all') {
       filtered = filtered.filter(
-        (repair) => repair.project_name === localFilters.project
+        (repair) => repair.project_id === localFilters.project?.id
       )
     }
 
-    // Aplicar filtro de búsqueda localmente
-    if (localFilters.searchTerm) {
-      const searchLower = localFilters.searchTerm.toLowerCase()
+    //Aplicar filtro de búsqueda localmente
+    if (localFilters.repairCode) {
+      const searchLower = localFilters.repairCode.toLowerCase()
       filtered = filtered.filter((repair) => {
         const repairCode = `D${repair.drop}.L${repair.level}.${getRepairType(
           repair.phases
@@ -397,7 +404,10 @@ export default function ManagerRepairsPage() {
     }
 
     return filtered
-  }, [repairs, localFilters.searchTerm, localFilters.project])
+  }, [repairs, localFilters.repairCode, localFilters.project])
+
+  console.log(filteredRepairs);
+  
 
   const handleFilter = (newFilters: FilterOptions) => {
     setLocalFilters(newFilters)
@@ -497,7 +507,7 @@ export default function ManagerRepairsPage() {
           <RepairsFilter
             onFilter={handleFilter}
             onSort={handleSort}
-            projects={uniqueProjects}
+            projects={projects}
             elevations={uniqueElevationsInProject}
           />
 
@@ -536,7 +546,7 @@ export default function ManagerRepairsPage() {
                 {filteredRepairs.length === 0 ? (
                   <div className="text-center py-12">
                     <p className="text-muted-foreground text-sm">
-                      {localFilters.searchTerm
+                      {localFilters.repairCode
                         ? 'No repairs found matching the search criteria'
                         : 'No repairs found matching the current filters'}
                     </p>
@@ -590,7 +600,7 @@ export default function ManagerRepairsPage() {
                             colSpan={11}
                             className="text-center py-8 text-muted-foreground"
                           >
-                            {localFilters.searchTerm
+                            {localFilters.repairCode
                               ? 'No repairs found matching the search criteria'
                               : 'No repairs found matching the current filters'}
                           </TableCell>

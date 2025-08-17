@@ -97,6 +97,9 @@ export interface RepairListParams {
   project_id?: number
   status?: RepairDataStatusType
   elevation_name?: string
+  drop?: number
+  level?: number
+  repair_code?: string
 }
 
 export interface RepairListResponse {
