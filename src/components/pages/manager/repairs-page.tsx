@@ -292,8 +292,6 @@ export default function ManagerRepairsPage() {
     totalPages,
   } = useRepairsList(20)
 
-  console.log(pagination)
-
   const { projects } = useProjectsList()
 
   const [selectedRepair, setSelectedRepair] = useState<RepairData | null>(null)
@@ -312,8 +310,6 @@ export default function ManagerRepairsPage() {
     sortBy: 'date',
     sortOrder: 'desc',
   })
-
-  console.log(localFilters.project)
 
   const uniqueElevationsInProject = useMemo(
     () => [
@@ -405,8 +401,6 @@ export default function ManagerRepairsPage() {
 
     return filtered
   }, [repairs, localFilters.repairCode, localFilters.project])
-
-  console.log(filteredRepairs);
   
 
   const handleFilter = (newFilters: FilterOptions) => {

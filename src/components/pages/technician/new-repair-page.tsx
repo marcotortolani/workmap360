@@ -1128,9 +1128,6 @@ export default function TechnicianNewRepairPage() {
     )
   }
 
-  console.log('repair types: ', selectedProject?.repair_types)
-  console.log('matching repairs', matchingRepairs)
-
   return (
     <div className="w-full flex flex-col gap-8 p-1 sm:p-2 md:p-8">
       <Card className="w-full lg:max-w-4xl">

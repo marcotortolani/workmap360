@@ -3,7 +3,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, Filter, X } from 'lucide-react'
+import {  Filter, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -68,8 +68,6 @@ export function RepairsFilter({
     sortBy: 'date',
     sortOrder: 'desc',
   })
-
-  console.log('Filters:', filters)
 
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
@@ -409,7 +407,7 @@ export function RepairsFilter({
         </Select>
 
         {/* Search Bar */}
-        <div className="relative flex-1 min-w-[200px] max-w-md">
+        {/* <div className="relative flex-1 min-w-[200px] max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search a repair code..."
@@ -419,7 +417,7 @@ export function RepairsFilter({
             onChange={(e) => handleFilterChange('repairCode', e.target.value)}
             className="pl-9"
           />
-        </div>
+        </div> */}
 
         {/* Sort Options */}
         <div className=" flex gap-2">
