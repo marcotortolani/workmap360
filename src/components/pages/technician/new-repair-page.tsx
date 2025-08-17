@@ -570,20 +570,7 @@ export default function TechnicianNewRepairPage() {
           selectedRepair.phases.progress.length - 1
         ]
 
-      console.log(lastProgress)
-
       const lastMeasurements = lastProgress?.measurements || {}
-
-      console.log(
-        Object.keys(lastMeasurements).some((key) => {
-          const lastValue = lastMeasurements[key] || 0
-          console.log(lastValue)
-          const currentValue = measurements[key] || 0
-          console.log(currentValue)
-
-          return Math.abs(lastValue - currentValue) > 0.001 // Considerar diferencias mínimas como iguales
-        })
-      )
 
       return Object.keys(lastMeasurements).some((key) => {
         const lastValue = lastMeasurements[key] || 0
@@ -1120,8 +1107,6 @@ export default function TechnicianNewRepairPage() {
   }
 
   const getLatestMeasurementsString = () => {
-    console.log(selectedRepairType)
-
     if (!selectedRepairType) return ''
 
     const { unit_measure } = selectedRepairType
@@ -1131,17 +1116,12 @@ export default function TechnicianNewRepairPage() {
 
     let measurements
 
-    console.log(repair?.phases?.progress?.length)
-
     if (repair?.phases?.progress && repair?.phases?.progress?.length >= 1) {
       const progress = repair?.phases.progress
       const latestProgress = progress?.[progress.length - 1]
       measurements = latestProgress?.measurements || {}
-      console.log(measurements)
     } else {
       measurements = repair?.phases.survey?.measurements || {}
-
-      console.log(measurements)
     }
 
     switch (unit_measure.type) {
@@ -1193,11 +1173,6 @@ export default function TechnicianNewRepairPage() {
         ? getLatestMeasurementsString()
         : getMeasurementsString()
     const phaseCode = getPhaseCode()
-
-    console.log(currentPhase)
-    console.log(measurementsModified)
-
-    console.log(measurementsStr)
 
     if (
       !drop ||
