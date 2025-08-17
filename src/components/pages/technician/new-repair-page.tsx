@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 // src/components/pages/technician/new-repair-page.tsx
 
 'use client'
@@ -558,6 +557,41 @@ export default function TechnicianNewRepairPage() {
   const hasMeasurementsChanged = useCallback(() => {
     if (!selectedRepair?.phases.survey?.measurements) return false
 
+    if (!measurements) return false
+    if (currentPhase === 'survey' || currentPhase === 'finish') return false
+
+    // si el selected repair tiene mas de un progress, entonces utilizar la ultima medicion del ultimo progress
+    if (
+      selectedRepair.phases?.progress &&
+      selectedRepair.phases?.progress?.length >= 1
+    ) {
+      const lastProgress =
+        selectedRepair.phases?.progress?.[
+          selectedRepair.phases.progress.length - 1
+        ]
+
+      console.log(lastProgress)
+
+      const lastMeasurements = lastProgress?.measurements || {}
+
+      console.log(
+        Object.keys(lastMeasurements).some((key) => {
+          const lastValue = lastMeasurements[key] || 0
+          console.log(lastValue)
+          const currentValue = measurements[key] || 0
+          console.log(currentValue)
+
+          return Math.abs(lastValue - currentValue) > 0.001 // Considerar diferencias mínimas como iguales
+        })
+      )
+
+      return Object.keys(lastMeasurements).some((key) => {
+        const lastValue = lastMeasurements[key] || 0
+        const currentValue = measurements[key] || 0
+        return Math.abs(lastValue - currentValue) > 0.001 // Considerar diferencias mínimas como iguales
+      })
+    }
+
     const surveyMeasurements = selectedRepair.phases.survey.measurements
 
     return Object.keys(surveyMeasurements).some((key) => {
@@ -565,7 +599,7 @@ export default function TechnicianNewRepairPage() {
       const currentValue = measurements[key] || 0
       return Math.abs(surveyValue - currentValue) > 0.001 // Considerar diferencias mínimas como iguales
     })
-  }, [selectedRepair, measurements])
+  }, [selectedRepair, measurements, currentPhase])
 
   // Función para obtener el valor a mostrar en cada input
   const getInputValue = useCallback(
@@ -581,7 +615,15 @@ export default function TechnicianNewRepairPage() {
           return measurements[fieldKey] || 0
         } else {
           // Si no se han modificado, usar los valores del survey
-          return selectedRepair?.phases.survey?.measurements?.[fieldKey] || 0
+          if (selectedRepair?.phases?.progress?.length) {
+            return (
+              selectedRepair?.phases.progress[
+                selectedRepair?.phases.progress.length - 1
+              ]?.measurements?.[fieldKey] || 0
+            )
+          } else {
+            return selectedRepair?.phases.survey?.measurements?.[fieldKey] || 0
+          }
         }
       }
 
@@ -592,16 +634,41 @@ export default function TechnicianNewRepairPage() {
   )
 
   useEffect(() => {
+    if (currentPhase === 'survey' || !selectedRepair) {
+      setMeasurementsModified(false)
+      return
+    }
+
     if (
       currentPhase === 'progress' &&
+      selectedRepair?.phases?.progress &&
+      selectedRepair?.phases?.progress?.length >= 1
+    ) {
+      const lastProgress =
+        selectedRepair.phases?.progress?.[
+          selectedRepair.phases?.progress?.length - 1
+        ]
+      setMeasurements(lastProgress.measurements || {})
+      setMeasurementsModified(false)
+    }
+
+    if (
+      currentPhase === 'progress' &&
+      !selectedRepair?.phases?.progress &&
       selectedRepair?.phases.survey?.measurements
     ) {
       // Al entrar en progress, inicializar con valores del survey
       const surveyMeasurements = selectedRepair.phases.survey.measurements
       setMeasurements(surveyMeasurements)
       setMeasurementsModified(false)
-    } else if (currentPhase === 'survey') {
-      // Reset del flag cuando volvemos a survey
+    }
+
+    if (currentPhase === 'finish') {
+      const lastProgress =
+        selectedRepair?.phases?.progress?.[
+          selectedRepair?.phases?.progress?.length - 1
+        ]
+      setMeasurements(lastProgress?.measurements || {})
       setMeasurementsModified(false)
     }
   }, [currentPhase, selectedRepair])
@@ -1052,10 +1119,85 @@ export default function TechnicianNewRepairPage() {
     }
   }
 
+  const getLatestMeasurementsString = () => {
+    console.log(selectedRepairType)
+
+    if (!selectedRepairType) return ''
+
+    const { unit_measure } = selectedRepairType
+
+    // obtener el valor de las mediciones del ultimo progress de la repair elegida
+    const repair = locationRepairs.find((r) => r.id === selectedRepair?.id)
+
+    let measurements
+
+    console.log(repair?.phases?.progress?.length)
+
+    if (repair?.phases?.progress && repair?.phases?.progress?.length >= 1) {
+      const progress = repair?.phases.progress
+      const latestProgress = progress?.[progress.length - 1]
+      measurements = latestProgress?.measurements || {}
+      console.log(measurements)
+    } else {
+      measurements = repair?.phases.survey?.measurements || {}
+
+      console.log(measurements)
+    }
+
+    switch (unit_measure.type) {
+      case 'volume':
+        const width = measurements.width || 0
+        const height = measurements.height || 0
+        const depth =
+          measurements.depth || unit_measure.default_values?.depth || 0
+        return `${width}x${height}x${depth}`
+
+      case 'area':
+        const areaWidth = measurements.width || 0
+        const areaHeight = measurements.height || 0
+        return `${areaWidth}x${areaHeight}`
+
+      case 'area_thickness': // ✅ NUEVO
+        const areaThickWidth = measurements.width || 0
+        const areaThickHeight = measurements.height || 0
+        const thickness =
+          measurements.thickness || unit_measure.default_values?.thickness || 0
+        return `${areaThickWidth}x${areaThickHeight}x${thickness}`
+
+      case 'length':
+        const length = measurements.length || 0
+        return `${length}`
+
+      case 'length_thickness': // ✅ NUEVO
+        const lengthThickLength = measurements.length || 0
+        const lengthThickness =
+          measurements.thickness || unit_measure.default_values?.thickness || 0
+        return `${lengthThickLength}x${lengthThickness}`
+
+      case 'each': // ✅ CAMBIADO de 'unit' a 'each'
+        const count = measurements.each || 0
+        return `${count}`
+
+      default:
+        console.warn(
+          `Unknown unit measure type for measurements string: ${unit_measure.type}`
+        )
+        return ''
+    }
+  }
+
   // Generar el código completo de reparación
   const getFullRepairCode = () => {
-    const measurementsStr = getMeasurementsString()
+    const measurementsStr =
+      currentPhase === 'progress' && !measurementsModified
+        ? getLatestMeasurementsString()
+        : getMeasurementsString()
     const phaseCode = getPhaseCode()
+
+    console.log(currentPhase)
+    console.log(measurementsModified)
+
+    console.log(measurementsStr)
 
     if (
       !drop ||
@@ -1573,16 +1715,14 @@ export default function TechnicianNewRepairPage() {
                       <Label>Measurements</Label>
 
                       {/* ✅ Mostrar indicador si estamos en progress y usando valores del survey */}
-                      {currentPhase === 'progress' &&
-                        !measurementsModified &&
-                        selectedRepair?.phases.survey?.measurements && (
-                          <div className="mb-2 p-2 bg-blue-50 rounded-md border border-blue-200">
-                            <p className="text-xs text-blue-700">
-                              📋 Using measurements from Survey phase. Modify
-                              any value to update.
-                            </p>
-                          </div>
-                        )}
+                      {currentPhase === 'progress' && !measurementsModified && (
+                        <div className="mb-2 p-2 bg-blue-50 rounded-md border border-blue-200">
+                          <p className="text-xs text-blue-700">
+                            📋 Using latest measurements. Modify any value to
+                            update.
+                          </p>
+                        </div>
+                      )}
 
                       <div className="grid gap-3 md:grid-cols-3 mt-2">
                         {getMeasurementFields().map((field, index) => (
@@ -1596,7 +1736,7 @@ export default function TechnicianNewRepairPage() {
                               {currentPhase === 'progress' &&
                                 !measurementsModified && (
                                   <span className="text-blue-500 ml-1 text-xs">
-                                    (from Survey)
+                                    (latest)
                                   </span>
                                 )}
                             </Label>
@@ -1620,6 +1760,7 @@ export default function TechnicianNewRepairPage() {
                             {/* ✅ Mostrar valor original del survey si estamos en progress y se ha modificado */}
                             {currentPhase === 'progress' &&
                               measurementsModified &&
+                              !selectedRepair?.phases?.progress &&
                               selectedRepair?.phases.survey?.measurements?.[
                                 field.key
                               ] && (
@@ -1629,6 +1770,21 @@ export default function TechnicianNewRepairPage() {
                                     selectedRepair.phases.survey.measurements[
                                       field.key
                                     ]
+                                  }
+                                </p>
+                              )}
+                            {/* ✅ Mostrar valor original del survey si estamos en progress y se ha modificado */}
+                            {currentPhase === 'progress' &&
+                              measurementsModified &&
+                              selectedRepair?.phases?.progress &&
+                              selectedRepair?.phases?.progress?.length >= 1 && (
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Latest value:{' '}
+                                  {
+                                    selectedRepair?.phases?.progress?.[
+                                      selectedRepair?.phases?.progress?.length -
+                                        1
+                                    ]?.measurements?.[field.key]
                                   }
                                 </p>
                               )}
@@ -1772,7 +1928,10 @@ export default function TechnicianNewRepairPage() {
                             level,
                             repair_type,
                             repair_index,
-                            measures: getMeasurementsString(),
+                            measures:
+                              currentPhase === 'finish'
+                                ? getLatestMeasurementsString()
+                                : getMeasurementsString(),
                             phase: getPhaseCode(),
                           }}
                           // folderName={selectedProject?.name || folderName}
