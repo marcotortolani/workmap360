@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 // src/components/pages/manager/repairs-page.tsx
 
 'use client'
@@ -49,6 +48,7 @@ import {
 import { getRepairType } from '@/lib/utils'
 import { useRepairsList } from '@/hooks/use-repairs-list'
 import { useProjectsList } from '@/hooks/use-projects-list'
+import { useCurrentUser } from '@/stores/user-store'
 //import { toast } from 'sonner'
 
 // Helper function to determine if repair can have next phase
@@ -261,7 +261,7 @@ const RepairCard = ({
             <Eye className="mr-1 h-3 w-3" />
             View
           </Button>
-          {canAddPhase && (
+          {/* {canAddPhase && (
             <Button
               variant="outline"
               size="sm"
@@ -271,7 +271,7 @@ const RepairCard = ({
               <Plus className="mr-1 h-3 w-3" />
               {nextPhaseName}
             </Button>
-          )}
+          )} */}
         </div>
       </CardContent>
     </Card>
@@ -293,6 +293,7 @@ export default function ManagerRepairsPage() {
   } = useRepairsList(20)
 
   const { projects } = useProjectsList()
+  const { refreshSession, refreshCurrentUser } = useCurrentUser()
 
   const [selectedRepair, setSelectedRepair] = useState<RepairData | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -401,7 +402,6 @@ export default function ManagerRepairsPage() {
 
     return filtered
   }, [repairs, localFilters.repairCode, localFilters.project])
-  
 
   const handleFilter = (newFilters: FilterOptions) => {
     setLocalFilters(newFilters)
@@ -461,6 +461,8 @@ export default function ManagerRepairsPage() {
   }
 
   const handleRefresh = async () => {
+    refreshCurrentUser()
+    refreshSession()
     await refetch()
   }
 
