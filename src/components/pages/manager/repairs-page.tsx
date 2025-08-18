@@ -11,7 +11,7 @@ import {
   MapPin,
   Layers,
   Wrench,
-  Plus,
+  // Plus,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -93,10 +93,20 @@ const getNextPhaseName = (repair: RepairData, totalPhases: number): string => {
 }
 
 // Componente para las fases
-const PhasesDisplay = ({ repair }: { repair: RepairData }) => {
+const PhasesDisplay = ({
+  repair,
+  nextPhaseName = '',
+}: {
+  repair: RepairData
+  nextPhaseName?: string
+}) => {
   const isPhaseComplete = (phase: RepairPhase): boolean => {
     return (phase && phase.created_at && phase.created_at.length > 0) || false
   }
+
+  const nextPhaseNameToDisplay = nextPhaseName?.includes('Progress')
+    ? `P${nextPhaseName.split(' ')[1]}`
+    : null
 
   return (
     <div className="flex items-center gap-1 flex-wrap">
@@ -131,6 +141,23 @@ const PhasesDisplay = ({ repair }: { repair: RepairData }) => {
         </Badge>
       ))}
 
+      {nextPhaseNameToDisplay && (
+        <Badge
+          variant={
+            isPhaseComplete(repair.phases.progress?.[0] as RepairPhase)
+              ? 'default'
+              : 'outline'
+          }
+          className={`text-xs ${
+            isPhaseComplete(repair.phases.progress?.[0] as RepairPhase)
+              ? 'bg-green-100 text-green-800 border-green-300'
+              : 'bg-gray-100 text-gray-600'
+          }`}
+        >
+          {nextPhaseNameToDisplay}
+        </Badge>
+      )}
+
       <Badge
         variant={
           isPhaseComplete(repair.phases.finish as RepairPhase)
@@ -153,8 +180,8 @@ const PhasesDisplay = ({ repair }: { repair: RepairData }) => {
 const RepairCard = ({
   repair,
   onViewRepair,
-  onAddPhase,
-  canAddPhase,
+  // onAddPhase,
+  // canAddPhase,
   nextPhaseName,
 }: {
   repair: RepairData
@@ -194,12 +221,12 @@ const RepairCard = ({
                 <Eye className="mr-2 h-4 w-4" />
                 View Details
               </DropdownMenuItem>
-              {canAddPhase && (
+              {/* {canAddPhase && (
                 <DropdownMenuItem onClick={() => onAddPhase(repair)}>
                   <Plus className="mr-2 h-4 w-4" />
                   Add {nextPhaseName}
                 </DropdownMenuItem>
-              )}
+              )} */}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -227,7 +254,7 @@ const RepairCard = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Wrench className="h-3 w-3 text-muted-foreground" />
-            <PhasesDisplay repair={repair} />
+            <PhasesDisplay repair={repair} nextPhaseName={nextPhaseName} />
           </div>
 
           <Badge
@@ -629,7 +656,7 @@ export default function ManagerRepairsPage() {
                                 {getRepairType(repair.phases)}.
                                 {repair.repair_index}
                               </TableCell>
-                              <TableCell className="truncate max-w-[200px] line-clamp-1">
+                              <TableCell className=" max-w-[200px] ">
                                 {repair.project_name}
                               </TableCell>
                               <TableCell>{repair.elevation_name}</TableCell>
