@@ -7,7 +7,7 @@ import {
   Eye,
   Loader2,
   RefreshCw,
-  MoreVertical,
+  // MoreVertical,
   MapPin,
   Layers,
   Wrench,
@@ -22,12 +22,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuTrigger,
+// } from '@/components/ui/dropdown-menu'
 // import {
 //   Dialog,
 //   DialogContent,
@@ -210,7 +210,26 @@ const RepairCard = ({
             <h3 className="font-semibold text-base truncate">{repairCode}</h3>
           </div>
 
-          <DropdownMenu>
+          <Badge
+            variant={
+              repair.status === 'approved'
+                ? 'default'
+                : repair.status === 'pending'
+                ? 'secondary'
+                : 'destructive'
+            }
+            className={`text-xs ${
+              repair.status === 'approved'
+                ? 'bg-green-100 text-green-800'
+                : repair.status === 'pending'
+                ? 'bg-yellow-100 text-yellow-800'
+                : 'bg-red-100 text-red-800'
+            }`}
+          >
+            {repair.status}
+          </Badge>
+
+          {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                 <MoreVertical className="h-4 w-4" />
@@ -221,14 +240,14 @@ const RepairCard = ({
                 <Eye className="mr-2 h-4 w-4" />
                 View Details
               </DropdownMenuItem>
-              {/* {canAddPhase && (
+              {canAddPhase && (
                 <DropdownMenuItem onClick={() => onAddPhase(repair)}>
                   <Plus className="mr-2 h-4 w-4" />
                   Add {nextPhaseName}
                 </DropdownMenuItem>
-              )} */}
+              )}
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
         </div>
 
         <div className="space-y-2 mb-3">
@@ -256,25 +275,6 @@ const RepairCard = ({
             <Wrench className="h-3 w-3 text-muted-foreground" />
             <PhasesDisplay repair={repair} nextPhaseName={nextPhaseName} />
           </div>
-
-          <Badge
-            variant={
-              repair.status === 'approved'
-                ? 'default'
-                : repair.status === 'pending'
-                ? 'secondary'
-                : 'destructive'
-            }
-            className={`text-xs ${
-              repair.status === 'approved'
-                ? 'bg-green-100 text-green-800'
-                : repair.status === 'pending'
-                ? 'bg-yellow-100 text-yellow-800'
-                : 'bg-red-100 text-red-800'
-            }`}
-          >
-            {repair.status}
-          </Badge>
         </div>
 
         {/* Action buttons for mobile */}
