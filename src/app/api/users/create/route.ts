@@ -4,11 +4,16 @@ import { NextResponse } from 'next/server'
 import { getSupabaseAuthWithRole } from '@/lib/getSupabaseAuthWithRole'
 import { getServiceSupabase } from '@/lib/supabaseAuth'
 import { validRoles } from '@/data/roles'
+import { validateCSRFForRequest } from '@/lib/security/csrf'
 
 export async function POST(req: Request) {
   if (req.method !== 'POST') {
     return NextResponse.json({ error: 'Method not allowed' }, { status: 405 })
   }
+
+  // CSRF Protection
+  const csrfValidation = await validateCSRFForRequest(req)
+  if (csrfValidation) return csrfValidation
 
   const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
 

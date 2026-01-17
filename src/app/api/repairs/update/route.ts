@@ -6,8 +6,13 @@ import { getSupabaseAuthWithRole } from '@/lib/getSupabaseAuthWithRole'
 import { getUserDataFromAuthId } from '@/lib/api/utils'
 import { TechnicianAssignment } from '@/types/project-types'
 import { RepairData } from '@/types/repair-type'
+import { validateCSRFForRequest } from '@/lib/security/csrf'
 
 export async function PUT(req: NextRequest) {
+  // CSRF Protection
+  const csrfValidation = await validateCSRFForRequest(req)
+  if (csrfValidation) return csrfValidation
+
   const { id, repairData } = await req.json()
   try {
     const { user, role, error } = await getSupabaseAuthWithRole(req)

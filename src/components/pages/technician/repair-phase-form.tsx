@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { useCurrentUser } from '@/stores/user-store'
 import CustomImageUpload from '@/components/custom-image-upload'
+import { fetchWithCSRF } from '@/hooks/use-csrf-token'
 import { CheckCircle2, Loader2, Info, Plus, X, Camera } from 'lucide-react'
 import { RepairData, ProgressPhase, RepairType } from '@/types/repair-type'
 import { REPAIR_TYPE_LIST } from '@/data/repair-type-list'
@@ -395,11 +396,8 @@ export default function RepairPhaseForm({
 
       try {
         // Obtener firma para la subida
-        const signResponse = await fetch('/api/images/signed-upload', {
+        const signResponse = await fetchWithCSRF('/api/images/signed-upload', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
           body: JSON.stringify({
             public_id: fileName.trim(),
             folder: sanitizeFolderName(folderName),

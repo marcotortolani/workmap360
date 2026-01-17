@@ -25,6 +25,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { useProjectsList } from '@/hooks/use-projects-list'
 import { useRepairsByLocation } from '@/hooks/use-repairs-by-location'
+import { fetchWithCSRF } from '@/hooks/use-csrf-token'
 
 // import { useRepairsDataStore } from '@/stores/repairs-data-store'
 import { useCurrentUser } from '@/stores/user-store'
@@ -792,11 +793,8 @@ export default function TechnicianNewRepairPage() {
 
       try {
         // Obtener firma para la subida
-        const signResponse = await fetch('/api/images/signed-upload', {
+        const signResponse = await fetchWithCSRF('/api/images/signed-upload', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
           body: JSON.stringify({
             public_id: fileName.trim(),
             folder: sanitizeFolderName(folderName),

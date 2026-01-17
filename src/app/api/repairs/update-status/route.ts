@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServiceSupabase } from '@/lib/supabaseAuth'
 import { getSupabaseAuthWithRole } from '@/lib/getSupabaseAuthWithRole'
 import { getUserDataFromAuthId } from '@/lib/api/utils'
+import { validateCSRFForRequest } from '@/lib/security/csrf'
 // import { TechnicianAssignment } from '@/types/project-types'
 // import { RepairData } from '@/types/repair-type'
 
@@ -108,8 +109,12 @@ import { getUserDataFromAuthId } from '@/lib/api/utils'
 
 export async function PATCH(
   req: NextRequest,
-  
+
 ) {
+  // CSRF Protection
+  const csrfValidation = await validateCSRFForRequest(req)
+  if (csrfValidation) return csrfValidation
+
   const { id, status } = await req.json()
   try {
     const { user, role, error } = await getSupabaseAuthWithRole(req)

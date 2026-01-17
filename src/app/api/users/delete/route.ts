@@ -3,8 +3,13 @@ import { NextResponse } from 'next/server'
 import { getSupabaseAuthWithRole } from '@/lib/getSupabaseAuthWithRole'
 import { checkPermissionOrFail } from '@/lib/auth/permissions'
 import { getServiceSupabase } from '@/lib/supabaseAuth'
+import { validateCSRFForRequest } from '@/lib/security/csrf'
 
 export async function DELETE(req: Request) {
+  // CSRF Protection
+  const csrfValidation = await validateCSRFForRequest(req)
+  if (csrfValidation) return csrfValidation
+
   const { supabase, user, role, error } = await getSupabaseAuthWithRole(req)
   const body = await req.json()
   const { id: targetId } = body

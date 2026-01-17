@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { getSupabaseAuthWithRole } from '@/lib/getSupabaseAuthWithRole'
 import { getServiceSupabase } from '@/lib/supabaseAuth'
 import { getCloudinary } from '@/lib/cloudinary'
+import { validateCSRFForRequest } from '@/lib/security/csrf'
 
 interface ImageUploadRequest {
   file: string // Base64-encoded image
@@ -12,6 +13,10 @@ interface ImageUploadRequest {
 
 // POST /api/images/upload
 export async function POST(req: Request) {
+  // CSRF Protection
+  const csrfValidation = await validateCSRFForRequest(req)
+  if (csrfValidation) return csrfValidation
+
   try {
     const { user, role, error } = await getSupabaseAuthWithRole(req)
 

@@ -4,10 +4,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAuthWithRole } from '@/lib/getSupabaseAuthWithRole'
 import { getServiceSupabase } from '@/lib/supabaseAuth'
 import { getUserDataFromAuthId } from '@/lib/api/utils'
+import { validateCSRFForRequest } from '@/lib/security/csrf'
 
 import { TechnicianAssignment } from "@/types/project-types"
 
 export async function POST(req: NextRequest) {
+  // CSRF Protection
+  const csrfValidation = await validateCSRFForRequest(req)
+  if (csrfValidation) return csrfValidation
+
   try {
     const { user, role, error } = await getSupabaseAuthWithRole(req)
 

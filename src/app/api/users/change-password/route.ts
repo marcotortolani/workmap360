@@ -2,8 +2,13 @@
 
 import { NextResponse, NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { validateCSRFForRequest } from '@/lib/security/csrf'
 
 export async function PUT(req: NextRequest) {
+  // CSRF Protection
+  const csrfValidation = await validateCSRFForRequest(req)
+  if (csrfValidation) return csrfValidation
+
   try {
     const body = await req.json()
     const { newPassword } = body

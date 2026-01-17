@@ -2,10 +2,15 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { getSupabaseAuthWithRole } from '@/lib/getSupabaseAuthWithRole'
 import { getServiceSupabase } from '@/lib/supabaseAuth'
+import { validateCSRFForRequest } from '@/lib/security/csrf'
 
 export async function PUT(
   req: NextRequest
 ) {
+  // CSRF Protection
+  const csrfValidation = await validateCSRFForRequest(req)
+  if (csrfValidation) return csrfValidation
+
   const { id, updateData } = await req.json()
   try {
     const { user, role, error } = await getSupabaseAuthWithRole(req)
