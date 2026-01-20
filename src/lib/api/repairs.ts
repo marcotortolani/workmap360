@@ -7,6 +7,7 @@ import {
   RepairListResponse,
   RepairDataStatusType,
 } from '@/types/repair-type'
+import { fetchWithCSRF } from '@/hooks/use-csrf-token'
 
 // Función para obtener listado de reparaciones
 export async function getRepairsViaAPI(
@@ -169,10 +170,9 @@ export async function createRepairViaAPI(
   accessToken: string
 ): Promise<{ success: boolean; repairId?: number; error?: string }> {
   try {
-    const response = await fetch('/api/repairs/create', {
+    const response = await fetchWithCSRF('/api/repairs/create', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify(repairData),
@@ -204,10 +204,9 @@ export async function updateRepairViaAPI(
   accessToken: string
 ): Promise<{ success: boolean; repair?: RepairData; error?: string }> {
   try {
-    const response = await fetch(`/api/repairs/update`, {
+    const response = await fetchWithCSRF(`/api/repairs/update`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({ id: repairId, repairData: updateData }),
@@ -236,10 +235,9 @@ export async function updateRepairStatusViaAPI(
   accessToken: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await fetch(`/api/repairs/update-status`, {
+    const response = await fetchWithCSRF(`/api/repairs/update-status`, {
       method: 'PATCH',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({ id: repairId, status }),
@@ -267,7 +265,7 @@ export async function deleteRepairViaAPI(
   accessToken: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await fetch(`/api/repairs/delete`, {
+    const response = await fetchWithCSRF(`/api/repairs/delete`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${accessToken}`,

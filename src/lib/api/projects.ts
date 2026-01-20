@@ -5,6 +5,7 @@ import {
   ProjectRepairType,
   TechnicianAssignment,
 } from '@/types/project-types'
+import { fetchWithCSRF } from '@/hooks/use-csrf-token'
 
 // Función para crear un proyecto usando el endpoint
 export async function createProjectViaAPI(
@@ -22,10 +23,9 @@ export async function createProjectViaAPI(
   accessToken: string
 ): Promise<{ success: boolean; projectId?: number; error?: string }> {
   try {
-    const response = await fetch('/api/projects/create', {
+    const response = await fetchWithCSRF('/api/projects/create', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify(projectData),
@@ -184,10 +184,9 @@ export async function updateProjectViaAPI(
   accessToken: string
 ): Promise<{ success: boolean; project?: ProjectData; error?: string }> {
   try {
-    const response = await fetch(`/api/projects/update`, {
+    const response = await fetchWithCSRF(`/api/projects/update`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({ id: projectId, updateData }),
@@ -215,7 +214,7 @@ export async function deleteProjectViaAPI(
   accessToken: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await fetch(`/api/projects/delete`, {
+    const response = await fetchWithCSRF(`/api/projects/delete`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${accessToken}`,

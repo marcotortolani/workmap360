@@ -1,6 +1,7 @@
 // lib/api/users.ts
 import { UserType, UserRole, UserStatus } from '@/types/user-types'
 import { generateRandomPeepsAvatar } from '../utils/avatar-peeps'
+import { fetchWithCSRF } from '@/hooks/use-csrf-token'
 
 // 🔧 FUNCIÓN PRINCIPAL: Lista de usuarios con paginación y filtros
 export async function fetchUsersListViaAPI(
@@ -130,10 +131,9 @@ export async function createUserViaAPI(
       createdAt: userData.created_at || new Date().toISOString(),
     }
 
-    const response = await fetch('/api/users/create', {
+    const response = await fetchWithCSRF('/api/users/create', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         Accept: 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
@@ -198,10 +198,9 @@ export async function updateUserViaAPI(
   accessToken: string
 ): Promise<{ success: boolean; user?: UserType; error?: string }> {
   try {
-    const response = await fetch('/api/users/edit', {
+    const response = await fetchWithCSRF('/api/users/edit', {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({
@@ -265,10 +264,9 @@ export async function deleteUserViaAPI(
   accessToken: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await fetch('/api/users/delete', {
+    const response = await fetchWithCSRF('/api/users/delete', {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({ id: userId }),
@@ -297,10 +295,9 @@ export async function changeUserStatusViaAPI(
   accessToken: string
 ): Promise<{ success: boolean; user?: UserType; error?: string }> {
   try {
-    const response = await fetch('/api/users/change-status', {
+    const response = await fetchWithCSRF('/api/users/change-status', {
       method: 'PATCH',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({
