@@ -18,6 +18,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'Workmap360',
   description: 'Project Management System for Construction Industry',
+  other: {
+    version: '0.1.0',
+  },
 }
 
 export default function RootLayout({
