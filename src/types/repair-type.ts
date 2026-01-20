@@ -100,6 +100,8 @@ export interface RepairListParams {
   drop?: number
   level?: number
   repair_code?: string
+  sortBy?: 'created_at' | 'updated_at' | 'status' | 'project' | 'id'
+  sortOrder?: 'asc' | 'desc'
 }
 
 export interface RepairListResponse {

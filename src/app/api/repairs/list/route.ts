@@ -37,7 +37,9 @@ export async function GET(req: NextRequest) {
     const statusFilter = searchParams.get('status')
     const elevationFilter = searchParams.get('elevation_name')
     const dropFilter = searchParams.get('drop')
-    const levelFilter = searchParams.get('level')    
+    const levelFilter = searchParams.get('level')
+    const sortBy = searchParams.get('sortBy') || 'updated_at'
+    const sortOrder = searchParams.get('sortOrder') || 'desc'    
 
     const serviceClient = getServiceSupabase()
 
@@ -151,12 +153,34 @@ export async function GET(req: NextRequest) {
     }
 
     // Aplicar paginación y ordenamiento
+    // Mapear el campo de ordenamiento
+    let orderByColumn = 'updated_at'
+    switch (sortBy) {
+      case 'created_at':
+        orderByColumn = 'created_at'
+        break
+      case 'updated_at':
+        orderByColumn = 'updated_at'
+        break
+      case 'id':
+        orderByColumn = 'id'
+        break
+      case 'status':
+        orderByColumn = 'status'
+        break
+      case 'project':
+        orderByColumn = 'project_name'
+        break
+      default:
+        orderByColumn = 'updated_at'
+    }
+
     const {
       data: repairsData,
       error: queryError,
       count,
     } = await query
-      .order('created_at', { ascending: false })
+      .order(orderByColumn, { ascending: sortOrder === 'asc' })
       .range(offset, offset + limit - 1)
 
     if (queryError) {

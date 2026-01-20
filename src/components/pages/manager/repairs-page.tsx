@@ -2,7 +2,7 @@
 
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import {
   Eye,
   Loader2,
@@ -335,7 +335,7 @@ export default function ManagerRepairsPage() {
     drop: 'all',
     level: 'all',
     repairCode: '',
-    sortBy: 'date',
+    sortBy: 'updated_at',
     sortOrder: 'desc',
   })
 
@@ -387,6 +387,15 @@ export default function ManagerRepairsPage() {
 
     if (filters.level && filters.level !== 'all') {
       apiFilters.level = filters.level.toString()
+    }
+
+    // Agregar parámetros de ordenamiento
+    if (filters.sortBy) {
+      apiFilters.sortBy = filters.sortBy
+    }
+
+    if (filters.sortOrder) {
+      apiFilters.sortOrder = filters.sortOrder
     }
 
     // if (filters.searchTerm) {
@@ -444,11 +453,16 @@ export default function ManagerRepairsPage() {
     sortBy: FilterOptions['sortBy']
     sortOrder: FilterOptions['sortOrder']
   }) => {
-    setLocalFilters((prev) => ({
-      ...prev,
+    const newFilters = {
+      ...localFilters,
       sortBy,
       sortOrder,
-    }))
+    }
+    setLocalFilters(newFilters)
+
+    // Actualizar los filtros de la API incluyendo el ordenamiento
+    const apiFilters = convertFiltersToAPI(newFilters)
+    setApiFilters(apiFilters)
   }
 
   const handleViewRepair = (repair: RepairData) => {
@@ -492,6 +506,16 @@ export default function ManagerRepairsPage() {
     refreshSession()
     await refetch()
   }
+
+  // Inicializar filtros con ordenamiento por defecto
+  const isInitialized = useRef(false)
+  useEffect(() => {
+    if (!isInitialized.current) {
+      isInitialized.current = true
+      const initialFilters = convertFiltersToAPI(localFilters)
+      setApiFilters(initialFilters)
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8 p-2 sm:p-4 lg:p-8 max-w-screen-2xl mx-auto">

@@ -30,7 +30,7 @@ export interface FilterOptions {
   drop?: number | 'all'
   level?: number | 'all'
   repairCode?: string
-  sortBy?: 'date' | 'status' | 'project' | 'id'
+  sortBy?: 'created_at' | 'updated_at' | 'status' | 'project' | 'id'
   sortOrder?: 'asc' | 'desc'
 }
 
@@ -54,7 +54,7 @@ interface RepairsFilterProps {
 
 export function RepairsFilter({
   onFilter,
-  //onSort,
+  onSort,
   projects = [],
   elevations = [],
 }: RepairsFilterProps) {
@@ -65,7 +65,7 @@ export function RepairsFilter({
     drop: 'all',
     level: 'all',
     repairCode: '',
-    sortBy: 'date',
+    sortBy: 'updated_at',
     sortOrder: 'desc',
   })
 
@@ -208,22 +208,24 @@ export function RepairsFilter({
     onFilter(newFilters)
   }
 
-  // const handleSortChange = (sortBy: string) => {
-  //   const newSortOrder =
-  //     filters.sortBy === sortBy && filters.sortOrder === 'asc' ? 'desc' : 'asc'
+  const handleSortChange = (value: string) => {
+    const [sortBy, sortOrder] = value.split('-') as [
+      FilterOptions['sortBy'],
+      FilterOptions['sortOrder']
+    ]
 
-  //   const newFilters = {
-  //     ...filters,
-  //     sortBy: sortBy as FilterOptions['sortBy'],
-  //     sortOrder: newSortOrder,
-  //   }
+    const newFilters = {
+      ...filters,
+      sortBy,
+      sortOrder,
+    }
 
-  //   setFilters(newFilters as FilterOptions)
-  //   onSort({
-  //     sortBy: sortBy as FilterOptions['sortBy'],
-  //     sortOrder: newSortOrder,
-  //   })
-  // }
+    setFilters(newFilters)
+    onSort({
+      sortBy,
+      sortOrder,
+    })
+  }
 
   const clearFilters = () => {
     const defaultFilters: FilterOptions = {
@@ -233,11 +235,15 @@ export function RepairsFilter({
       drop: 'all',
       level: 'all',
       repairCode: '',
-      sortBy: 'date',
+      sortBy: 'updated_at',
       sortOrder: 'desc',
     }
     setFilters(defaultFilters)
     onFilter(defaultFilters)
+    onSort({
+      sortBy: 'updated_at',
+      sortOrder: 'desc',
+    })
   }
 
   const activeFiltersCount = [
@@ -251,7 +257,7 @@ export function RepairsFilter({
 
   return (
     <div className="mb-6 space-y-4">
-      <div className="h-full flex flex-wrap wrap-anywhere gap-2">
+      <div className="h-full flex flex-wrap xl:flex-nowrap wrap-anywhere gap-2">
        {/* Advanced Filters */}
         <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
           <PopoverTrigger asChild>
@@ -395,7 +401,7 @@ export function RepairsFilter({
           value={filters.status}
           onValueChange={(value) => handleFilterChange('status', value)}
         >
-          <SelectTrigger className="w-[120px]">
+          <SelectTrigger className="w-[140px]">
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
           <SelectContent>
@@ -406,48 +412,29 @@ export function RepairsFilter({
           </SelectContent>
         </Select>
 
-        {/* Search Bar */}
-        {/* <div className="relative flex-1 min-w-[200px] max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search a repair code..."
-            // value={filters.searchTerm}
-            // onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
-            value={filters.repairCode}
-            onChange={(e) => handleFilterChange('repairCode', e.target.value)}
-            className="pl-9"
-          />
-        </div> */}
-
-        {/* Sort Options */}
-        <div className=" flex gap-2">
-          {/* <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleSortChange('date')}
-            className={filters.sortBy === 'date' ? 'bg-accent' : ''}
-          >
-            {filters.sortOrder === 'asc' ? (
-              <SortAsc className="h-4 w-4 mr-1" />
-            ) : (
-              <SortDesc className="h-4 w-4 mr-1" />
-            )}
-            Date
-          </Button> */}
-          {/* <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleSortChange('id')}
-            className={filters.sortBy === 'id' ? 'bg-accent' : ''}
-          >
-            {filters.sortOrder === 'asc' ? (
-              <SortAsc className="h-4 w-4 mr-1" />
-            ) : (
-              <SortDesc className="h-4 w-4 mr-1" />
-            )}
-            ID
-          </Button> */}
-        </div>
+        {/* Sort By */}
+        <Select
+          value={`${filters.sortBy}-${filters.sortOrder}`}
+          onValueChange={handleSortChange}
+        >
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Sort By" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="updated_at-desc">
+              Recently Modified
+            </SelectItem>
+            <SelectItem value="updated_at-asc">
+              Oldest Modified
+            </SelectItem>
+            <SelectItem value="created_at-desc">
+              Recently Created
+            </SelectItem>
+            <SelectItem value="created_at-asc">
+              Oldest Created
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Active Filters Display */}

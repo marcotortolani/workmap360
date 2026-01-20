@@ -37,6 +37,10 @@ export async function getRepairsViaAPI(
     if (filters?.drop) searchParams.append('drop', filters.drop.toString())
     if (filters?.level) searchParams.append('level', filters.level.toString())
 
+    // Agregar parámetros de ordenamiento
+    if (filters?.sortBy) searchParams.append('sortBy', filters.sortBy)
+    if (filters?.sortOrder) searchParams.append('sortOrder', filters.sortOrder)
+
     const response = await fetch(
       `/api/repairs/list?${searchParams.toString()}`,
       {
