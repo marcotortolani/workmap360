@@ -3,7 +3,7 @@
 'use client'
 
 import { useState } from 'react'
-import {  Filter, X } from 'lucide-react'
+import { Filter, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -91,7 +91,7 @@ export function RepairsFilter({
       // Si no hay elevation específica, permitir todos los drops del proyecto
       const totalDrops = selectedProject.elevations.reduce(
         (total, elev) => total + elev.drops,
-        0
+        0,
       )
       return {
         min: 1,
@@ -104,7 +104,7 @@ export function RepairsFilter({
     // Si hay elevation seleccionada, usar solo los drops de esa elevation
     const range = getDropRangeForElevation(
       filters.elevation as string,
-      selectedProject.elevations
+      selectedProject.elevations,
     )
     if (range) {
       return {
@@ -136,7 +136,7 @@ export function RepairsFilter({
       // Si no hay elevation específica, usar el máximo de levels del proyecto
       const maxLevels = selectedProject.elevations.reduce(
         (max, elev) => Math.max(max, elev.levels),
-        0
+        0,
       )
       return {
         min: 1,
@@ -148,7 +148,7 @@ export function RepairsFilter({
 
     // Si hay elevation seleccionada, usar los levels de esa elevation
     const selectedElevation = selectedProject.elevations.find(
-      (e) => e.name === filters.elevation
+      (e) => e.name === filters.elevation,
     )
     if (selectedElevation) {
       return {
@@ -211,7 +211,7 @@ export function RepairsFilter({
   const handleSortChange = (value: string) => {
     const [sortBy, sortOrder] = value.split('-') as [
       FilterOptions['sortBy'],
-      FilterOptions['sortOrder']
+      FilterOptions['sortOrder'],
     ]
 
     const newFilters = {
@@ -258,7 +258,7 @@ export function RepairsFilter({
   return (
     <div className="mb-6 space-y-4">
       <div className="h-full flex flex-wrap xl:flex-nowrap wrap-anywhere gap-2">
-       {/* Advanced Filters */}
+        {/* Advanced Filters */}
         <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" className="gap-2">
@@ -271,7 +271,7 @@ export function RepairsFilter({
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-80">
+          <PopoverContent className="w-[80vw] min-w-2xs ml-2 shadow-xl shadow-black/40">
             <div className="space-y-4">
               <h4 className="font-medium">Advanced Filters</h4>
 
@@ -421,18 +421,10 @@ export function RepairsFilter({
             <SelectValue placeholder="Sort By" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="updated_at-desc">
-              Recently Modified
-            </SelectItem>
-            <SelectItem value="updated_at-asc">
-              Oldest Modified
-            </SelectItem>
-            <SelectItem value="created_at-desc">
-              Recently Created
-            </SelectItem>
-            <SelectItem value="created_at-asc">
-              Oldest Created
-            </SelectItem>
+            <SelectItem value="updated_at-desc">Recently Modified</SelectItem>
+            <SelectItem value="updated_at-asc">Oldest Modified</SelectItem>
+            <SelectItem value="created_at-desc">Recently Created</SelectItem>
+            <SelectItem value="created_at-asc">Oldest Created</SelectItem>
           </SelectContent>
         </Select>
       </div>
