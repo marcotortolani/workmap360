@@ -171,7 +171,8 @@ export default function DatabaseManagementPage() {
       if (!response.ok) {
         // Try to get error details from response
         const errorData = await response.json().catch(() => null)
-        const errorMessage = errorData?.details || errorData?.error || 'Failed to export database'
+        const errorMessage =
+          errorData?.details || errorData?.error || 'Failed to export database'
         console.error('Export error details:', errorData)
         throw new Error(errorMessage)
       }
@@ -396,7 +397,7 @@ export default function DatabaseManagementPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-3">
+          <div className="flex flex-col md:flex-row gap-3">
             <Button
               onClick={handleCreateBackup}
               disabled={isCreatingBackup || isExporting}
