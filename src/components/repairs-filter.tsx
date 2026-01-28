@@ -22,7 +22,11 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { MultiSelect } from '@/components/ui/multi-select'
 import { RepairDataStatusType } from '@/types/repair-type'
-import { ProjectData, Elevation, TechnicianAssignment } from '@/types/project-types'
+import {
+  ProjectData,
+  Elevation,
+  TechnicianAssignment,
+} from '@/types/project-types'
 import { getDropRangeForElevation } from '@/lib/utils/elevation-utils'
 import { REPAIR_TYPE_LIST } from '@/data/repair-type-list'
 import { useTechniciansList } from '@/hooks/use-technicians-list'
@@ -86,7 +90,7 @@ export function RepairsFilter({
 
   // Prepare repair type options for MultiSelect
   const repairTypeOptions = REPAIR_TYPE_LIST.filter(
-    (rt) => rt.status === 'active'
+    (rt) => rt.status === 'active',
   ).map((rt) => ({
     value: rt.type,
     label: `${rt.type} - ${rt.variation}`,
@@ -105,11 +109,14 @@ export function RepairsFilter({
         return []
       }
 
-      const assignedTechnicianIds = selectedProject.technicians?.map(
-        (t: TechnicianAssignment) => t.technician_id
-      ) || []
+      const assignedTechnicianIds =
+        selectedProject.technicians?.map(
+          (t: TechnicianAssignment) => t.technician_id,
+        ) || []
 
-      filtered = technicians.filter((tech) => assignedTechnicianIds.includes(tech.id))
+      filtered = technicians.filter((tech) =>
+        assignedTechnicianIds.includes(tech.id),
+      )
     }
 
     // Apply search filter
@@ -221,9 +228,10 @@ export function RepairsFilter({
       // Check if current technician is assigned to the new project
       let newTechnician = filters.technician
       if (newProjectId !== 0 && filters.technician?.id !== 0) {
-        const assignedTechIds = newProject?.technicians?.map(
-          (t: TechnicianAssignment) => t.technician_id
-        ) || []
+        const assignedTechIds =
+          newProject?.technicians?.map(
+            (t: TechnicianAssignment) => t.technician_id,
+          ) || []
 
         // If current technician is not in the new project, reset to "All"
         if (!assignedTechIds.includes(filters.technician?.id || 0)) {
@@ -243,8 +251,8 @@ export function RepairsFilter({
         technician: newTechnician,
       }
 
-      setFilters(newFilters)
-      onFilter(newFilters)
+      setFilters(newFilters as FilterOptions)
+      onFilter(newFilters as FilterOptions)
       return
     }
 
@@ -304,7 +312,7 @@ export function RepairsFilter({
 
     // Find technician by full name
     const technician = technicians.find(
-      (tech) => `${tech.first_name} ${tech.last_name}` === value
+      (tech) => `${tech.first_name} ${tech.last_name}` === value,
     )
 
     if (technician) {
@@ -332,10 +340,8 @@ export function RepairsFilter({
     }
     setFilters(defaultFilters)
     onFilter(defaultFilters)
-    onSort({
-      sortBy: 'updated_at',
-      sortOrder: 'desc',
-    })
+    // onSort() call removed - it's redundant and causes a race condition
+    // The defaultFilters already includes sortBy and sortOrder which are handled by onFilter
   }
 
   // Cuenta solo los filtros dentro del popover de Advanced Filters
@@ -524,8 +530,8 @@ export function RepairsFilter({
                 {filters.technician?.id !== 0
                   ? filters.technician?.name
                   : filters.project?.id !== 0
-                  ? `All (${filteredTechnicians.length})`
-                  : 'All Technicians'}
+                    ? `All (${filteredTechnicians.length})`
+                    : 'All Technicians'}
               </span>
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
@@ -554,7 +560,7 @@ export function RepairsFilter({
                     }}
                     className={cn(
                       'relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground',
-                      filters.technician?.id === 0 && 'bg-accent'
+                      filters.technician?.id === 0 && 'bg-accent',
                     )}
                   >
                     <Check
@@ -562,7 +568,7 @@ export function RepairsFilter({
                         'mr-2 h-4 w-4',
                         filters.technician?.id === 0
                           ? 'opacity-100'
-                          : 'opacity-0'
+                          : 'opacity-0',
                       )}
                     />
                     All Technicians
@@ -576,42 +582,40 @@ export function RepairsFilter({
                   )}
 
                   {/* Technicians */}
-                  {!loadingTechnicians && filteredTechnicians.length > 0 ? (
-                    filteredTechnicians.map((tech) => {
-                      const fullName = `${tech.first_name} ${tech.last_name}`
-                      const isSelected = filters.technician?.id === tech.id
+                  {!loadingTechnicians && filteredTechnicians.length > 0
+                    ? filteredTechnicians.map((tech) => {
+                        const fullName = `${tech.first_name} ${tech.last_name}`
+                        const isSelected = filters.technician?.id === tech.id
 
-                      return (
-                        <button
-                          key={tech.id}
-                          onClick={() => {
-                            handleTechnicianChange(fullName)
-                            setIsTechnicianOpen(false)
-                          }}
-                          className={cn(
-                            'relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground',
-                            isSelected && 'bg-accent'
-                          )}
-                        >
-                          <Check
+                        return (
+                          <button
+                            key={tech.id}
+                            onClick={() => {
+                              handleTechnicianChange(fullName)
+                              setIsTechnicianOpen(false)
+                            }}
                             className={cn(
-                              'mr-2 h-4 w-4',
-                              isSelected ? 'opacity-100' : 'opacity-0'
+                              'relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground',
+                              isSelected && 'bg-accent',
                             )}
-                          />
-                          {fullName}
-                        </button>
-                      )
-                    })
-                  ) : (
-                    !loadingTechnicians && (
-                      <div className="py-6 text-center text-sm text-muted-foreground">
-                        {technicianSearch
-                          ? 'No technician matches your search'
-                          : 'No technicians available'}
-                      </div>
-                    )
-                  )}
+                          >
+                            <Check
+                              className={cn(
+                                'mr-2 h-4 w-4',
+                                isSelected ? 'opacity-100' : 'opacity-0',
+                              )}
+                            />
+                            {fullName}
+                          </button>
+                        )
+                      })
+                    : !loadingTechnicians && (
+                        <div className="py-6 text-center text-sm text-muted-foreground">
+                          {technicianSearch
+                            ? 'No technician matches your search'
+                            : 'No technicians available'}
+                        </div>
+                      )}
                 </div>
               </ScrollArea>
             </div>
@@ -652,11 +656,7 @@ export function RepairsFilter({
 
         {/* Clear All Button */}
         {activeFiltersCount > 0 && (
-          <Button
-            variant="outline"
-            onClick={clearFilters}
-            className="gap-2"
-          >
+          <Button variant="outline" onClick={clearFilters} className="gap-2">
             <X className="h-4 w-4" />
             Clear All
           </Button>
@@ -732,7 +732,7 @@ export function RepairsFilter({
                   className="h-3 w-3 cursor-pointer"
                   onClick={() =>
                     handleRepairTypesChange(
-                      filters.repairTypes!.filter((t) => t !== type)
+                      filters.repairTypes!.filter((t) => t !== type),
                     )
                   }
                 />

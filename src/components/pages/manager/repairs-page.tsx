@@ -191,7 +191,7 @@ const RepairCard = ({
   nextPhaseName: string
 }) => {
   const repairCode = `D${repair.drop}.L${repair.level}.${getRepairType(
-    repair.phases
+    repair.phases,
   )}.${repair.repair_index}`
 
   return (
@@ -215,15 +215,15 @@ const RepairCard = ({
               repair.status === 'approved'
                 ? 'default'
                 : repair.status === 'pending'
-                ? 'secondary'
-                : 'destructive'
+                  ? 'secondary'
+                  : 'destructive'
             }
             className={`text-xs ${
               repair.status === 'approved'
                 ? 'bg-green-100 text-green-800'
                 : repair.status === 'pending'
-                ? 'bg-yellow-100 text-yellow-800'
-                : 'bg-red-100 text-red-800'
+                  ? 'bg-yellow-100 text-yellow-800'
+                  : 'bg-red-100 text-red-800'
             }`}
           >
             {repair.status}
@@ -345,10 +345,10 @@ export default function ManagerRepairsPage() {
         projects
           .filter((p) => p.name === localFilters.project?.name)
           .map((p) => p.elevations)
-          .flat()
+          .flat(),
       ),
     ],
-    [localFilters.project]
+    [localFilters.project, projects],
   )
 
   // Helper function to get total phases for a repair
@@ -359,7 +359,7 @@ export default function ManagerRepairsPage() {
 
     // Buscar el tipo de reparación en el proyecto
     const repairTypeConfig = project.repair_types.find(
-      (rt) => rt.repair_type === repair.phases.survey?.repair_type
+      (rt) => rt.repair_type === repair.phases.survey?.repair_type,
     )
 
     return repairTypeConfig?.phases || 3 // Default value
@@ -426,7 +426,7 @@ export default function ManagerRepairsPage() {
       const searchLower = localFilters.repairCode.toLowerCase()
       filtered = filtered.filter((repair) => {
         const repairCode = `D${repair.drop}.L${repair.level}.${getRepairType(
-          repair.phases
+          repair.phases,
         )}.${repair.repair_index}`.toLowerCase()
         const projectName = repair.project_name.toLowerCase()
         const elevationName = repair.elevation_name.toLowerCase()
@@ -521,7 +521,7 @@ export default function ManagerRepairsPage() {
       const initialFilters = convertFiltersToAPI(localFilters)
       setApiFilters(initialFilters)
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8 p-2 sm:p-4 lg:p-8 max-w-screen-2xl mx-auto">
@@ -701,15 +701,15 @@ export default function ManagerRepairsPage() {
                                     repair.status === 'approved'
                                       ? 'default'
                                       : repair.status === 'pending'
-                                      ? 'secondary'
-                                      : 'destructive'
+                                        ? 'secondary'
+                                        : 'destructive'
                                   }
                                   className={`text-xs ${
                                     repair.status === 'approved'
                                       ? 'bg-green-100 text-green-800'
                                       : repair.status === 'pending'
-                                      ? 'bg-yellow-100 text-yellow-800'
-                                      : 'bg-red-100 text-red-800'
+                                        ? 'bg-yellow-100 text-yellow-800'
+                                        : 'bg-red-100 text-red-800'
                                   }`}
                                 >
                                   {repair.status}
