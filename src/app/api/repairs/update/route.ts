@@ -81,7 +81,30 @@ export async function PUT(req: NextRequest) {
     const updateData: Partial<RepairData> = {
       updated_at: new Date().toISOString(),
     }
-    if (phases !== undefined) updateData.phases = phases
+    if (phases !== undefined) {
+      updateData.phases = phases
+
+      // Update denormalized columns if repair_type changed
+      const newRepairTypeCode =
+        phases.survey?.repair_type ||
+        phases.progress?.[0]?.repair_type ||
+        null
+
+      // Lookup repair_type_id if code changed
+      let newRepairTypeId = null
+      if (newRepairTypeCode) {
+        const { data: repairTypeData } = await serviceClient
+          .from('repair_types')
+          .select('id')
+          .eq('type', newRepairTypeCode)
+          .single()
+        newRepairTypeId = repairTypeData?.id || null
+      }
+
+      updateData.repair_type_id = newRepairTypeId
+      updateData.repair_type_code = newRepairTypeCode
+      // Note: primary_technician_id typically doesn't change (it's who created survey)
+    }
     if (status !== undefined) updateData.status = status
 
     const { data: updatedRepair, error: updateError } = await serviceClient

@@ -415,18 +415,13 @@ export default function ManagerRepairsPage() {
     return apiFilters
   }
 
-  // Aplicar filtros locales (principalmente para búsqueda)
-  // Los filtros de repairTypes y technician ahora se manejan en el backend
+  // Aplicar solo filtro de búsqueda local (texto libre)
+  // Todos los demás filtros (project, status, elevation, drop, level, repairTypes, technician)
+  // se manejan en el backend para mejor performance
   const filteredRepairs = useMemo(() => {
     let filtered = [...repairs]
 
-    if (localFilters.project && localFilters.project?.name !== 'all') {
-      filtered = filtered.filter(
-        (repair) => repair.project_id === localFilters.project?.id
-      )
-    }
-
-    //Aplicar filtro de búsqueda localmente
+    // Aplicar filtro de búsqueda localmente (solo si hay texto de búsqueda)
     if (localFilters.repairCode) {
       const searchLower = localFilters.repairCode.toLowerCase()
       filtered = filtered.filter((repair) => {
@@ -448,7 +443,7 @@ export default function ManagerRepairsPage() {
     }
 
     return filtered
-  }, [repairs, localFilters.repairCode, localFilters.project])
+  }, [repairs, localFilters.repairCode])
 
   const handleFilter = (newFilters: FilterOptions) => {
     setLocalFilters(newFilters)

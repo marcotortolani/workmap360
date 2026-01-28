@@ -41,11 +41,13 @@ export async function GET(req: NextRequest) {
     const repairTypesFilter = searchParams.get('repair_types') // Comma-separated list
     const technicianIdFilter = searchParams.get('technician_id')
     const sortBy = searchParams.get('sortBy') || 'updated_at'
-    const sortOrder = searchParams.get('sortOrder') || 'desc'    
+    const sortOrder = searchParams.get('sortOrder') || 'desc'
 
     const serviceClient = getServiceSupabase()
 
-    let query = serviceClient.from('repairs').select('*', { count: 'exact' })
+    // Use 'estimated' count for better performance (fastest, uses table statistics)
+    // This avoids counting all rows which is slow with large tables
+    let query = serviceClient.from('repairs').select('*', { count: 'estimated' })
     let allowedProjectIds: number[] = []
 
     // Aplicar filtros de rol para obtener proyectos permitidos
@@ -154,6 +156,17 @@ export async function GET(req: NextRequest) {
       query = query.eq('level', levelFilter)
     }
 
+    // Filter by repair_type using indexed column (replaces in-memory filtering)
+    if (repairTypesFilter) {
+      const repairTypes = repairTypesFilter.split(',').map((t) => t.trim())
+      query = query.in('repair_type_code', repairTypes)
+    }
+
+    // Filter by technician using indexed column (replaces in-memory filtering)
+    if (technicianIdFilter) {
+      query = query.eq('primary_technician_id', parseInt(technicianIdFilter))
+    }
+
     // Aplicar ordenamiento
     let orderByColumn = 'updated_at'
     switch (sortBy) {
@@ -176,28 +189,14 @@ export async function GET(req: NextRequest) {
         orderByColumn = 'updated_at'
     }
 
-    // Si hay filtros de repair_types o technician, necesitamos obtener todos los registros
-    // y filtrar en memoria porque estos campos están dentro de JSONB
-    const needsInMemoryFilter = repairTypesFilter || technicianIdFilter
-
-    let queryResult
-    if (needsInMemoryFilter) {
-      // Obtener todos los registros (sin paginación) para filtrar en memoria
-      queryResult = await query
-        .order(orderByColumn, { ascending: sortOrder === 'asc' })
-        .limit(10000) // Límite razonable de seguridad
-    } else {
-      // Aplicar paginación normal
-      queryResult = await query
-        .order(orderByColumn, { ascending: sortOrder === 'asc' })
-        .range(offset, offset + limit - 1)
-    }
-
+    // Execute query with pagination (no more in-memory filtering!)
     const {
       data: repairsData,
       error: queryError,
-      count: dbCount,
-    } = queryResult
+      count,
+    } = await query
+      .order(orderByColumn, { ascending: sortOrder === 'asc' })
+      .range(offset, offset + limit - 1)
 
     if (queryError) {
       console.error('Error fetching repairs:', queryError)
@@ -207,84 +206,8 @@ export async function GET(req: NextRequest) {
       )
     }
 
-    let repairs = repairsData || []
-
-    // Aplicar filtros en memoria para campos dentro de JSONB
-    if (needsInMemoryFilter && repairs.length > 0) {
-      // Filtrar por repair_types
-      if (repairTypesFilter) {
-        const repairTypes = repairTypesFilter.split(',').map((t) => t.trim())
-        repairs = repairs.filter((repair: RepairData) => {
-          const phases = repair.phases || {}
-          // Buscar repair_type en survey
-          const surveyType = phases.survey?.repair_type
-          if (surveyType && repairTypes.includes(surveyType)) return true
-
-          // Buscar repair_type en progress
-          if (phases.progress && Array.isArray(phases.progress)) {
-            const progressType = phases.progress[0]?.repair_type
-            if (progressType && repairTypes.includes(progressType)) return true
-          }
-
-          return false
-        })
-      }
-
-      // Filtrar por technician
-      if (technicianIdFilter) {
-        const technicianId = parseInt(technicianIdFilter)
-        repairs = repairs.filter((repair: RepairData) => {
-          const phases = repair.phases || {}
-
-          // Buscar en survey
-          if (phases.survey?.created_by_user_id === technicianId) return true
-
-          // Buscar en progress
-          if (phases.progress && Array.isArray(phases.progress)) {
-            if (
-              phases.progress.some((p) => p.created_by_user_id === technicianId)
-            )
-              return true
-          }
-
-          // Buscar en finish
-          if (phases.finish?.created_by_user_id === technicianId) return true
-
-          return false
-        })
-      }
-
-      // Aplicar paginación manual después del filtrado
-      const total = repairs.length
-      const paginatedRepairs = repairs.slice(offset, offset + limit)
-
-      return NextResponse.json({
-        repairs: paginatedRepairs.map((repair: RepairData) => ({
-          id: repair.id,
-          project_id: repair.project_id,
-          project_name: repair.project_name,
-          elevation_name: repair.elevation_name,
-          drop: repair.drop,
-          level: repair.level,
-          repair_index: repair.repair_index,
-          status: repair.status,
-          phases: repair.phases || {},
-          created_by_user_name: repair.created_by_user_name,
-          created_by_user_id: repair.created_by_user_id,
-          created_at: repair.created_at,
-          updated_at: repair.updated_at,
-        })),
-        pagination: {
-          total: total,
-          page,
-          limit,
-          totalPages: Math.ceil(total / limit),
-        },
-      })
-    }
-
-    // Sin filtros en memoria, usar el count de la DB
-    const total = dbCount || 0
+    const repairs = repairsData || []
+    const total = count || 0
 
     return NextResponse.json({
       repairs: repairs.map((repair: RepairData) => ({

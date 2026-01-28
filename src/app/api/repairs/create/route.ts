@@ -92,6 +92,22 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Extract repair_type_code and primary_technician_id from phases for indexing
+    const phasesData = phases || {}
+    const repairTypeCode = phasesData.survey?.repair_type || null
+    const primaryTechnicianId = phasesData.survey?.created_by_user_id || null
+
+    // Lookup repair_type_id from repair_types table if code exists
+    let repairTypeId = null
+    if (repairTypeCode) {
+      const { data: repairTypeData } = await serviceClient
+        .from('repair_types')
+        .select('id')
+        .eq('type', repairTypeCode)
+        .single()
+      repairTypeId = repairTypeData?.id || null
+    }
+
     // Crear la reparación
     const { data: repair, error: repairError } = await serviceClient
       .from('repairs')
@@ -102,12 +118,16 @@ export async function POST(req: NextRequest) {
         drop,
         level,
         repair_index,
-        phases: phases || {},
+        phases: phasesData,
         status: 'pending',
         created_by_user_name: `${userData.first_name || ''} ${
           userData.last_name || ''
         }`.trim(),
         created_by_user_id: userData.id,
+        // Indexed columns for efficient filtering
+        repair_type_id: repairTypeId,
+        repair_type_code: repairTypeCode,
+        primary_technician_id: primaryTechnicianId,
       })
       .select('id')
       .single()

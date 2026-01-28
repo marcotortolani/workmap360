@@ -89,6 +89,10 @@ export interface RepairData {
   created_by_user_id?: number
   created_at: string
   updated_at: string
+  // Denormalized indexed columns for performance optimization
+  repair_type_id?: number | null // Foreign Key to repair_types.id
+  repair_type_code?: string | null // Denormalized code: "CR", "RR", etc.
+  primary_technician_id?: number | null // Foreign Key to users.id
 }
 
 export interface RepairListParams {
@@ -100,6 +104,8 @@ export interface RepairListParams {
   drop?: number
   level?: number
   repair_code?: string
+  repair_types?: string // Comma-separated list of repair type codes (e.g., "CR,RR,JR")
+  technician_id?: number // Filter by primary technician ID
   sortBy?: 'created_at' | 'updated_at' | 'status' | 'project' | 'id'
   sortOrder?: 'asc' | 'desc'
 }

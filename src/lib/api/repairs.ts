@@ -37,6 +37,10 @@ export async function getRepairsViaAPI(
     if (filters?.drop) searchParams.append('drop', filters.drop.toString())
     if (filters?.level) searchParams.append('level', filters.level.toString())
 
+    // Agregar nuevos filtros optimizados (repair_types y technician_id)
+    if (filters?.repair_types) searchParams.append('repair_types', filters.repair_types)
+    if (filters?.technician_id) searchParams.append('technician_id', filters.technician_id.toString())
+
     // Agregar parámetros de ordenamiento
     if (filters?.sortBy) searchParams.append('sortBy', filters.sortBy)
     if (filters?.sortOrder) searchParams.append('sortOrder', filters.sortOrder)

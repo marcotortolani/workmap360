@@ -2,8 +2,8 @@
 
 'use client'
 
-import { useState } from 'react'
-import { Filter, X } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { Filter, X, Check, ChevronsUpDown, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -19,12 +19,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { MultiSelect } from '@/components/ui/multi-select'
 import { RepairDataStatusType } from '@/types/repair-type'
-import { ProjectData, Elevation } from '@/types/project-types'
+import { ProjectData, Elevation, TechnicianAssignment } from '@/types/project-types'
 import { getDropRangeForElevation } from '@/lib/utils/elevation-utils'
 import { REPAIR_TYPE_LIST } from '@/data/repair-type-list'
 import { useTechniciansList } from '@/hooks/use-technicians-list'
+import { cn } from '@/lib/utils'
 
 export interface FilterOptions {
   status?: RepairDataStatusType | 'all'
@@ -79,6 +81,8 @@ export function RepairsFilter({
   })
 
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [isTechnicianOpen, setIsTechnicianOpen] = useState(false)
+  const [technicianSearch, setTechnicianSearch] = useState('')
 
   // Prepare repair type options for MultiSelect
   const repairTypeOptions = REPAIR_TYPE_LIST.filter(
@@ -90,6 +94,35 @@ export function RepairsFilter({
   }))
 
   const selectedProject = projects.find((p) => p.id === filters.project?.id)
+
+  // Filter technicians by selected project
+  const filteredTechnicians = useMemo(() => {
+    let filtered = technicians
+
+    // If project selected, filter by assigned technicians
+    if (filters.project && filters.project.id !== 0) {
+      if (!selectedProject) {
+        return []
+      }
+
+      const assignedTechnicianIds = selectedProject.technicians?.map(
+        (t: TechnicianAssignment) => t.technician_id
+      ) || []
+
+      filtered = technicians.filter((tech) => assignedTechnicianIds.includes(tech.id))
+    }
+
+    // Apply search filter
+    if (technicianSearch.trim()) {
+      const searchLower = technicianSearch.toLowerCase()
+      filtered = filtered.filter((tech) => {
+        const fullName = `${tech.first_name} ${tech.last_name}`.toLowerCase()
+        return fullName.includes(searchLower)
+      })
+    }
+
+    return filtered
+  }, [technicians, filters.project, selectedProject, technicianSearch])
 
   const getDropConstraints = () => {
     if (!filters.project) {
@@ -182,26 +215,36 @@ export function RepairsFilter({
 
   const handleFilterChange = (key: keyof FilterOptions, value: string) => {
     if (key === 'project') {
-      setFilters({
+      const newProjectId = projects.find((p) => p.name === value)?.id || 0
+      const newProject = projects.find((p) => p.id === newProjectId)
+
+      // Check if current technician is assigned to the new project
+      let newTechnician = filters.technician
+      if (newProjectId !== 0 && filters.technician?.id !== 0) {
+        const assignedTechIds = newProject?.technicians?.map(
+          (t: TechnicianAssignment) => t.technician_id
+        ) || []
+
+        // If current technician is not in the new project, reset to "All"
+        if (!assignedTechIds.includes(filters.technician?.id || 0)) {
+          newTechnician = { id: 0, name: 'all' }
+        }
+      }
+
+      const newFilters = {
         ...filters,
         [key]: {
-          id: projects.find((p) => p.name === value)?.id || 0,
+          id: newProjectId,
           name: value,
         },
         elevation: 'all',
         drop: 'all',
         level: 'all',
-      })
-      onFilter({
-        ...filters,
-        [key]: {
-          id: projects.find((p) => p.name === value)?.id || 0,
-          name: value,
-        },
-        elevation: 'all',
-        drop: 'all',
-        level: 'all',
-      })
+        technician: newTechnician,
+      }
+
+      setFilters(newFilters)
+      onFilter(newFilters)
       return
     }
 
@@ -439,15 +482,7 @@ export function RepairsFilter({
                 })()}
               </div>
 
-              <div className="flex justify-between">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearFilters}
-                  className="text-muted-foreground"
-                >
-                  Clear All
-                </Button>
+              <div className="flex justify-end">
                 <Button size="sm" onClick={() => setIsFilterOpen(false)}>
                   Apply
                 </Button>
@@ -467,27 +502,121 @@ export function RepairsFilter({
           />
         </div>
 
-        {/* Technician Filter */}
-        <Select
-          value={filters.technician?.name || 'all'}
-          onValueChange={handleTechnicianChange}
-          disabled={loadingTechnicians}
+        {/* Technician Filter with Search */}
+        <Popover
+          open={isTechnicianOpen}
+          onOpenChange={(open) => {
+            setIsTechnicianOpen(open)
+            if (!open) {
+              setTechnicianSearch('') // Reset search when closing
+            }
+          }}
         >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Technicians</SelectItem>
-            {technicians.map((tech) => (
-              <SelectItem
-                key={tech.id}
-                value={`${tech.first_name} ${tech.last_name}`}
-              >
-                {tech.first_name} {tech.last_name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={isTechnicianOpen}
+              className="w-[200px] justify-between"
+              disabled={loadingTechnicians}
+            >
+              <span className="truncate">
+                {filters.technician?.id !== 0
+                  ? filters.technician?.name
+                  : filters.project?.id !== 0
+                  ? `All (${filteredTechnicians.length})`
+                  : 'All Technicians'}
+              </span>
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[220px] p-0">
+            <div className="flex flex-col">
+              {/* Search Input */}
+              <div className="flex items-center border-b px-3 py-2">
+                <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                <Input
+                  placeholder="Search technician..."
+                  value={technicianSearch}
+                  onChange={(e) => setTechnicianSearch(e.target.value)}
+                  className="h-8 border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                />
+              </div>
+
+              {/* Technicians List */}
+              <ScrollArea className="h-[300px]">
+                <div className="p-1">
+                  {/* All Technicians Option */}
+                  <button
+                    onClick={() => {
+                      handleTechnicianChange('all')
+                      setIsTechnicianOpen(false)
+                    }}
+                    className={cn(
+                      'relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground',
+                      filters.technician?.id === 0 && 'bg-accent'
+                    )}
+                  >
+                    <Check
+                      className={cn(
+                        'mr-2 h-4 w-4',
+                        filters.technician?.id === 0
+                          ? 'opacity-100'
+                          : 'opacity-0'
+                      )}
+                    />
+                    All Technicians
+                  </button>
+
+                  {/* Loading State */}
+                  {loadingTechnicians && (
+                    <div className="py-6 text-center text-sm text-muted-foreground">
+                      Loading technicians...
+                    </div>
+                  )}
+
+                  {/* Technicians */}
+                  {!loadingTechnicians && filteredTechnicians.length > 0 ? (
+                    filteredTechnicians.map((tech) => {
+                      const fullName = `${tech.first_name} ${tech.last_name}`
+                      const isSelected = filters.technician?.id === tech.id
+
+                      return (
+                        <button
+                          key={tech.id}
+                          onClick={() => {
+                            handleTechnicianChange(fullName)
+                            setIsTechnicianOpen(false)
+                          }}
+                          className={cn(
+                            'relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground',
+                            isSelected && 'bg-accent'
+                          )}
+                        >
+                          <Check
+                            className={cn(
+                              'mr-2 h-4 w-4',
+                              isSelected ? 'opacity-100' : 'opacity-0'
+                            )}
+                          />
+                          {fullName}
+                        </button>
+                      )
+                    })
+                  ) : (
+                    !loadingTechnicians && (
+                      <div className="py-6 text-center text-sm text-muted-foreground">
+                        {technicianSearch
+                          ? 'No technician matches your search'
+                          : 'No technicians available'}
+                      </div>
+                    )
+                  )}
+                </div>
+              </ScrollArea>
+            </div>
+          </PopoverContent>
+        </Popover>
 
         {/* Quick Status Filter */}
         <Select
@@ -520,6 +649,18 @@ export function RepairsFilter({
             <SelectItem value="created_at-asc">Oldest Created</SelectItem>
           </SelectContent>
         </Select>
+
+        {/* Clear All Button */}
+        {activeFiltersCount > 0 && (
+          <Button
+            variant="outline"
+            onClick={clearFilters}
+            className="gap-2"
+          >
+            <X className="h-4 w-4" />
+            Clear All
+          </Button>
+        )}
       </div>
 
       {/* Active Filters Display */}
@@ -535,9 +676,9 @@ export function RepairsFilter({
               />
             </Badge>
           )}
-          {selectedProject?.id !== 0 && (
+          {filters.project?.id !== 0 && filters.project?.name !== 'all' && (
             <Badge variant="secondary" className="gap-1">
-              Project: {selectedProject?.name}
+              Project: {filters.project?.name}
               <X
                 className="h-3 w-3 cursor-pointer"
                 onClick={() => handleFilterChange('project', 'all')}
