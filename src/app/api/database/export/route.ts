@@ -71,7 +71,7 @@ export async function GET(request: Request) {
       .select('*')
 
     // Don't fail if repair_types table doesn't exist
-    let repairTypesForExport: any[] = []
+    let repairTypesForExport: Record<string, unknown>[] = []
     if (repairTypesError) {
       console.warn('Warning: repair_types table not found, using hardcoded data without functions:', repairTypesError)
       // Use hardcoded data but remove function properties to make it JSON-serializable

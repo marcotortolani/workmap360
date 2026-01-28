@@ -3,6 +3,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import Image from 'next/image'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -1861,10 +1862,13 @@ export default function TechnicianNewRepairPage() {
                             key={`Processed-Image-${image.id}`}
                             className="relative"
                           >
-                            <img
+                            <Image
                               src={image.previewUrl}
                               alt={`${getCurrentPhaseName()} ${index + 1}`}
+                              width={256}
+                              height={128}
                               className="w-full h-32 object-cover rounded-md border"
+                              unoptimized
                             />
                             <Button
                               type="button"

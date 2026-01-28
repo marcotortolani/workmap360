@@ -3,6 +3,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -578,12 +579,13 @@ export default function AvatarCustomizer({
                 <div className="flex flex-col items-center space-y-4">
                   <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 bg-white">
                     {previewUrl ? (
-                      <img
+                      <Image
                         src={previewUrl}
                         alt="Avatar Preview"
                         width={128}
                         height={128}
                         className="w-full h-full object-cover"
+                        unoptimized
                         onError={(e) => {
                           const target = e.target as HTMLImageElement
 

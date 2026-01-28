@@ -521,7 +521,8 @@ export default function ManagerRepairsPage() {
       const initialFilters = convertFiltersToAPI(localFilters)
       setApiFilters(initialFilters)
     }
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Only run on mount to initialize filters
 
   return (
     <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8 p-2 sm:p-4 lg:p-8 max-w-screen-2xl mx-auto">
