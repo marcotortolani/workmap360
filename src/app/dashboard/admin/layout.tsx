@@ -33,6 +33,11 @@ export default function AdminLayout({
     redirect('/')
   }
 
+  // Verificar que el usuario tenga rol de admin
+  if (user.role !== 'admin') {
+    redirect(`/dashboard/${user.role}`)
+  }
+
   return (
     <div className="flex flex-col md:flex-row w-full h-screen">
       <Header role="admin" userData={user} />

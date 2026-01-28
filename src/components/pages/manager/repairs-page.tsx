@@ -389,6 +389,16 @@ export default function ManagerRepairsPage() {
       apiFilters.level = filters.level.toString()
     }
 
+    // Agregar filtros de repair types (comma-separated)
+    if (filters.repairTypes && filters.repairTypes.length > 0) {
+      apiFilters.repair_types = filters.repairTypes.join(',')
+    }
+
+    // Agregar filtro de technician
+    if (filters.technician && filters.technician.id !== 0) {
+      apiFilters.technician_id = filters.technician.id.toString()
+    }
+
     // Agregar parámetros de ordenamiento
     if (filters.sortBy) {
       apiFilters.sortBy = filters.sortBy
@@ -406,6 +416,7 @@ export default function ManagerRepairsPage() {
   }
 
   // Aplicar filtros locales (principalmente para búsqueda)
+  // Los filtros de repairTypes y technician ahora se manejan en el backend
   const filteredRepairs = useMemo(() => {
     let filtered = [...repairs]
 

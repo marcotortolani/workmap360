@@ -19,9 +19,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { MultiSelect } from '@/components/ui/multi-select'
 import { RepairDataStatusType } from '@/types/repair-type'
 import { ProjectData, Elevation } from '@/types/project-types'
 import { getDropRangeForElevation } from '@/lib/utils/elevation-utils'
+import { REPAIR_TYPE_LIST } from '@/data/repair-type-list'
+import { useTechniciansList } from '@/hooks/use-technicians-list'
 
 export interface FilterOptions {
   status?: RepairDataStatusType | 'all'
@@ -30,6 +33,8 @@ export interface FilterOptions {
   drop?: number | 'all'
   level?: number | 'all'
   repairCode?: string
+  repairTypes?: string[]
+  technician?: { id: number; name: string }
   sortBy?: 'created_at' | 'updated_at' | 'status' | 'project' | 'id'
   sortOrder?: 'asc' | 'desc'
 }
@@ -58,6 +63,8 @@ export function RepairsFilter({
   projects = [],
   elevations = [],
 }: RepairsFilterProps) {
+  const { technicians, loading: loadingTechnicians } = useTechniciansList()
+
   const [filters, setFilters] = useState<FilterOptions>({
     status: 'all',
     project: { id: 0, name: 'all' },
@@ -65,11 +72,22 @@ export function RepairsFilter({
     drop: 'all',
     level: 'all',
     repairCode: '',
+    repairTypes: [],
+    technician: { id: 0, name: 'all' },
     sortBy: 'updated_at',
     sortOrder: 'desc',
   })
 
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+
+  // Prepare repair type options for MultiSelect
+  const repairTypeOptions = REPAIR_TYPE_LIST.filter(
+    (rt) => rt.status === 'active'
+  ).map((rt) => ({
+    value: rt.type,
+    label: `${rt.type} - ${rt.variation}`,
+    color: rt.color,
+  }))
 
   const selectedProject = projects.find((p) => p.id === filters.project?.id)
 
@@ -227,6 +245,35 @@ export function RepairsFilter({
     })
   }
 
+  const handleRepairTypesChange = (types: string[]) => {
+    const newFilters = { ...filters, repairTypes: types }
+    setFilters(newFilters)
+    onFilter(newFilters)
+  }
+
+  const handleTechnicianChange = (value: string) => {
+    if (value === 'all') {
+      const newFilters = { ...filters, technician: { id: 0, name: 'all' } }
+      setFilters(newFilters)
+      onFilter(newFilters)
+      return
+    }
+
+    // Find technician by full name
+    const technician = technicians.find(
+      (tech) => `${tech.first_name} ${tech.last_name}` === value
+    )
+
+    if (technician) {
+      const newFilters = {
+        ...filters,
+        technician: { id: technician.id, name: value },
+      }
+      setFilters(newFilters)
+      onFilter(newFilters)
+    }
+  }
+
   const clearFilters = () => {
     const defaultFilters: FilterOptions = {
       status: 'all',
@@ -235,6 +282,8 @@ export function RepairsFilter({
       drop: 'all',
       level: 'all',
       repairCode: '',
+      repairTypes: [],
+      technician: { id: 0, name: 'all' },
       sortBy: 'updated_at',
       sortOrder: 'desc',
     }
@@ -246,6 +295,15 @@ export function RepairsFilter({
     })
   }
 
+  // Cuenta solo los filtros dentro del popover de Advanced Filters
+  const advancedFiltersCount = [
+    filters.project?.name !== 'all',
+    filters.elevation !== 'all',
+    filters.drop !== 'all',
+    filters.level !== 'all',
+  ].filter(Boolean).length
+
+  // Cuenta todos los filtros activos (incluye los de fuera del popover)
   const activeFiltersCount = [
     filters.status !== 'all',
     filters.project?.name !== 'all',
@@ -253,6 +311,8 @@ export function RepairsFilter({
     filters.drop !== 'all',
     filters.level !== 'all',
     filters.repairCode !== '',
+    filters.repairTypes && filters.repairTypes.length > 0,
+    filters.technician?.id !== 0,
   ].filter(Boolean).length
 
   return (
@@ -264,14 +324,14 @@ export function RepairsFilter({
             <Button variant="outline" className="gap-2">
               <Filter className="h-4 w-4" />
               Filters
-              {activeFiltersCount > 0 && (
+              {advancedFiltersCount > 0 && (
                 <Badge variant="secondary" className="ml-1">
-                  {activeFiltersCount}
+                  {advancedFiltersCount}
                 </Badge>
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[80vw] min-w-2xs ml-2 shadow-xl shadow-black/40">
+          <PopoverContent className="w-[80vw] min-w-2xs max-w-2xl ml-2 shadow-xl shadow-black/40">
             <div className="space-y-4">
               <h4 className="font-medium">Advanced Filters</h4>
 
@@ -396,6 +456,39 @@ export function RepairsFilter({
           </PopoverContent>
         </Popover>
 
+        {/* Repair Type Filter */}
+        <div className="w-[180px]">
+          <MultiSelect
+            options={repairTypeOptions}
+            value={filters.repairTypes || []}
+            onValueChange={handleRepairTypesChange}
+            placeholder="All Repair Types"
+            maxDisplayed={2}
+          />
+        </div>
+
+        {/* Technician Filter */}
+        <Select
+          value={filters.technician?.name || 'all'}
+          onValueChange={handleTechnicianChange}
+          disabled={loadingTechnicians}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Technicians</SelectItem>
+            {technicians.map((tech) => (
+              <SelectItem
+                key={tech.id}
+                value={`${tech.first_name} ${tech.last_name}`}
+              >
+                {tech.first_name} {tech.last_name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
         {/* Quick Status Filter */}
         <Select
           value={filters.status}
@@ -485,6 +578,32 @@ export function RepairsFilter({
               <X
                 className="h-3 w-3 cursor-pointer"
                 onClick={() => handleFilterChange('repairCode', '')}
+              />
+            </Badge>
+          )}
+
+          {filters.repairTypes &&
+            filters.repairTypes.length > 0 &&
+            filters.repairTypes.map((type) => (
+              <Badge key={type} variant="secondary" className="gap-1">
+                Type: {type}
+                <X
+                  className="h-3 w-3 cursor-pointer"
+                  onClick={() =>
+                    handleRepairTypesChange(
+                      filters.repairTypes!.filter((t) => t !== type)
+                    )
+                  }
+                />
+              </Badge>
+            ))}
+
+          {filters.technician?.id !== 0 && (
+            <Badge variant="secondary" className="gap-1">
+              Created by: {filters.technician?.name}
+              <X
+                className="h-3 w-3 cursor-pointer"
+                onClick={() => handleTechnicianChange('all')}
               />
             </Badge>
           )}

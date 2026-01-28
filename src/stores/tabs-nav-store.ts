@@ -12,6 +12,7 @@ import {
   ListOrderedIcon,
   ChartBar,
   LayoutDashboard,
+  Database,
 } from 'lucide-react'
 
 export interface NavProps {
@@ -68,6 +69,11 @@ const NAV_TABS: {
       title: 'Reports',
       href: '/dashboard/admin/reports',
       icon: ChartBar,
+    },
+    {
+      title: 'Database',
+      href: '/dashboard/admin/database',
+      icon: Database,
     },
     {
       title: 'Profile',
